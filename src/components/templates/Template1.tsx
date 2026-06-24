@@ -1,11 +1,11 @@
 import React from 'react';
 import Image from 'next/image';
-import { Media, Story } from '@/payload-types';
+import { Story } from '@/payload-types';
+import { LayoutRenderer } from '@/components/LexicalRenderer';
 
 export default function Template1({ story }: { story: Story }) {
-  // Extracting media URL if exists
   const heroMediaUrl = story.heroMedia && typeof story.heroMedia === 'object' && 'url' in story.heroMedia ? story.heroMedia.url : null;
-  const sectionName = story.section && typeof story.section === 'object' && 'title' in story.section ? story.section.title : 'Feature';
+  const sectionName = story.section ?? 'Feature';
 
   return (
     <div className="landing">
@@ -25,7 +25,7 @@ export default function Template1({ story }: { story: Story }) {
           
           {story.author && Array.isArray(story.author) && story.author.length > 0 && (
              <div className="text-sm font-mono text-paper-cool mt-auto">
-                By {story.author.map((a: any) => typeof a === 'object' && a.name ? a.name : '').join(', ')}
+                By {story.author.map((a: any) => typeof a === 'object' && a.firstName ? `${a.firstName} ${a.lastName ?? ''}`.trim() : '').filter(Boolean).join(', ')}
              </div>
           )}
         </div>
@@ -34,19 +34,18 @@ export default function Template1({ story }: { story: Story }) {
         <div className="three-col-card bg-ink/95 backdrop-blur-md p-10 border-r border-ink-soft flex-col justify-start">
           <h1 className="three-col-headline text-5xl mb-8 leading-tight">{story.headline}</h1>
           <div className="prose prose-invert prose-lg max-w-none font-serif leading-relaxed">
-             {/* We will render Lexical content here later, for now placeholder */}
              {story.caption && <p className="text-xl italic text-paper-newsprint border-l-2 border-accent pl-4">{story.caption}</p>}
           </div>
         </div>
 
-        {/* Right Column: Key Details / Content */}
+        {/* Right Column: Story Body */}
         <div className="three-col-card bg-ink/90 backdrop-blur-md p-8">
-           <div className="prose prose-invert font-sans text-sm leading-relaxed">
-              <p>The full story goes here. This column is for details, related links, or continued body text in a multi-column masonry layout if preferred.</p>
-              {/* Note: Proper Lexical renderer will be needed */}
+           <div className="prose prose-invert font-sans text-sm leading-relaxed overflow-y-auto max-h-[70vh]">
+             <LayoutRenderer layout={(story as any).layout ?? []} />
            </div>
         </div>
       </div>
     </div>
   );
 }
+

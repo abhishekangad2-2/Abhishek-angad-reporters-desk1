@@ -4,8 +4,8 @@ export const Integrations: GlobalConfig = {
   slug: 'integrations',
   label: 'Integrations Tab',
   access: {
-    read: () => true,
-    update: () => true, // Restrict this to Admin in a real permission matrix
+    read: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
+    update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
   },
   fields: [
     {

@@ -13,6 +13,8 @@ import { Polls } from './collections/Polls'
 import { Subscriptions } from './collections/Subscriptions'
 import { Transactions } from './collections/Transactions'
 import { Newsletters } from './collections/Newsletters'
+import { NewsletterSubscribers } from './collections/NewsletterSubscribers'
+import { Payments } from './collections/Payments'
 import { AuditLogs } from './collections/AuditLogs'
 import { RTIRequests } from './collections/RTIRequests'
 import { Integrations } from './globals/Integrations'
@@ -24,7 +26,11 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
-  collections: [Users, Stories, Media, LiveDispatches, Polls, Subscriptions, Transactions, Newsletters, AuditLogs, RTIRequests],
+  collections: [
+    Users, Stories, Media, LiveDispatches, Polls,
+    Subscriptions, Transactions, Newsletters, NewsletterSubscribers,
+    Payments, AuditLogs, RTIRequests,
+  ],
   globals: [Integrations],
   plugins: [
     gcsStorage({

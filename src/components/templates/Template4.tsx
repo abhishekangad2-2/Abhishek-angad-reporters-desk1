@@ -2,10 +2,10 @@ import React from 'react';
 import Image from 'next/image';
 import { Story } from '@/payload-types';
 import PlexusBackground from '../PlexusBackground';
+import { RichTextRenderer } from '@/components/LexicalRenderer';
 
 export default function Template4({ story }: { story: Story }) {
-  // Scrollytelling requires specific fields defined in the story schema
-  const chapters = story.scrollytellingChapters || [];
+  const chapters = (story as any).scrollytellingChapters || [];
 
   return (
     <div className="landing landing--immersive">
@@ -17,12 +17,12 @@ export default function Template4({ story }: { story: Story }) {
       {/* Immersive Hero */}
       <div className="immersive-hero">
         <div className="font-mono text-sm tracking-widest uppercase text-accent mb-2 z-10 relative">
-           {story.section && typeof story.section === 'object' && 'title' in story.section ? story.section.title : 'Feature'}
+           {story.section ?? 'Feature'}
         </div>
         <h1 className="z-10 relative">{story.headline}</h1>
         {story.strap && <p className="text-xl font-serif max-w-2xl text-paper-cool z-10 relative">{story.strap}</p>}
         
-        {/* Toggle Audio Button */}
+        {/* Audio toggle — functional implementation requires WaveSurfer.js integration */}
         <button className="audio-toggle mt-8 z-10 relative flex items-center gap-2">
            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -35,12 +35,12 @@ export default function Template4({ story }: { story: Story }) {
       {/* Chapters */}
       <div className="relative z-10">
         {chapters.length > 0 ? (
-          chapters.map((chapter, index) => {
+          chapters.map((chapter: any, index: number) => {
             const bgMediaUrl = chapter.backgroundMedia && typeof chapter.backgroundMedia === 'object' && 'url' in chapter.backgroundMedia ? chapter.backgroundMedia.url : null;
             
             return (
               <div key={index} className="chapter relative">
-                 {/* Chapter Background (Fades in over plexus based on scroll) */}
+                 {/* Chapter Background */}
                  {bgMediaUrl && (
                     <div className="absolute inset-0 z-0 opacity-40 transition-opacity duration-1000">
                        <Image src={bgMediaUrl} alt={chapter.chapterTitle || ''} fill className="object-cover" />
@@ -54,8 +54,8 @@ export default function Template4({ story }: { story: Story }) {
                  }`}>
                     {chapter.chapterTitle && <h3 className="font-serif text-2xl font-bold mb-4 text-accent">{chapter.chapterTitle}</h3>}
                     <div className="prose prose-invert prose-lg font-serif">
-                       <p>This is chapter {index + 1}. In a full scrollytelling implementation, this text would be driven by Intersection Observers to trigger the audio and background changes as the user scrolls into this chapter's view.</p>
-                       {/* Lexical rich text renderer placeholder */}
+                      {/* Render the chapter's Lexical rich text content */}
+                      <RichTextRenderer content={chapter.content} />
                     </div>
                  </div>
               </div>
@@ -73,3 +73,4 @@ export default function Template4({ story }: { story: Story }) {
     </div>
   );
 }
+

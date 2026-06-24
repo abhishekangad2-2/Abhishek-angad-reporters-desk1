@@ -57,7 +57,7 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
             {sections.map((section: any, idx: number) => (
-              <div key={section.id} className="group cursor-pointer">
+              <Link key={section.id} href={`/${section.slug}`} className="group cursor-pointer no-underline">
                 <div className="text-stone-400 font-serif text-5xl mb-2 group-hover:text-stone-900 transition-colors duration-500">
                   0{idx + 1}
                 </div>
@@ -67,7 +67,7 @@ export default async function Home() {
                 <p className="text-sm text-stone-600 font-sans leading-relaxed">
                   {section.description || `Archives and live reports from the ${section.name} desk.`}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

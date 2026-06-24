@@ -17,16 +17,26 @@ export const Polls: CollectionConfig = {
       minRows: 2,
       fields: [
         {
-          name: 'text',
+          name: 'label',
           type: 'text',
           required: true,
         },
         {
-          name: 'votes',
+          name: 'voteCount',
           type: 'number',
           defaultValue: 0,
         },
       ],
+    },
+    {
+      name: 'resultsVisible',
+      type: 'select',
+      options: [
+        { label: 'Live (readers see results immediately)', value: 'live' },
+        { label: 'After Close', value: 'after-close' },
+      ],
+      defaultValue: 'after-close',
+      required: true,
     },
     {
       name: 'active',
@@ -34,14 +44,14 @@ export const Polls: CollectionConfig = {
       defaultValue: true,
     },
     {
-      name: 'openWindow',
+      name: 'opensAt',
       type: 'date',
       admin: {
         description: 'When the poll should open for voting.',
       },
     },
     {
-      name: 'closeWindow',
+      name: 'closesAt',
       type: 'date',
       admin: {
         description: 'When the poll should close for voting.',
@@ -49,3 +59,4 @@ export const Polls: CollectionConfig = {
     },
   ],
 }
+

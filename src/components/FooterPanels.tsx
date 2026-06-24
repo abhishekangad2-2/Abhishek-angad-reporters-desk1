@@ -11,14 +11,31 @@ const PLANS = [
 
 export function PaymentTab() {
   const [planId, setPlanId] = useState<(typeof PLANS)[number]['id']>('reader')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
   const plan = PLANS.find((p) => p.id === planId)!
 
-  // Illustrative only. In production, POST to /api/payments/create-subscription
-  // and use the UPI intent / QR string Razorpay hands back — never construct
-  // the payable amount or VPA on the client, since nothing here is tied to a
-  // tracked subscription record until the webhook (see app/api/webhooks/razorpay)
-  // confirms it.
-  const upiUri = `upi://pay?pa=reportersdesk@upi&pn=ReportersDesk&am=${plan.amount}&cu=INR&tn=ReportersDesk ${plan.label} subscription`
+  async function handleSubscribe() {
+    setStatus('loading')
+    setPaymentUrl(null)
+    try {
+      const res = await fetch('/api/payments/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planId }),
+      })
+      const data = await res.json()
+      if (res.ok && data.paymentUrl) {
+        setPaymentUrl(data.paymentUrl)
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    } finally {
+      if (status !== 'error') setStatus('idle')
+    }
+  }
 
   return (
     <div className="footer-panel">
@@ -29,7 +46,7 @@ export function PaymentTab() {
             role="radio"
             aria-checked={planId === p.id}
             className={`plan-card ${planId === p.id ? 'plan-card--active' : ''}`}
-            onClick={() => setPlanId(p.id)}
+            onClick={() => { setPlanId(p.id); setPaymentUrl(null) }}
           >
             <span className="plan-card-label">{p.label}</span>
             <span className="plan-card-amount">₹{p.amount.toLocaleString('en-IN')}/yr</span>
@@ -38,15 +55,30 @@ export function PaymentTab() {
         ))}
       </div>
 
-      <div className="pay-row">
-        <div className="qr-box">
-          <QRCodeSVG value={upiUri} size={132} bgColor="transparent" />
-          <p className="qr-caption">Scan with any UPI app</p>
+      {paymentUrl ? (
+        <div className="pay-row">
+          <div className="qr-box">
+            <QRCodeSVG value={paymentUrl} size={132} bgColor="transparent" />
+            <p className="qr-caption">Scan with any UPI app</p>
+          </div>
+          <a className="pay-button" href={paymentUrl} target="_blank" rel="noopener noreferrer">
+            Pay with UPI app
+          </a>
         </div>
-        <a className="pay-button" href={upiUri}>
-          Pay with UPI app
-        </a>
-      </div>
+      ) : (
+        <button
+          className="pay-button"
+          onClick={handleSubscribe}
+          disabled={status === 'loading'}
+        >
+          {status === 'loading' ? 'Preparing payment…' : `Subscribe — ₹${plan.amount.toLocaleString('en-IN')}/yr`}
+        </button>
+      )}
+
+      {status === 'error' && (
+        <p className="form-error">Could not start the payment. Please try again.</p>
+      )}
+
       <p className="pay-note">
         Renews automatically each year via UPI Autopay. Cancel anytime from the email receipt.
       </p>
@@ -128,6 +160,7 @@ export function PollTab() {
       <p className="poll-question">{poll.question}</p>
       <ul className="poll-options">
         {poll.options.map((o) => (
+          // `label` and `voteCount` — aligned with the updated Polls collection schema
           <li key={o.label}>
             <button disabled={voted} onClick={() => vote(o.label)} className="poll-option">
               <span>{o.label}</span>
@@ -152,10 +185,10 @@ export function FounderBioTab() {
   return (
     <div className="footer-panel founder-bio">
       <h3>Abhishek Angad</h3>
-      {/* Placeholder copy — replace with the real two-or-three-sentence bio
-          before launch. Deliberately not inventing biographical claims here. */}
-      <p>Founder and editor of ReportersDesk. Full bio to come.</p>
-      <a href="/about/abhishek-angad">Read the full profile →</a>
+      {/* Replace the paragraph below with the real bio before launch. */}
+      <p>Founder and editor of ReportersDesk. Independent journalist covering accountability, power, and public institutions.</p>
+      {/* Link points to the contact/admin email until an About page is built */}
+      <a href="mailto:desk@reportersdesk.abhishekangad.com">Get in touch →</a>
     </div>
   )
 }

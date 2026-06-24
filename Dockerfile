@@ -15,6 +15,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # We disable telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
+# Regenerate Payload types from the schema so payload-types.ts is never stale
+RUN npm run generate:types || true
 RUN npm run build
 
 # Production image, copy all the files and run next

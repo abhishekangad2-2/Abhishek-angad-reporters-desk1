@@ -13,6 +13,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const payload = await getPayload({ config })
   const poll = await payload.findByID({ collection: 'polls', id })
 
+  // Match by `label` and increment `voteCount` — both now aligned with the Polls collection schema
   const options = poll.options.map((o: any) =>
     o.label === option ? { ...o, voteCount: (o.voteCount ?? 0) + 1 } : o,
   )
@@ -22,3 +23,4 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   res.cookies.set(cookieName, '1', { maxAge: 60 * 60 * 24 * 30, path: '/' })
   return res
 }
+
