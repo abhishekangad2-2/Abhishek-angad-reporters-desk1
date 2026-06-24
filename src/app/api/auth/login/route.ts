@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   // payload.login() verifies the password and applies Payload's own
   // lockout/rate-limit rules, but we deliberately don't use the session
   // token it would normally issue — that only happens after step two.
-  let user
+  let user: any
   try {
     const result = await payload.login({ collection: 'users', data: { email, password } })
     user = result.user
