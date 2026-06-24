@@ -93,7 +93,8 @@ function PlexusScene({
     <>
       <points ref={pointsRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={points.length} array={initialPositions} itemSize={3} />
+          {/* @ts-ignore */}
+          <bufferAttribute attach="attributes-position" count={points.length} array={initialPositions} itemSize={3} args={[initialPositions, 3]} />
         </bufferGeometry>
         <pointsMaterial color={color} size={0.06} transparent opacity={intensity} sizeAttenuation />
       </points>
