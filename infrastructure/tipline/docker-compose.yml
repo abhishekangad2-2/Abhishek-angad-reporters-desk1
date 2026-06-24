@@ -1,0 +1,71 @@
+# Secure tip line — deployment skeleton, NOT verified against Hush Line's
+# current official docs. I could not confirm a current, exact image/tag
+# reference for this through search, and a guessed tag is worse than no tag
+# for something source-safety depends on. Before running this:
+#   1. Visit Hush Line's own GitHub/docs and confirm the current self-hosting
+#      method and image reference.
+#   2. Replace the `image:` line below with whatever they currently publish.
+#   3. Everything else here — the isolation, the network, the volumes — is
+#      the part that's actually mine to recommend.
+#
+# The one non-negotiable principle this file exists to enforce: this stack
+# runs on ITS OWN VPS, not alongside the Payload CMS, Postgres, or anything
+# else in infra/vps/. A breach of the main CMS database must never be able
+# to reach a single tip submission.
+
+version: '3.9'
+
+services:
+  tipline:
+    # image: <confirm the current official Hush Line image from their docs>
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+    volumes:
+      - tipline_data:/data
+    networks:
+      - tipline_internal
+    # No ports published directly — Caddy is the only thing that talks to
+    # this container, and Caddy itself should be reachable only via the
+    # .onion address configured below, not the public web, if the
+    # newsroom wants the strongest version of this (recommended for an
+    # accountability/investigative desk specifically).
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    networks:
+      - tipline_internal
+    depends_on:
+      - tipline
+
+  # Optional but recommended: a Tor hidden service so sources can reach the
+  # tip line without it ever touching the public DNS/CDN layer the rest of
+  # ReportersDesk sits behind.
+  tor:
+    image: goldy/tor-hidden-service
+    restart: unless-stopped
+    environment:
+      TIPLINE_TOR_SERVICE_HOSTS: '80:caddy:80'
+      TIPLINE_TOR_SERVICE_VERSION: '3'
+    volumes:
+      - tor_keys:/var/lib/tor/hidden_service/
+    networks:
+      - tipline_internal
+    depends_on:
+      - caddy
+
+networks:
+  tipline_internal:
+    driver: bridge
+    internal: false # caddy needs egress for TLS cert issuance; tipline itself does not
+
+volumes:
+  tipline_data:
+  caddy_data:
+  tor_keys:

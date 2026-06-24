@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "reporters-desk",
+          "region": "asia-south1"
+        }
+      }
+    ]
+  }
+}

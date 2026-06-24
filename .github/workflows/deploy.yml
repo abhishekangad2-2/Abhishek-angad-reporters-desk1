@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reportersdesk-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: reportersdesk-frontend
+          vercel-args: '--prod'
+
+  deploy-cms:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Configure Docker to use Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest .
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: reportersdesk-cms
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest
+          region: us-central1
+          env_vars: |
+            DATABASE_URI=${{ secrets.DATABASE_URI }}
+            PAYLOAD_SECRET=${{ secrets.PAYLOAD_SECRET }}
+            PENDING_2FA_SECRET=${{ secrets.PENDING_2FA_SECRET }}
+            GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}
+            GCS_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
+
+  static-mirror:
+    needs: [deploy-frontend]
+    uses: ./.github/workflows/static-mirror.yml
+    secrets: inherit

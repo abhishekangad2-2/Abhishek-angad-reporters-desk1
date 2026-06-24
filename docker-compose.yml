@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: reporters_desk
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
+    restart: always
+    environment:
+      MEILI_MASTER_KEY: 'masterKey123'
+    ports:
+      - "7700:7700"
+    volumes:
+      - meili-data:/meili_data
+
+volumes:
+  db-data:
+  meili-data:

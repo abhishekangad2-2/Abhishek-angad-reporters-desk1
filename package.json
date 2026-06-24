@@ -6,21 +6,46 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:importmap": "payload generate:importmap",
+    "payload": "payload",
+    "generate:types": "payload generate:types"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@payloadcms/db-postgres": "^3.85.1",
+    "@payloadcms/next": "^3.85.1",
+    "@payloadcms/richtext-lexical": "^3.85.1",
+    "@payloadcms/storage-gcs": "^3.85.1",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "bcryptjs": "^3.0.3",
+    "graphql": "^16.14.2",
+    "gsap": "^3.15.0",
+    "jsonwebtoken": "^9.0.3",
     "next": "16.2.9",
+    "otplib": "^13.4.1",
+    "payload": "^3.85.1",
+    "pg": "^8.22.0",
+    "qrcode.react": "^4.2.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "three": "^0.184.0",
+    "wavesurfer.js": "^7.12.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.184.1",
+    "autoprefixer": "^10.5.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.1",
     "typescript": "^5"
   }
 }

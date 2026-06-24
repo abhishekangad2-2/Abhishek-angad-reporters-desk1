@@ -1,0 +1,23 @@
+{
+  # No access logging by default — the whole point of this server is that
+  # it should not be able to tell you, even under subpoena, which IP
+  # submitted which tip. If you need uptime monitoring, monitor the
+  # container's health endpoint from outside, don't turn on request logs here.
+  admin off
+}
+
+:443 {
+  tls internal # replace with a real cert if this is reachable over the
+               # public web at all; if you're Tor-only, this can stay internal
+
+  reverse_proxy tipline:80 {
+    header_up X-Forwarded-For "" # strip — don't pass the real client IP through
+  }
+
+  header {
+    Strict-Transport-Security "max-age=31536000"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "no-referrer"
+  }
+}
