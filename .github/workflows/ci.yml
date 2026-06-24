@@ -6,33 +6,18 @@ on:
     branches: [main]
 
 jobs:
-  frontend:
+  build-and-test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: reportersdesk-frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: reportersdesk-frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
       - run: npm run build
         env:
           PAYLOAD_API_URL: https://placeholder.invalid # build-time only, never a real secret
-
-  cms:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: reportersdesk-cms
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npx tsc --noEmit
+          DATABASE_URI: postgres://postgres:password@127.0.0.1:5432/reporters_desk # local placeholder for build
+          PAYLOAD_SECRET: placeholder_secret_key

@@ -5,29 +5,18 @@ on:
     branches: [main]
 
 jobs:
-  deploy-frontend:
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: reportersdesk-frontend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: reportersdesk-frontend
-          vercel-args: '--prod'
-
-  deploy-cms:
-    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - uses: actions/checkout@v4
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          workload_identity_provider: 'projects/941847389917/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-deployer@abhishek-angad-reporters-desk1.iam.gserviceaccount.com'
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -52,8 +41,3 @@ jobs:
             PENDING_2FA_SECRET=${{ secrets.PENDING_2FA_SECRET }}
             GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}
             GCS_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-
-  static-mirror:
-    needs: [deploy-frontend]
-    uses: ./.github/workflows/static-mirror.yml
-    secrets: inherit
