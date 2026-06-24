@@ -52,6 +52,6 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || 'postgres://postgres:password@127.0.0.1:5432/reporters_desk',
     },
-    push: process.env.NODE_ENV !== 'production',
+    push: true,
   }),
 })
