@@ -4,27 +4,19 @@ import config from '@/payload.config'
 import PlexusBackground from '@/components/PlexusBackground'
 import { notFound } from 'next/navigation'
 
+import { SECTIONS } from '@/lib/sections'
+
 export const dynamic = 'force-dynamic'
 
 export default async function SectionArchive({ params }: { params: Promise<{ section: string }> }) {
   const resolvedParams = await params;
   const payload = await getPayload({ config })
   
-  const sections = await payload.find({
-    collection: 'sections',
-    where: {
-      slug: {
-        equals: resolvedParams.section,
-      },
-    },
-    limit: 1,
-  })
+  const section = SECTIONS.find(s => s.slug === resolvedParams.section)
 
-  if (!sections.docs.length) {
+  if (!section) {
     notFound()
   }
-
-  const section = sections.docs[0]
 
   const stories = await payload.find({
     collection: 'stories',

@@ -3,16 +3,12 @@ import PlexusBackground from '@/components/PlexusBackground'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
+import { SECTIONS } from '@/lib/sections'
+
 export const dynamic = 'force-dynamic'
 
-// Fetch real sections from the seeded database to prove integration
 async function getSections() {
-  const payload = await getPayload({ config })
-  const result = await payload.find({
-    collection: 'sections',
-    limit: 8,
-  })
-  return result.docs
+  return SECTIONS
 }
 
 export default async function Home() {
