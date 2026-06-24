@@ -1,22 +1,29 @@
-import { authenticator } from 'otplib'
+import { generateSecret, generateURI, verifySync } from 'otplib'
 import QRCode from 'qrcode'
 import bcrypt from 'bcryptjs'
 
-// Allow ±1 step (~30s) of clock drift between the server and the
-// authenticator app — too tight a window causes real, confusing failures.
-authenticator.options = { window: 1 }
-
 export function generateTotpSecret() {
-  return authenticator.generateSecret()
+  return generateSecret()
 }
 
 export async function generateEnrollmentQr(email: string, secret: string) {
-  const otpauthUrl = authenticator.keyuri(email, 'ReportersDesk', secret)
+  const otpauthUrl = generateURI({
+    secret,
+    issuer: 'ReportersDesk',
+    label: email,
+    strategy: 'totp',
+  })
   return QRCode.toDataURL(otpauthUrl)
 }
 
 export function verifyTotpCode(secret: string, code: string) {
-  return authenticator.check(code, secret)
+  const result = verifySync({
+    secret,
+    token: code,
+    epochTolerance: 30, // 30 seconds drift tolerance (equivalent to window: 1)
+    strategy: 'totp',
+  })
+  return result.valid
 }
 
 export function generateBackupCodes(count = 8) {
