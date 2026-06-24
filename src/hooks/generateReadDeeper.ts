@@ -30,8 +30,8 @@ export const generateReadDeeperHook: CollectionBeforeChangeHook = async ({ data,
 
   try {
     const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      req.payload.logger.warn('GEMINI_API_KEY is not set. Skipping Read Deeper generation.')
+    if (!apiKey || apiKey === 'none') {
+      req.payload.logger.warn('GEMINI_API_KEY is not set or is set to none. Skipping Read Deeper generation.')
       return data
     }
 

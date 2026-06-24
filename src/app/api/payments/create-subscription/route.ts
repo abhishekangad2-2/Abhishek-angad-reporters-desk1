@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const keyId = process.env.RAZORPAY_KEY_ID
   const keySecret = process.env.RAZORPAY_KEY_SECRET
 
-  if (!keyId || !keySecret) {
+  if (!keyId || keyId === 'none' || !keySecret || keySecret === 'none') {
     return NextResponse.json(
       { error: 'Payment gateway not configured.' },
       { status: 503 },
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid plan.' }, { status: 400 })
   }
 
-  if (!plan.razorpayPlanId) {
+  if (!plan.razorpayPlanId || plan.razorpayPlanId === 'none') {
     return NextResponse.json(
       { error: 'Razorpay plan ID not configured for this plan.' },
       { status: 503 },

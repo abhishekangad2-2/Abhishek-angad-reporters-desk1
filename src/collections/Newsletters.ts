@@ -10,14 +10,15 @@ export const Newsletters: CollectionConfig = {
       async ({ doc, previousDoc, req, operation }) => {
         // If status changed to 'sent', trigger Resend API
         if (operation === 'update' && doc.status === 'sent' && previousDoc.status !== 'sent') {
-          if (process.env.RESEND_API_KEY) {
+          const resendKey = process.env.RESEND_API_KEY
+          if (resendKey && resendKey !== 'none') {
             console.log(`[Newsletter Hook] Dispatching newsletter "${doc.subject}" via Resend...`);
             // In a real implementation:
             // 1. Fetch all subscribed users.
             // 2. Render the Lexical content to HTML.
             // 3. Batch send via Resend SDK.
           } else {
-             console.log(`[Newsletter Hook] Cannot dispatch "${doc.subject}", RESEND_API_KEY is missing.`);
+             console.log(`[Newsletter Hook] Cannot dispatch "${doc.subject}", RESEND_API_KEY is missing or set to none.`);
           }
         }
       }
