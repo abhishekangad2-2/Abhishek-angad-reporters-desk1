@@ -1,7 +1,7 @@
-import Masthead from '../shell/Masthead'
-import FooterTabs from '../shell/FooterTabs'
-import LiveDispatchesWidget from '../shell/LiveDispatches'
-import PlexusBackground from '../three/PlexusBackground'
+import Masthead from './Masthead'
+import FooterTabs from './FooterTabs'
+import LiveDispatchesWidget from './LiveDispatches'
+import PlexusBackground from './PlexusBackground'
 import type { Story } from '../../lib/types'
 
 export default function ZPatternLanding({ stories }: { stories: Story[] }) {

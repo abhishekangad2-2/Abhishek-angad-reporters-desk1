@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Masthead from '../shell/Masthead'
-import FooterTabs from '../shell/FooterTabs'
-import LiveDispatchesWidget from '../shell/LiveDispatches'
-import PlexusBackground from '../three/PlexusBackground'
+import Masthead from './Masthead'
+import FooterTabs from './FooterTabs'
+import LiveDispatchesWidget from './LiveDispatches'
+import PlexusBackground from './PlexusBackground'
 import type { ImmersiveChapter } from '../../lib/types'
 
 gsap.registerPlugin(ScrollTrigger)
