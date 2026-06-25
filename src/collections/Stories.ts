@@ -1,5 +1,8 @@
 import type { Block, CollectionConfig } from 'payload'
 import { generateReadDeeperHook } from '../hooks/generateReadDeeper'
+import { LayoutPicker } from '../components/admin/LayoutPicker'
+import { AccentThemePicker } from '../components/admin/AccentThemePicker'
+import { PublishGateChecklist } from '../components/admin/PublishGateChecklist'
 
 const SinglePictureBlock: Block = {
   slug: 'SinglePicture',
@@ -67,6 +70,9 @@ export const Stories: CollectionConfig = {
   slug: 'stories',
   admin: {
     useAsTitle: 'headline',
+    components: {
+      BeforeDocumentControls: [PublishGateChecklist],
+    },
   },
   access: {
     read: () => true, // Public can read
@@ -176,6 +182,9 @@ export const Stories: CollectionConfig = {
               defaultValue: 'inherit',
               admin: {
                 description: 'Override the desk\'s default accent color (optional)',
+                components: {
+                  Field: AccentThemePicker,
+                },
               },
             },
             {
@@ -258,6 +267,11 @@ export const Stories: CollectionConfig = {
               ],
               required: true,
               defaultValue: 'template_1',
+              admin: {
+                components: {
+                  Field: LayoutPicker,
+                },
+              },
             },
             {
               name: 'scrollytellingChapters',

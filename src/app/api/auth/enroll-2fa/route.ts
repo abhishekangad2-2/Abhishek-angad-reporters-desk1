@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Two-factor is already enrolled on this account.' }, { status: 400 })
   }
 
-  const payload = await getPayload({ config })
   const secret = generateTotpSecret()
   const qrDataUrl = await generateEnrollmentQr(user.email, secret)
   const backupCodes = generateBackupCodes()
