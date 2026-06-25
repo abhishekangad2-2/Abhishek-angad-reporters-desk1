@@ -17,6 +17,7 @@
  */
 import Image from 'next/image'
 import React from 'react'
+import HlsVideo from './HlsVideo'
 
 // ─────────────────────────── Lexical node renderer ───────────────────────────
 
@@ -154,7 +155,11 @@ function TextPhotoBlock({ block }: { block: any }) {
 }
 
 function GalleryBlock({ block }: { block: any }) {
-  const trackUrl = getUrl(block.track)
+  const track: any = block.track
+  const trackUrl = getUrl(track)
+  const trackId = track && typeof track === 'object' ? track.id : undefined
+  const mime: string = track && typeof track === 'object' ? (track.mimeType ?? '') : ''
+  const isVideo = mime.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(trackUrl ?? '')
   return (
     <div className="my-8">
       {block.gallery?.length > 0 && (
@@ -172,9 +177,9 @@ function GalleryBlock({ block }: { block: any }) {
       )}
       {trackUrl && (
         <div className="mt-4">
-          {/* Render as video if it looks like a video, otherwise audio */}
-          {/\.(mp4|webm|mov)$/i.test(trackUrl) ? (
-            <video src={trackUrl} controls className="w-full rounded" />
+          {isVideo ? (
+            // Plays the Transcoder HLS rendition when ready, else the original.
+            <HlsVideo trackId={trackId} fallbackUrl={trackUrl} />
           ) : (
             <audio src={trackUrl} controls className="w-full" />
           )}

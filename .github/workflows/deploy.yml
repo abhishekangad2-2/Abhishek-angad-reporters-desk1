@@ -38,8 +38,8 @@ jobs:
           region: us-central1
           # Non-sensitive config only. Razorpay/Resend are intentionally "none".
           env_vars: |
-            GCS_BUCKET_NAME=reportersdesk-media-abhishek-angad-reporters-desk1
-            GCS_PROJECT_ID=abhishek-angad-reporters-desk1
+            GCS_BUCKET_NAME=reportersdesk-media-secret-walker-497804-d5
+            GCS_PROJECT_ID=secret-walker-497804-d5
             RAZORPAY_KEY_ID=none
             RAZORPAY_KEY_SECRET=none
             RAZORPAY_PLAN_ID_READER=none

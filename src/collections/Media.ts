@@ -27,16 +27,48 @@ export const Media: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ doc, req, operation }) => {
-        // Trigger Whisper transcription if audio/video and it doesn't have a transcript yet
-        if (operation === 'create' && doc.mimeType && (doc.mimeType.startsWith('audio/') || doc.mimeType.startsWith('video/'))) {
-          if (!doc.transcript) {
-            // In a real implementation, you would dispatch a background job here
-            // to fetch the file from S3 and send it to OpenAI, then update the doc.
-            // For now, we simulate the hook firing.
-            console.log(`[Media Hook] Audio/Video uploaded: ${doc.filename}. Dispatching transcription job...`);
+        if (operation !== 'create' || !doc.mimeType) return
+
+        // Video → kick off a Google Cloud Transcoder job that produces an HLS
+        // rendition + manifest into gs://<bucket>/transcoded/<id>/. Auth is the
+        // Cloud Run service account (ADC); the job runs in the secret-walker
+        // project (GCS_PROJECT_ID). Failures are logged, never block the upload.
+        if (doc.mimeType.startsWith('video/')) {
+          const bucket = process.env.GCS_BUCKET_NAME
+          const project = process.env.GCS_PROJECT_ID
+          const location = process.env.TRANSCODER_LOCATION || 'us-central1'
+          if (!bucket || !project) return
+          try {
+            const { TranscoderServiceClient } = await import('@google-cloud/video-transcoder')
+            const client = new TranscoderServiceClient()
+            await client.createJob({
+              parent: client.locationPath(project, location),
+              job: {
+                inputUri: `gs://${bucket}/${doc.filename}`,
+                outputUri: `gs://${bucket}/transcoded/${doc.id}/`,
+                config: {
+                  elementaryStreams: [
+                    { key: 'video0', videoStream: { h264: { heightPixels: 720, widthPixels: 1280, bitrateBps: 2_500_000, frameRate: 30 } } },
+                    { key: 'audio0', audioStream: { codec: 'aac', bitrateBps: 64_000 } },
+                  ],
+                  muxStreams: [
+                    { key: 'hd', container: 'ts', elementaryStreams: ['video0', 'audio0'] },
+                  ],
+                  manifests: [
+                    { fileName: 'manifest.m3u8', type: 'HLS', muxStreams: ['hd'] },
+                  ],
+                },
+              },
+            })
+            req.payload.logger.info(`[Transcoder] HLS job created for media ${doc.id} (${doc.filename})`)
+          } catch (err) {
+            req.payload.logger.error('[Transcoder] failed to create job: ' + err)
           }
         }
-      }
+
+        // Audio → Speech-to-Text transcription is a later phase (the
+        // transcript / transcriptionStatus fields already exist for it).
+      },
     ]
   },
   fields: [
