@@ -36,16 +36,20 @@ jobs:
           service: reportersdesk-cms
           image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest
           region: us-central1
+          # Non-sensitive config only. Razorpay/Resend are intentionally "none".
           env_vars: |
-            DATABASE_URI=${{ secrets.DATABASE_URI }}
-            PAYLOAD_SECRET=${{ secrets.PAYLOAD_SECRET }}
-            PENDING_2FA_SECRET=${{ secrets.PENDING_2FA_SECRET }}
-            GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }}
-            GCS_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY || 'none' }}
-            RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID || 'none' }}
-            RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET || 'none' }}
-            RAZORPAY_PLAN_ID_READER=${{ secrets.RAZORPAY_PLAN_ID_READER || 'none' }}
-            RAZORPAY_PLAN_ID_FOI_PATRON=${{ secrets.RAZORPAY_PLAN_ID_FOI_PATRON || 'none' }}
-            RESEND_API_KEY=${{ secrets.RESEND_API_KEY || 'none' }}
-
+            GCS_BUCKET_NAME=reportersdesk-media-abhishek-angad-reporters-desk1
+            GCS_PROJECT_ID=abhishek-angad-reporters-desk1
+            RAZORPAY_KEY_ID=none
+            RAZORPAY_KEY_SECRET=none
+            RAZORPAY_PLAN_ID_READER=none
+            RAZORPAY_PLAN_ID_FOI_PATRON=none
+            RESEND_API_KEY=none
+          # Sensitive values come from Secret Manager (not GitHub Secrets / plaintext env).
+          secrets: |
+            DATABASE_URI=database-uri:latest
+            PAYLOAD_SECRET=payload-secret:latest
+            PENDING_2FA_SECRET=pending-2fa-secret:latest
+            GEMINI_API_KEY=gemini-api-key:latest
+          # Preserve the Cloud SQL socket connection the DATABASE_URI relies on.
+          flags: '--add-cloudsql-instances=abhishek-angad-reporters-desk1:us-central1:reportersdesk-db'
