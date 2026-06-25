@@ -29,7 +29,7 @@ export async function GET() {
           await payload.create({
             collection: 'sections',
             data: {
-              title: section,
+              name: section,
               slug,
             },
           })
