@@ -9,6 +9,11 @@ export const Users: CollectionConfig = {
     // Payload uses Argon2id out of the box for password hashing.
     maxLoginAttempts: 5,
     lockTime: 600000, // 10 minutes
+    // Use stateless JWTs (no server-side session records). Our custom 2FA
+    // flow (api/auth/verify-2fa) mints the Payload auth token itself after
+    // the second factor succeeds; a stateless token can be issued without
+    // replicating Payload's internal addSessionToUser() session bookkeeping.
+    useSessions: false,
   },
   fields: [
     {

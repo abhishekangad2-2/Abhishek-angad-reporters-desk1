@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
-import { getPayload } from 'payload'
+import { getPayload, getFieldsToSign } from 'payload'
 import config from '../../../../payload.config'
 import { verifyTotpCode, verifyBackupCode } from '../../../../lib/auth/totp'
 import { SESSION_COOKIE } from '../../../../lib/auth/session'
@@ -63,8 +63,22 @@ export async function POST(req: NextRequest) {
     data: { user: user.id, action: 'login', collectionName: 'users', documentId: user.id, details: { ipAddress } },
   })
 
+  // 1) Custom session used by middleware.ts to gate /admin server-side.
   const sessionToken = jwt.sign({ userId: user.id, role: user.role }, process.env.PAYLOAD_SECRET!, {
     expiresIn: '2h',
+  })
+
+  // 2) A real Payload auth token so the admin panel itself treats the user as
+  //    logged in. Payload authenticates requests via its own `payload-token`
+  //    cookie; without this the user would clear our gate and then face
+  //    Payload's own login screen. We sign exactly the claims Payload signs
+  //    (getFieldsToSign), which is valid because Users uses stateless JWTs
+  //    (auth.useSessions = false), so no server-side session record is needed.
+  const usersConfig = payload.collections['users'].config
+  const tokenExpiration = usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
+  const fieldsToSign = getFieldsToSign({ collectionConfig: usersConfig, email: user.email, user })
+  const payloadToken = jwt.sign(fieldsToSign, process.env.PAYLOAD_SECRET!, {
+    expiresIn: tokenExpiration,
   })
 
   const res = NextResponse.json({ ok: true })
@@ -73,6 +87,13 @@ export async function POST(req: NextRequest) {
     secure: true,
     sameSite: 'strict',
     maxAge: 60 * 60 * 2,
+    path: '/',
+  })
+  res.cookies.set('payload-token', payloadToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    maxAge: tokenExpiration,
     path: '/',
   })
   return res
