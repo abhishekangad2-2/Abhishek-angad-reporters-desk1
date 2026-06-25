@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local databases / sqlite snapshots (app uses Postgres; never commit these)
+*.db
+*.sqlite
+*.sqlite3
+
+# local logs
+dev.log
+*.log

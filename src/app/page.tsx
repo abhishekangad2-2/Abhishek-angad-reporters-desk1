@@ -3,8 +3,6 @@ import PlexusBackground from '@/components/PlexusBackground'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
-import { SECTIONS } from '@/lib/sections'
-
 export const dynamic = 'force-dynamic'
 
 function sectionSlug(story: any): string | null {
@@ -17,25 +15,29 @@ function storyHref(story: any): string | null {
   return slug ? `/${slug}/${story.slug}` : null
 }
 
-async function getPublishedStories() {
+async function getHomeData() {
   try {
     const payload = await getPayload({ config })
-    const result = await payload.find({
-      collection: 'stories',
-      where: { status: { equals: 'published' } },
-      sort: '-publishedAt',
-      depth: 1,
-      limit: 7,
-    })
-    return result.docs
+    const [stories, sections] = await Promise.all([
+      payload.find({
+        collection: 'stories',
+        where: { status: { equals: 'published' } },
+        sort: '-publishedAt',
+        depth: 1,
+        limit: 7,
+      }),
+      // Sections come from the collection so desk links use the real slugs
+      // (the hardcoded lib slugs drift from the seeded collection slugs).
+      payload.find({ collection: 'sections', sort: 'name', limit: 50 }),
+    ])
+    return { stories: stories.docs, sections: sections.docs }
   } catch {
-    return []
+    return { stories: [], sections: [] }
   }
 }
 
 export default async function Home() {
-  const sections = SECTIONS
-  const stories = await getPublishedStories()
+  const { stories, sections } = await getHomeData()
   const lead = stories[0]
   const rest = stories.slice(1)
 

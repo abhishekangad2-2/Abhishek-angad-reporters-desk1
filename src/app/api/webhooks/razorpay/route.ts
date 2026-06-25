@@ -57,8 +57,8 @@ export async function POST(req: NextRequest) {
           data: {
             ...data,
             razorpaySubscriptionId: sub.id,
-            subscriberEmail: sub.notes?.email ?? 'unknown',
-            plan: sub.notes?.plan === 'foi-patron' ? 'foi-patron' : 'reader',
+            subscriberEmail: sub.notes?.email ?? undefined,
+            plan: sub.notes?.plan === 'foi_patron' ? 'foi_patron' : 'reader',
           },
         })
       }
@@ -104,14 +104,19 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true })
 }
 
+// Map Razorpay's subscription statuses onto the Subscriptions.status options.
+// Every returned value must be a valid option on that select field.
 function mapStatus(razorpayStatus: string) {
   const map: Record<string, string> = {
     created: 'created',
     authenticated: 'authenticated',
     active: 'active',
+    pending: 'created',
+    halted: 'paused',
     paused: 'paused',
     cancelled: 'cancelled',
-    completed: 'expired',
+    completed: 'completed',
+    expired: 'expired',
   }
   return map[razorpayStatus] ?? 'created'
 }

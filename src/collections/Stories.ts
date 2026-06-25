@@ -106,7 +106,8 @@ export const Stories: CollectionConfig = {
               /* if we can't resolve it, fall through (don't block on lookup failure) */
             }
           }
-          if (sectionSlug === 'accountability' || sectionSlug === 'investigative') {
+          // Match the seeded section slugs (derived from the desk names).
+          if (sectionSlug === 'accountability-journalism' || sectionSlug === 'investigative-journalism') {
             if (!data.editorialReview?.factChecked || !data.editorialReview?.legallyReviewed) {
               throw new Error('Accountability and Investigative stories must be fact-checked and legally reviewed before publishing.')
             }

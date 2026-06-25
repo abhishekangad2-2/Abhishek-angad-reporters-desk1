@@ -2,8 +2,8 @@ name: Static Resilience Mirror
 
 on:
   workflow_call:
-  schedule:
-    - cron: '0 */6 * * *' # also refresh on a schedule, independent of deploys
+  # Manual-only until Cloudflare Pages secrets are configured. (Was a 6-hourly
+  # cron that failed every run because the paths below were wrong.)
   workflow_dispatch:
 
 jobs:
@@ -15,7 +15,8 @@ jobs:
         with:
           node-version: 20
       - name: Build the static snapshot
-        working-directory: reportersdesk-infra
+        # The script lives at scripts/build-static-mirror.mjs (repo root) and
+        # writes to ./mirror — there is no reportersdesk-infra directory.
         run: node scripts/build-static-mirror.mjs
         env:
           PAYLOAD_API_URL: ${{ secrets.PAYLOAD_API_URL }}
@@ -24,4 +25,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy reportersdesk-infra/mirror --project-name=reportersdesk-mirror
+          command: pages deploy mirror --project-name=reportersdesk-mirror
