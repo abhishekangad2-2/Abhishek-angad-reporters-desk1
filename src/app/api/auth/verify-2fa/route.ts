@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import { getPayload, getFieldsToSign } from 'payload'
 import config from '../../../../payload.config'
@@ -77,7 +78,16 @@ export async function POST(req: NextRequest) {
   const usersConfig = payload.collections['users'].config
   const tokenExpiration = usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
   const fieldsToSign = getFieldsToSign({ collectionConfig: usersConfig, email: user.email, user })
-  const payloadToken = jwt.sign(fieldsToSign, process.env.PAYLOAD_SECRET!, {
+  // Payload does NOT sign its JWTs with the raw PAYLOAD_SECRET — at init it
+  // derives the signing key as sha256(secret) hex, truncated to 32 chars
+  // (see payload Payload.init). We must sign with the same derived key or the
+  // admin panel rejects the token.
+  const payloadJwtSecret = crypto
+    .createHash('sha256')
+    .update(process.env.PAYLOAD_SECRET!)
+    .digest('hex')
+    .slice(0, 32)
+  const payloadToken = jwt.sign(fieldsToSign, payloadJwtSecret, {
     expiresIn: tokenExpiration,
   })
 
