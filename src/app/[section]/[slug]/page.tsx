@@ -7,15 +7,21 @@ import Template2 from '@/components/templates/Template2'
 import Template3 from '@/components/templates/Template3'
 import Template4 from '@/components/templates/Template4'
 
-import { SECTIONS } from '@/lib/sections'
-
 export const dynamic = 'force-dynamic'
 
 export default async function StoryPage({ params }: { params: Promise<{ section: string, slug: string }> }) {
   const resolvedParams = await params;
   const payload = await getPayload({ config })
 
-  const section = SECTIONS.find(s => s.slug === resolvedParams.section)
+  // Resolve the section from the Sections collection by slug. The hardcoded
+  // SECTIONS list has no Payload document id, so querying stories by it never
+  // matched — look up the real section document instead.
+  const sectionResult = await payload.find({
+    collection: 'sections',
+    where: { slug: { equals: resolvedParams.section } },
+    limit: 1,
+  })
+  const section = sectionResult.docs[0]
 
   if (!section) {
     notFound()

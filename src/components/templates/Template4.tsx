@@ -17,7 +17,7 @@ export default function Template4({ story }: { story: Story }) {
       {/* Immersive Hero */}
       <div className="immersive-hero">
         <div className="font-mono text-sm tracking-widest uppercase text-accent mb-2 z-10 relative">
-           {story.section ?? 'Feature'}
+           {(typeof story.section === 'object' && story.section ? (story.section as any).name : story.section) ?? 'Feature'}
         </div>
         <h1 className="z-10 relative">{story.headline}</h1>
         {story.strap && <p className="text-xl font-serif max-w-2xl text-paper-cool z-10 relative">{story.strap}</p>}

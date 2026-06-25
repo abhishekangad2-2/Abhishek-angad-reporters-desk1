@@ -5,7 +5,7 @@ import { LayoutRenderer } from '@/components/LexicalRenderer';
 
 export default function Template1({ story }: { story: Story }) {
   const heroMediaUrl = story.heroMedia && typeof story.heroMedia === 'object' && 'url' in story.heroMedia ? story.heroMedia.url : null;
-  const sectionName = story.section ?? 'Feature';
+  const sectionName = (typeof story.section === 'object' && story.section ? (story.section as any).name : story.section) ?? 'Feature';
 
   return (
     <div className="landing">
