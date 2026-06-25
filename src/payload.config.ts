@@ -47,10 +47,18 @@ export default buildConfig({
   ],
   editor: lexicalEditor({}),
   secret: (() => {
-    if (!process.env.PAYLOAD_SECRET) {
-      throw new Error('PAYLOAD_SECRET environment variable is required. Generate via: openssl rand -base64 32')
+    if (process.env.PAYLOAD_SECRET) {
+      return process.env.PAYLOAD_SECRET
     }
-    return process.env.PAYLOAD_SECRET
+    // During `next build` (static page-data collection) the secret is neither
+    // present nor needed — no server is handling requests. Allow a build-only
+    // placeholder so the build can complete. This value is never used at
+    // runtime: on a running server PAYLOAD_SECRET is set, and if it is somehow
+    // missing we still fail hard below rather than signing sessions insecurely.
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return 'build-time-placeholder-not-used-at-runtime'
+    }
+    throw new Error('PAYLOAD_SECRET environment variable is required. Generate via: openssl rand -base64 32')
   })(),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
