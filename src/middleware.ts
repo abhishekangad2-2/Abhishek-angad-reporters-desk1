@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { jwtVerify } from 'jose'
 
 const SESSION_COOKIE = 'rd_session'
 
@@ -8,16 +8,20 @@ const SESSION_COOKIE = 'rd_session'
 // carry a valid 2FA session cookie or it is redirected to the custom login.
 // NOTE: the matcher deliberately does NOT include /admin-login or /api/auth,
 // so those stay reachable without a session.
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
 
   if (!sessionToken) {
     return NextResponse.redirect(new URL('/admin-login', request.url))
   }
 
-  // Verify the session token is valid and signed with PAYLOAD_SECRET.
+  // Verify the session token (signed with the raw PAYLOAD_SECRET in
+  // verify-2fa). Middleware runs in the Edge runtime, where `jsonwebtoken`
+  // cannot run (no Node crypto) — it would throw on every request and redirect
+  // even valid sessions. `jose` works in Edge and is interoperable with the
+  // HS256 token.
   try {
-    jwt.verify(sessionToken, process.env.PAYLOAD_SECRET!)
+    await jwtVerify(sessionToken, new TextEncoder().encode(process.env.PAYLOAD_SECRET))
     return NextResponse.next()
   } catch {
     // Invalid/expired token — clear it and send the user back to login.
