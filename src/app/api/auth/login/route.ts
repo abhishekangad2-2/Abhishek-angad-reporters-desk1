@@ -28,19 +28,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 })
   }
 
-  if (!user.twoFactorEnabled) {
-    return NextResponse.json(
-      {
-        error: 'Two-factor authentication is not yet enrolled on this account.',
-        requiresEnrollment: true,
-      },
-      { status: 403 },
-    )
-  }
-
+  // Whether the account still needs to enrol 2FA or already has it, the
+  // password is now verified, so we issue the same short-lived pending token.
+  // The client uses it to drive either enrollment (enroll-2fa +
+  // confirm-enrollment) or the TOTP challenge (verify-2fa) — no second
+  // password round-trip, and no dead end for a brand-new account.
   const pendingToken = jwt.sign({ userId: user.id, step: 'pending-2fa' }, PENDING_2FA_SECRET, {
     expiresIn: PENDING_2FA_TTL,
   })
+
+  if (!user.twoFactorEnabled) {
+    return NextResponse.json({ requiresEnrollment: true, pendingToken })
+  }
 
   return NextResponse.json({ pendingToken, requiresTotp: true })
 }
