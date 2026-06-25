@@ -47,12 +47,12 @@ export async function POST(req: NextRequest) {
 
 async function logFailedLogin(payload: any, email: string, req: NextRequest) {
   await payload.create({
-    collection: 'audit-log',
+    collection: 'audit-logs',
     data: {
       action: 'login-failed',
-      collection: 'users',
+      collectionName: 'users',
       documentId: email,
-      ipAddress: req.headers.get('x-forwarded-for') ?? undefined,
+      details: { ipAddress: req.headers.get('x-forwarded-for') ?? undefined },
     },
   })
 }

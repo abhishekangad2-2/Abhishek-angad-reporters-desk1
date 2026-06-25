@@ -2,45 +2,33 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 
 const SESSION_COOKIE = 'rd_session'
-const PUBLIC_PATHS = ['/api/auth', '/admin-login', '/']
 
+// This middleware only runs for the paths in `config.matcher` below (the
+// Payload admin, mounted at /admin). Every request that reaches here must
+// carry a valid 2FA session cookie or it is redirected to the custom login.
+// NOTE: the matcher deliberately does NOT include /admin-login or /api/auth,
+// so those stay reachable without a session.
 export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
+  const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
 
-  // Allow unauthenticated access to public paths
-  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
+  if (!sessionToken) {
+    return NextResponse.redirect(new URL('/admin-login', request.url))
+  }
+
+  // Verify the session token is valid and signed with PAYLOAD_SECRET.
+  try {
+    jwt.verify(sessionToken, process.env.PAYLOAD_SECRET!)
     return NextResponse.next()
+  } catch {
+    // Invalid/expired token — clear it and send the user back to login.
+    const response = NextResponse.redirect(new URL('/admin-login', request.url))
+    response.cookies.delete(SESSION_COOKIE)
+    return response
   }
-
-  // Protect /admin: require valid 2FA session
-  if (pathname.startsWith('/admin') || pathname.startsWith('/(payload)')) {
-    const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
-
-    if (!sessionToken) {
-      // No session — redirect to custom 2FA login
-      return NextResponse.redirect(new URL('/admin-login', request.url))
-    }
-
-    // Verify session token is valid and signed with PAYLOAD_SECRET
-    try {
-      jwt.verify(sessionToken, process.env.PAYLOAD_SECRET!)
-      return NextResponse.next()
-    } catch {
-      // Invalid/expired token — clear and redirect to login
-      const response = NextResponse.redirect(new URL('/admin-login', request.url))
-      response.cookies.delete(SESSION_COOKIE)
-      return response
-    }
-  }
-
-  return NextResponse.next()
 }
 
 export const config = {
-  matcher: [
-    // Protect admin routes
-    '/admin/:path*',
-    '/(payload)/:path*',
-    // Allow everything else to pass through
-  ],
+  // Match the admin index (/admin) AND everything under it (/admin/...).
+  // '/admin/:path*' alone does not match the bare /admin path.
+  matcher: ['/admin', '/admin/:path*'],
 }

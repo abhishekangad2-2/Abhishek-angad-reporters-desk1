@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
   await payload.update({ collection: 'users', id: user.id, data: { twoFactorEnabled: true } })
 
   await payload.create({
-    collection: 'audit-log',
-    data: { actor: user.id, action: 'update', collection: 'users', documentId: user.id },
+    collection: 'audit-logs',
+    data: { user: user.id, action: 'enroll-2fa', collectionName: 'users', documentId: user.id },
   })
 
   return NextResponse.json({ ok: true })

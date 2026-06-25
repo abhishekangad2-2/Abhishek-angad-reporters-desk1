@@ -52,15 +52,15 @@ export async function POST(req: NextRequest) {
 
   if (!verified) {
     await payload.create({
-      collection: 'audit-log',
-      data: { actor: user.id, action: 'login-failed', collection: 'users', documentId: user.id, ipAddress },
+      collection: 'audit-logs',
+      data: { user: user.id, action: 'login-failed', collectionName: 'users', documentId: user.id, details: { ipAddress } },
     })
     return NextResponse.json({ error: 'Incorrect code.' }, { status: 401 })
   }
 
   await payload.create({
-    collection: 'audit-log',
-    data: { actor: user.id, action: 'login', collection: 'users', documentId: user.id, ipAddress },
+    collection: 'audit-logs',
+    data: { user: user.id, action: 'login', collectionName: 'users', documentId: user.id, details: { ipAddress } },
   })
 
   const sessionToken = jwt.sign({ userId: user.id, role: user.role }, process.env.PAYLOAD_SECRET!, {
