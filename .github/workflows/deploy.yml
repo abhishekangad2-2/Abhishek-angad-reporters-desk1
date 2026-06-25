@@ -45,11 +45,13 @@ jobs:
             RAZORPAY_PLAN_ID_READER=none
             RAZORPAY_PLAN_ID_FOI_PATRON=none
             RESEND_API_KEY=none
+            VERTEX_PROJECT=secret-walker-497804-d5
+            VERTEX_LOCATION=us-central1
           # Sensitive values come from Secret Manager (not GitHub Secrets / plaintext env).
+          # (Gemini now uses Vertex AI via the service account — no API key.)
           secrets: |
             DATABASE_URI=database-uri:latest
             PAYLOAD_SECRET=payload-secret:latest
             PENDING_2FA_SECRET=pending-2fa-secret:latest
-            GEMINI_API_KEY=gemini-api-key:latest
           # Preserve the Cloud SQL socket connection the DATABASE_URI relies on.
           flags: '--add-cloudsql-instances=abhishek-angad-reporters-desk1:us-central1:reportersdesk-db'

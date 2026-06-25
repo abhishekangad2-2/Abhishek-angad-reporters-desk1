@@ -1,5 +1,5 @@
 import { CollectionBeforeChangeHook } from 'payload'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { VertexAI } from '@google-cloud/vertexai'
 
 // Hardcoded issue tags — must match the issueTags select options in Stories.ts
 const AVAILABLE_TAGS = [
@@ -29,14 +29,18 @@ export const generateReadDeeperHook: CollectionBeforeChangeHook = async ({ data,
   data.readDeeper.generateTags = false
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey || apiKey === 'none') {
-      req.payload.logger.warn('GEMINI_API_KEY is not set or is set to none. Skipping Read Deeper generation.')
+    // Vertex AI authenticates via the Cloud Run service account (ADC) — no API
+    // key. VERTEX_PROJECT points at the billing-healthy project that is
+    // permitted to generate (the app's own project may be billing-blocked).
+    const project = process.env.VERTEX_PROJECT
+    const location = process.env.VERTEX_LOCATION || 'us-central1'
+    if (!project) {
+      req.payload.logger.warn('VERTEX_PROJECT is not set. Skipping Read Deeper generation.')
       return data
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+    const vertex = new VertexAI({ project, location })
+    const model = vertex.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
     // Extract text from the article layout blocks (Prose block's content field)
     const layoutText = (data.layout || [])
@@ -67,7 +71,7 @@ Respond with a JSON object in exactly this format and no other text:
     req.payload.logger.info('Calling Gemini to generate Read Deeper tags...')
 
     const result = await model.generateContent(prompt)
-    let responseText = result.response.text()
+    let responseText = result.response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
 
     // Strip markdown code fences if present
     responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim()
