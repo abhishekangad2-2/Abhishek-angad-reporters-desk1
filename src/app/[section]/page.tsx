@@ -39,7 +39,7 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
 
   return (
     <div className="relative min-h-screen font-sans selection:bg-stone-300 selection:text-stone-900 bg-stone-50">
-      <PlexusBackground />
+      <PlexusBackground className="fixed inset-0 z-0 pointer-events-none" />
 
       <main className="relative z-10 max-w-screen-2xl mx-auto px-6 md:px-12 py-24 flex flex-col min-h-screen">
         <header className="flex justify-between items-center mb-24 border-b border-stone-300 pb-6">

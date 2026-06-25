@@ -43,8 +43,8 @@ export default async function Home() {
 
   return (
     <div className="relative min-h-screen font-sans selection:bg-stone-300 selection:text-stone-900">
-      {/* 3D WebGL Background Component */}
-      <PlexusBackground />
+      {/* 3D WebGL Background — full-screen, behind content (z-0), non-interactive */}
+      <PlexusBackground className="fixed inset-0 z-0 pointer-events-none" />
 
       <main className="relative z-10 max-w-screen-2xl mx-auto px-6 md:px-12 py-24 flex flex-col min-h-screen">
 
