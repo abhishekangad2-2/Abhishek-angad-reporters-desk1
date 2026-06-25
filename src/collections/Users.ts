@@ -48,10 +48,25 @@ export const Users: CollectionConfig = {
       },
       fields: [
         {
-          name: 'code',
+          name: 'codeHash',
           type: 'text',
         },
+        {
+          name: 'usedAt',
+          type: 'date',
+          admin: {
+            hidden: true,
+          },
+        },
       ],
+    },
+    {
+      name: 'twoFactorEnabled',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        hidden: true,
+      },
     },
   ],
 }

@@ -44,7 +44,12 @@ export default buildConfig({
     }),
   ],
   editor: lexicalEditor({}),
-  secret: process.env.PAYLOAD_SECRET || 'secret-key-reporters-desk',
+  secret: (() => {
+    if (!process.env.PAYLOAD_SECRET) {
+      throw new Error('PAYLOAD_SECRET environment variable is required. Generate via: openssl rand -base64 32')
+    }
+    return process.env.PAYLOAD_SECRET
+  })(),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
