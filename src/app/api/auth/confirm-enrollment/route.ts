@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
-import { getPayload } from 'payload'
+import { getPayload, getFieldsToSign } from 'payload'
 import config from '../../../../payload.config'
 import { verifyTotpCode } from '../../../../lib/auth/totp'
-import { getSessionUser } from '../../../../lib/auth/session'
+import { getSessionUser, SESSION_COOKIE } from '../../../../lib/auth/session'
 
 const PENDING_2FA_SECRET = process.env.PENDING_2FA_SECRET!
 
@@ -46,5 +47,37 @@ export async function POST(req: NextRequest) {
     data: { user: user.id, action: 'enroll-2fa', collectionName: 'users', documentId: user.id },
   })
 
-  return NextResponse.json({ ok: true })
+  // The code was just verified, so log the user straight in — no need to make
+  // them enter a second code immediately after enrolling. Same session cookies
+  // that verify-2fa issues: rd_session (middleware gate) + payload-token
+  // (Payload admin auth, signed with Payload's derived JWT secret).
+  const sessionToken = jwt.sign({ userId: user.id, role: user.role }, process.env.PAYLOAD_SECRET!, {
+    expiresIn: '2h',
+  })
+  const usersConfig = payload.collections['users'].config
+  const tokenExpiration = usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
+  const fieldsToSign = getFieldsToSign({ collectionConfig: usersConfig, email: user.email, user })
+  const payloadJwtSecret = crypto
+    .createHash('sha256')
+    .update(process.env.PAYLOAD_SECRET!)
+    .digest('hex')
+    .slice(0, 32)
+  const payloadToken = jwt.sign(fieldsToSign, payloadJwtSecret, { expiresIn: tokenExpiration })
+
+  const res = NextResponse.json({ ok: true })
+  res.cookies.set(SESSION_COOKIE, sessionToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    maxAge: 60 * 60 * 2,
+    path: '/',
+  })
+  res.cookies.set('payload-token', payloadToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    maxAge: tokenExpiration,
+    path: '/',
+  })
+  return res
 }

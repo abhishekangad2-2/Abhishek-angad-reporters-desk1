@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 type LoginStep = 'credentials' | 'totp-input' | 'enrollment'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
   const [step, setStep] = useState<LoginStep>('credentials')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -68,8 +66,11 @@ export default function AdminLoginPage() {
         return
       }
 
-      // Success — session cookie was set, redirect to admin
-      router.push('/admin')
+      // Success — session cookies set. Use a hard navigation so the request to
+      // /admin carries the new cookies through the auth middleware. A
+      // client-side router.push fetches the RSC payload through the
+      // redirecting middleware and can fail with "this page couldn't load".
+      window.location.href = '/admin'
     } catch (err) {
       setError('Network error. Please try again.')
     } finally {
@@ -126,12 +127,10 @@ export default function AdminLoginPage() {
         return
       }
 
-      // Success — enrollment complete, now verify with TOTP
-      setStep('totp-input')
-      setCode('')
-      setEnrollmentCode('')
-      setQrDataUrl('')
-      setBackupCodes([])
+      // Success — enrollment complete AND logged in: confirm-enrollment set
+      // the session cookies, so there's no need to enter a second code. Hard
+      // navigate to the admin (carries cookies through the middleware).
+      window.location.href = '/admin'
     } catch (err) {
       setError('Network error. Please try again.')
     } finally {
