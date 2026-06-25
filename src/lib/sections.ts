@@ -1,57 +1,53 @@
+// TRANSITIONAL: This file is kept for backwards compatibility with hardcoded routing.
+// In P2, fetch sections dynamically from the Payload API instead of this static array.
+// Synced with the Sections collection seed data.
+
 export interface Section {
-  id: string   // must exactly match the `section` select value in Stories collection
-  slug: string // used in URL routing  (/[section]/...)
+  id?: string // Payload document ID (added when fetched from API)
+  slug: string // URL routing  (/[section]/...)
   name: string
   description: string
 }
 
 export const SECTIONS: Section[] = [
   {
-    id: 'accountability',
     slug: 'accountability',
-    name: 'Accountability',
-    description: 'Power tracking, public records auditing, and institutional oversight.',
+    name: 'Accountability Journalism',
+    description: 'Holding power to account through investigative reporting and data analysis',
   },
   {
-    id: 'investigative',
-    slug: 'investigative',
-    name: 'Investigative',
-    description: 'Deep-dive reports on systemic corruption, financial crime, and human rights.',
+    slug: 'ground-reportage',
+    name: 'Ground Reportage',
+    description: 'On-the-ground reporting from underreported regions and communities',
   },
   {
-    id: 'data_journalism',
     slug: 'data-journalism',
     name: 'Data Journalism',
-    description: 'Datasets, charts, and quantitative reporting that reveal hidden patterns.',
+    description: 'Investigative stories driven by data analysis and visualization',
   },
   {
-    id: 'interviews',
-    slug: 'interviews',
-    name: 'Interviews',
-    description: 'Long-form conversations with key figures shaping public life.',
+    slug: 'investigative',
+    name: 'Investigative Journalism',
+    description: 'Deep dives into systemic issues and institutional failures',
   },
   {
-    id: 'explainers',
-    slug: 'explainers',
-    name: 'Explainers',
-    description: 'Clear, evidence-based guides to complex policy and events.',
+    slug: 'analysis',
+    name: 'Analysis',
+    description: 'Expert perspective on current events and long-term trends',
   },
   {
-    id: 'visual',
-    slug: 'visual',
-    name: 'Visual',
-    description: 'Photo essays, documentary photography, and visual investigations.',
+    slug: 'behind-the-process',
+    name: 'Behind the Process',
+    description: 'How we do our work: methodology, data sources, and editorial decisions',
   },
   {
-    id: 'audio',
-    slug: 'audio',
-    name: 'Audio',
-    description: 'Podcast dispatches, recorded testimonies, and audio documentaries.',
+    slug: 'visual-audio',
+    name: 'Visual and Audio Investigations',
+    description: 'Stories told through photography, video, and sound',
   },
   {
-    id: 'dispatches',
-    slug: 'dispatches',
-    name: 'Dispatches',
-    description: 'Short, urgent field reports from correspondents on the ground.',
+    slug: 'policy-people',
+    name: 'Policy and People',
+    description: 'How policy decisions impact lives on the ground',
   },
 ]

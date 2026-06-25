@@ -145,31 +145,38 @@ export const Stories: CollectionConfig = {
             },
             {
               name: 'section',
-              type: 'select',
-              options: [
-                { label: 'Accountability', value: 'accountability' },
-                { label: 'Investigative', value: 'investigative' },
-                { label: 'Data Journalism', value: 'data_journalism' },
-                { label: 'Interviews', value: 'interviews' },
-                { label: 'Explainers', value: 'explainers' },
-                { label: 'Visual', value: 'visual' },
-                { label: 'Audio', value: 'audio' },
-                { label: 'Dispatches', value: 'dispatches' },
-              ],
+              type: 'relationship',
+              relationTo: 'sections',
               required: true,
+              admin: {
+                description: 'Editorial desk this story belongs to',
+              },
             },
             {
               name: 'issueTags',
-              type: 'select',
+              type: 'relationship',
+              relationTo: 'issues',
               hasMany: true,
+              admin: {
+                description: 'Topics/issues covered in this story',
+              },
+            },
+            {
+              name: 'accentTheme',
+              type: 'select',
               options: [
-                { label: 'Corruption', value: 'corruption' },
-                { label: 'Environment', value: 'environment' },
-                { label: 'Healthcare', value: 'healthcare' },
-                { label: 'Politics', value: 'politics' },
-                { label: 'Law', value: 'law' },
-                { label: 'Economy', value: 'economy' }
+                { label: 'Inherit from desk', value: 'inherit' },
+                { label: 'House red', value: 'house-red' },
+                { label: 'Field teal', value: 'field-teal' },
+                { label: 'Ink', value: 'ink' },
+                { label: 'Archive sepia', value: 'archive-sepia' },
+                { label: 'Forest', value: 'forest' },
+                { label: 'Slate', value: 'slate' },
               ],
+              defaultValue: 'inherit',
+              admin: {
+                description: 'Override the desk\'s default accent color (optional)',
+              },
             },
             {
               name: 'author',

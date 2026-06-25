@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url'
 
 import { Users } from './collections/Users'
 import { Stories } from './collections/Stories'
+import { Sections } from './collections/Sections'
+import { Issues } from './collections/Issues'
 import { Media } from './collections/Media'
 import { LiveDispatches } from './collections/LiveDispatches'
 import { Polls } from './collections/Polls'
@@ -27,7 +29,7 @@ export default buildConfig({
     user: Users.slug,
   },
   collections: [
-    Users, Stories, Media, LiveDispatches, Polls,
+    Users, Sections, Issues, Stories, Media, LiveDispatches, Polls,
     Subscriptions, Transactions, Newsletters, NewsletterSubscribers,
     Payments, AuditLogs, RTIRequests,
   ],
