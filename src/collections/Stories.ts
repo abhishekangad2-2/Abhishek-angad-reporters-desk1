@@ -90,10 +90,26 @@ export const Stories: CollectionConfig = {
   hooks: {
     beforeChange: [
       generateReadDeeperHook,
-      ({ data, req, operation }) => {
-        if (data.status === 'published' && (data.section === 'accountability' || data.section === 'investigative')) {
-          if (!data.editorialReview?.factChecked || !data.editorialReview?.legallyReviewed) {
-            throw new Error('Accountability and Investigative stories must be fact-checked and legally reviewed before publishing.')
+      async ({ data, req }) => {
+        // `section` is a relationship, so data.section is an id (or, if passed
+        // populated, an object) — not the slug. Resolve the slug before gating,
+        // otherwise the comparison never matches and the gate silently passes.
+        if (data.status === 'published' && data.section) {
+          let sectionSlug: string | undefined
+          if (typeof data.section === 'object') {
+            sectionSlug = (data.section as any).slug
+          } else {
+            try {
+              const sec = await req.payload.findByID({ collection: 'sections', id: data.section, depth: 0 })
+              sectionSlug = (sec as any)?.slug
+            } catch {
+              /* if we can't resolve it, fall through (don't block on lookup failure) */
+            }
+          }
+          if (sectionSlug === 'accountability' || sectionSlug === 'investigative') {
+            if (!data.editorialReview?.factChecked || !data.editorialReview?.legallyReviewed) {
+              throw new Error('Accountability and Investigative stories must be fact-checked and legally reviewed before publishing.')
+            }
           }
         }
         return data
