@@ -90,7 +90,7 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
                     <>
                       <span className="w-1 h-1 bg-stone-300 rounded-full"></span>
                       <span className="text-xs font-bold uppercase tracking-widest text-stone-500 truncate">
-                        {story.issueTags[0].name}
+                        {typeof story.issueTags[0] === 'object' ? story.issueTags[0].title : story.issueTags[0]}
                       </span>
                     </>
                   )}

@@ -56,9 +56,17 @@ export default function Template3({ story }: { story: Story }) {
           <h3 className="font-serif font-bold text-xl mb-4 border-b border-ink-soft/30 pb-2">Key Details</h3>
           <ul className="list-disc pl-5 font-sans text-sm space-y-3">
             <li>Section: {sectionName}</li>
-            {story.issueTags && (story.issueTags as string[]).map((tag: string) => (
-              <li key={tag} className="capitalize">{tag}</li>
-            ))}
+            {Array.isArray(story.issueTags) && story.issueTags.map((tag: any, i: number) => {
+              // issueTags is a relationship to the `issues` collection: when
+              // populated each tag is an object { id, title, ... }; when not,
+              // it's the id string. Handle both, and always use a stable key.
+              const label = typeof tag === 'object' && tag !== null ? tag.title : tag
+              const key = typeof tag === 'object' && tag !== null ? (tag.id ?? i) : tag
+              if (!label) return null
+              return (
+                <li key={key} className="capitalize">{label}</li>
+              )
+            })}
           </ul>
         </div>
 
