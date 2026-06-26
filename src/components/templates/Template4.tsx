@@ -1,76 +1,62 @@
-import React from 'react';
-import Image from 'next/image';
-import { Story } from '@/payload-types';
-import PlexusBackground from '../PlexusBackground';
-import { RichTextRenderer } from '@/components/LexicalRenderer';
+import { Story } from '@/payload-types'
+import Masthead from '@/components/Masthead'
+import PlexusBackground from '@/components/PlexusBackground'
+import { RichTextRenderer } from '@/components/LexicalRenderer'
+import { sectionNameOf } from './storyMeta'
 
+/** Immersive design (z-axis scrollytelling) at the story level: load-bearing
+ *  Plexus behind full-bleed chapters that scroll over it. */
 export default function Template4({ story }: { story: Story }) {
-  const chapters = (story as any).scrollytellingChapters || [];
+  const chapters = (story as any).scrollytellingChapters || []
+  const sectionName = sectionNameOf(story)
 
   return (
-    <div className="landing landing--immersive">
-      {/* Plexus Background runs underneath the entire immersive experience */}
-      <div className="fixed inset-0 z-0">
-        <PlexusBackground />
-      </div>
-      
-      {/* Immersive Hero */}
-      <div className="immersive-hero">
-        <div className="font-mono text-sm tracking-widest uppercase text-accent mb-2 z-10 relative">
-           {(typeof story.section === 'object' && story.section ? (story.section as any).name : story.section) ?? 'Feature'}
-        </div>
-        <h1 className="z-10 relative">{story.headline}</h1>
-        {story.strap && <p className="text-xl font-serif max-w-2xl text-paper-cool z-10 relative">{story.strap}</p>}
-        
-        {/* Audio toggle — functional implementation requires WaveSurfer.js integration */}
-        <button className="audio-toggle mt-8 z-10 relative flex items-center gap-2">
-           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-           </svg>
-           Experience with Audio
-        </button>
-      </div>
+    <div className="story landing landing--immersive">
+      <PlexusBackground
+        className="landing-canvas landing-canvas--fixed"
+        nodeCount={120}
+        color="#b43d2a"
+        lineColor="#3e6b66"
+        intensity={0.5}
+      />
+      <Masthead />
 
-      {/* Chapters */}
-      <div className="relative z-10">
-        {chapters.length > 0 ? (
-          chapters.map((chapter: any, index: number) => {
-            const bgMediaUrl = chapter.backgroundMedia && typeof chapter.backgroundMedia === 'object' && 'url' in chapter.backgroundMedia ? chapter.backgroundMedia.url : null;
-            
-            return (
-              <div key={index} className="chapter relative">
-                 {/* Chapter Background */}
-                 {bgMediaUrl && (
-                    <div className="absolute inset-0 z-0 opacity-40 transition-opacity duration-1000">
-                       <Image src={bgMediaUrl} alt={chapter.chapterTitle || ''} fill className="object-cover" />
-                       <div className="absolute inset-0 bg-ink/60"></div>
-                    </div>
-                 )}
-                 
-                 <div className={`chapter-text relative z-10 ${
-                    chapter.alignment === 'left' ? 'mr-auto ml-10' :
-                    chapter.alignment === 'right' ? 'ml-auto mr-10' : 'mx-auto text-center'
-                 }`}>
-                    {chapter.chapterTitle && <h3 className="font-serif text-2xl font-bold mb-4 text-accent">{chapter.chapterTitle}</h3>}
-                    <div className="prose prose-invert prose-lg font-serif">
-                      {/* Render the chapter's Lexical rich text content */}
-                      <RichTextRenderer content={chapter.content} />
-                    </div>
-                 </div>
+      <header className="immersive-hero">
+        <span className="three-col-section">{sectionName}</span>
+        <h1>{story.headline}</h1>
+        {story.strap && <p className="immersive-strap">{story.strap}</p>}
+        {chapters.length > 0 && <span className="immersive-scrollcue">Scroll ↓</span>}
+      </header>
+
+      {chapters.length > 0 ? (
+        chapters.map((chapter: any, index: number) => {
+          const bgUrl =
+            chapter.backgroundMedia &&
+            typeof chapter.backgroundMedia === 'object' &&
+            'url' in chapter.backgroundMedia
+              ? chapter.backgroundMedia.url
+              : null
+          return (
+            <section
+              key={index}
+              className="chapter"
+              style={bgUrl ? { backgroundImage: `url(${bgUrl})` } : undefined}
+            >
+              <div className="chapter-text">
+                {chapter.chapterTitle && <h2>{chapter.chapterTitle}</h2>}
+                <RichTextRenderer content={chapter.content} />
               </div>
-            );
-          })
-        ) : (
-          <div className="chapter">
-             <div className="chapter-text mx-auto text-center">
-                <p>No scrollytelling chapters were defined for this article.</p>
-             </div>
+            </section>
+          )
+        })
+      ) : (
+        <section className="chapter">
+          <div className="chapter-text">
+            {story.caption && <p>{story.caption}</p>}
+            <p>This story has no scrollytelling chapters yet.</p>
           </div>
-        )}
-      </div>
-
+        </section>
+      )}
     </div>
-  );
+  )
 }
-
