@@ -1,6 +1,6 @@
 import { VertexAI } from '@google-cloud/vertexai'
 import { localeByCode } from './i18n'
-import type { LandingData } from './landing'
+import { DEFAULT_LABELS, type LandingData, type LandingLabels } from './landing'
 
 // Server-only: imports the Vertex SDK. Machine-only translation (no human
 // review) tuned to stay faithful and keep a journalistic tone. Results are
@@ -70,6 +70,23 @@ ${JSON.stringify(missTexts)}`
   return result
 }
 
+/** Translate a single short label (e.g. "Editor login"). Cached. */
+export async function tr(label: string, localeCode: string): Promise<string> {
+  if (localeCode === 'en' || !label) return label
+  const [out] = await translateBatch([label], localeCode)
+  return out
+}
+
+/** Read the user's locale from ?lang= (search params) or the rd_lang cookie. */
+export async function readLocale(searchLang?: string | string[] | undefined): Promise<string> {
+  const { cookies } = await import('next/headers')
+  const { isLocale, DEFAULT_LOCALE, LOCALE_COOKIE } = await import('./i18n')
+  const sp = typeof searchLang === 'string' ? searchLang : undefined
+  if (sp && isLocale(sp)) return sp
+  const c = (await cookies()).get(LOCALE_COOKIE)?.value
+  return isLocale(c) ? c : DEFAULT_LOCALE
+}
+
 /** Translate the text fields of the landing data (story headlines/straps/desk
  *  names) so every template renders in the reader's language. */
 export async function translateLandingData(data: LandingData, localeCode: string): Promise<LandingData> {
@@ -97,7 +114,17 @@ export async function translateLandingData(data: LandingData, localeCode: string
     description: sec[i * 2 + 1] || s.description,
   }))
 
-  return { stories, sections }
+  // Translate the small UI labels that buildCards needs for desk backfills.
+  const [editorialDesk, deskStrap] = await translateBatch(
+    [DEFAULT_LABELS.editorialDesk, DEFAULT_LABELS.deskStrap],
+    localeCode,
+  )
+  const labels: LandingLabels = {
+    editorialDesk: editorialDesk || DEFAULT_LABELS.editorialDesk,
+    deskStrap: deskStrap || DEFAULT_LABELS.deskStrap,
+  }
+
+  return { stories, sections, labels }
 }
 
 /** Translate a Lexical rich-text value in place-of-structure: deep-clone, swap

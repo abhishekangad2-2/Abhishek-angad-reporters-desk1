@@ -30,9 +30,21 @@ export type LandingSection = {
   description?: string
 }
 
+export type LandingLabels = {
+  editorialDesk: string
+  /** Template for desk-card strap; `{desk}` is replaced with the desk name. */
+  deskStrap: string
+}
+
+export const DEFAULT_LABELS: LandingLabels = {
+  editorialDesk: 'Editorial Desk',
+  deskStrap: 'Reporting and live dispatches from the {desk} desk.',
+}
+
 export type LandingData = {
   stories: LandingStory[]
   sections: LandingSection[]
+  labels?: LandingLabels
 }
 
 export function isLandingTemplate(value: unknown): value is LandingTemplate {
@@ -53,6 +65,7 @@ export type LandingCard = {
 /** Build at least `min` cards: real published stories first, then editorial
  *  desks as promos so the landing always looks full, with 1 story or 20. */
 export function buildCards(data: LandingData, min: number): LandingCard[] {
+  const labels = data.labels ?? DEFAULT_LABELS
   const cards: LandingCard[] = data.stories.map((s) => ({
     kind: 'story',
     kicker: s.sectionName,
@@ -65,9 +78,9 @@ export function buildCards(data: LandingData, min: number): LandingCard[] {
     if (cards.length >= min) break
     cards.push({
       kind: 'desk',
-      kicker: 'Editorial Desk',
+      kicker: labels.editorialDesk,
       headline: sec.name,
-      strap: sec.description || `Reporting and live dispatches from the ${sec.name} desk.`,
+      strap: sec.description || labels.deskStrap.replace('{desk}', sec.name),
       href: `/${sec.slug}`,
       heroUrl: null,
     })

@@ -1,16 +1,23 @@
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
+import { translateBatch } from '@/lib/translate.server'
 import type { LandingSection } from '@/lib/landing'
 
 /** The shared shell masthead — rendered identically by all four landing
- *  templates. Colours come from `currentColor`, so it inverts automatically
- *  on the dark immersive template without a separate variant. */
-export default function Masthead({ sections = [] }: { sections?: LandingSection[] }) {
+ *  templates. Reads the locale cookie and translates the small UI labels
+ *  (eyebrow, editor-login button) so the chrome matches the chosen language. */
+export default async function Masthead({ sections = [] }: { sections?: LandingSection[] }) {
+  const raw = (await cookies()).get(LOCALE_COOKIE)?.value
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE
+  const [estLabel, editorLabel] = await translateBatch(['Est. 2026', 'Editor login'], locale)
+
   return (
     <header className="site-masthead">
       <div className="mh-bar">
-        <span className="mh-eyebrow">Est. 2026</span>
+        <span className="mh-eyebrow">{estLabel}</span>
         <Link href="/admin" className="mh-editor">
-          Editor login
+          {editorLabel}
         </Link>
       </div>
 

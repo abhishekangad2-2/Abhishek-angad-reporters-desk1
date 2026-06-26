@@ -26,7 +26,14 @@ export default async function Home({
   const locale = isLocale(localeRaw) ? localeRaw : DEFAULT_LOCALE
 
   let data = await getLandingData()
-  if (locale !== DEFAULT_LOCALE) data = await translateLandingData(data, locale)
+  if (locale !== DEFAULT_LOCALE) {
+    const { translateBatch } = await import('@/lib/translate.server')
+    data = await translateLandingData(data, locale)
+    // Pre-translate the desk-backfill kicker and the default desk-strap pattern
+    // so the (server-side) buildCards renders the chrome in the chosen language
+    // without needing a Vertex call per card. Cached after first hit.
+    await translateBatch(['Editorial Desk'], locale)
+  }
 
   switch (template) {
     case 'z-pattern':
