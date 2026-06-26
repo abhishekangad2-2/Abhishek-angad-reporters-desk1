@@ -174,10 +174,11 @@ const TimelineBlock: Block = {
 
 // The full Visual Media toolkit — shared by the article body and the
 // dedicated Visual Media Studio tab. 12 formats.
-const VISUAL_MEDIA_BLOCKS: Block[] = [
-  SinglePictureBlock,
-  TextPhotoBlock,
-  GalleryAudioVideoBlock,
+// NOTE: the 9 new formats are temporarily held back until DB migration is in
+// place — Payload `push:true` doesn't run in production, so listing new blocks
+// here creates tables the prod DB lacks and breaks every stories query. The new
+// block defs + renderers stay in the codebase, ready to re-enable post-migration.
+const NEW_VISUAL_MEDIA_BLOCKS: Block[] = [
   FullBleedImageBlock,
   ImageComparisonBlock,
   PullQuoteBlock,
@@ -187,6 +188,13 @@ const VISUAL_MEDIA_BLOCKS: Block[] = [
   StatHighlightBlock,
   RedactedDocumentBlock,
   TimelineBlock,
+]
+void NEW_VISUAL_MEDIA_BLOCKS
+
+const VISUAL_MEDIA_BLOCKS: Block[] = [
+  SinglePictureBlock,
+  TextPhotoBlock,
+  GalleryAudioVideoBlock,
 ]
 
 export const Stories: CollectionConfig = {
