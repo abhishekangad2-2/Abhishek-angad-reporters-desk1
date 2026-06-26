@@ -3,15 +3,16 @@
 import { useState } from 'react'
 import Masthead from './Masthead'
 import PlexusBackground from './PlexusBackground'
-import type { LandingData } from '@/lib/landing'
+import { buildCards, type LandingData } from '@/lib/landing'
 
-/** Phase 6 — full-bleed three-column grid. The Plexus IS the background here:
- *  three minimal-text columns float over it, and hovering a column lifts it on
- *  the z-axis while the network leans toward it (focusIndex). Footer + Live
- *  Dispatches come from the shared shell in layout.tsx. */
+/** Phase 6 — full-bleed three-column grid. The Plexus IS the background; three
+ *  minimal-text columns float over it (real stories, backfilled with editorial
+ *  desks so it's never half-empty), and hovering a column lifts it on the
+ *  z-axis while the network leans toward it. */
 export default function ThreeColumnLanding({ data }: { data: LandingData }) {
   const [hovered, setHovered] = useState<number | null>(null)
-  const cards = data.stories.slice(0, 3)
+  const target = data.stories.length <= 3 ? 3 : 6
+  const cards = buildCards(data, target).slice(0, target)
 
   return (
     <div className="landing landing--three-column">
@@ -27,17 +28,17 @@ export default function ThreeColumnLanding({ data }: { data: LandingData }) {
 
       {cards.length > 0 ? (
         <div className="three-col-grid">
-          {cards.map((s, i) => (
+          {cards.map((c, i) => (
             <a
-              key={s.id}
-              href={s.href}
+              key={i}
+              href={c.href}
               className={`three-col-card ${hovered !== null && hovered !== i ? 'three-col-card--dim' : ''}`}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
             >
               <span className="three-col-index">0{i + 1}</span>
-              <span className="three-col-section">{s.sectionName}</span>
-              <h2 className="three-col-headline">{s.headline}</h2>
+              <span className="three-col-section">{c.kicker}</span>
+              <h2 className="three-col-headline">{c.headline}</h2>
             </a>
           ))}
         </div>

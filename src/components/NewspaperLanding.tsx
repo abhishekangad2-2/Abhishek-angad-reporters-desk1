@@ -1,14 +1,14 @@
 import Masthead from './Masthead'
 import PlexusBackground from './PlexusBackground'
-import type { LandingData } from '@/lib/landing'
+import { buildCards, type LandingData } from '@/lib/landing'
 
-/** Phase 8 — print-grid broadsheet. Plexus is deliberately near-invisible
- *  (a faint watermark in the masthead band only) so the page reads as print.
- *  Footer + Live Dispatches come from the shared shell in layout.tsx. */
+/** Phase 8 — print-grid broadsheet. Faint Plexus watermark in the masthead band
+ *  only; lead + rail filled from real stories, backfilled with editorial desks. */
 export default function NewspaperLanding({ data }: { data: LandingData }) {
-  const [lead, ...rest] = data.stories
-  const secondary = rest.slice(0, 2)
-  const briefs = rest.slice(2, 7)
+  const cards = buildCards(data, 6)
+  const lead = cards[0]
+  const secondary = cards.slice(1, 3)
+  const briefs = cards.slice(3, 7)
 
   return (
     <div className="landing landing--newspaper">
@@ -30,7 +30,7 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img className="newspaper-lead-img" src={lead.heroUrl} alt={lead.headline} />
             )}
-            <span className="newspaper-section">{lead.sectionName}</span>
+            <span className="newspaper-section">{lead.kicker}</span>
             <a href={lead.href} className="newspaper-lead-link">
               <h1>{lead.headline}</h1>
             </a>
@@ -38,21 +38,21 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
           </article>
 
           <aside className="newspaper-secondary">
-            {secondary.map((s) => (
-              <a key={s.id} href={s.href} className="newspaper-sec-item">
-                <span className="newspaper-section">{s.sectionName}</span>
-                <h3>{s.headline}</h3>
-                <p>{s.strap}</p>
+            {secondary.map((c, i) => (
+              <a key={i} href={c.href} className="newspaper-sec-item">
+                <span className="newspaper-section">{c.kicker}</span>
+                <h3>{c.headline}</h3>
+                <p>{c.strap}</p>
               </a>
             ))}
           </aside>
 
           <aside className="newspaper-briefs">
-            <h4>In brief</h4>
+            <h4>More from the desks</h4>
             <ul>
-              {briefs.map((b) => (
-                <li key={b.id}>
-                  <a href={b.href}>{b.headline}</a>
+              {briefs.map((c, i) => (
+                <li key={i}>
+                  <a href={c.href}>{c.headline}</a>
                 </li>
               ))}
             </ul>

@@ -5,18 +5,18 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Masthead from './Masthead'
 import PlexusBackground from './PlexusBackground'
-import type { LandingData } from '@/lib/landing'
+import { buildCards, type LandingData } from '@/lib/landing'
 
-/** Phase 9 — immersive scrollytelling. Plexus is load-bearing: its density
- *  and brightness are tied to scroll progress, so the network "connects more
- *  dots" as the reader descends. Footer + Live Dispatches come from the
- *  shared shell in layout.tsx. */
+/** Phase 9 — immersive scrollytelling. Load-bearing Plexus tied to scroll
+ *  progress; hero + chapter panels filled from real stories, backfilled with
+ *  editorial desks so the scroll never dead-ends after one screen. */
 export default function ImmersiveLanding({ data }: { data: LandingData }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [intensity, setIntensity] = useState(0.25)
 
-  const [lead, ...rest] = data.stories
-  const panels = rest.slice(0, 5)
+  const cards = buildCards(data, 5)
+  const hero = cards[0]
+  const panels = cards.slice(1, 6)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -59,28 +59,28 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
       <Masthead sections={data.sections} />
 
       <header className="immersive-hero">
-        {lead && <span className="three-col-section">{lead.sectionName}</span>}
-        <h1>{lead ? lead.headline : 'ReportersDesk'}</h1>
-        {lead && <p className="immersive-strap">{lead.strap}</p>}
-        {lead && (
-          <a className="audio-toggle" href={lead.href}>
-            Read the investigation →
+        {hero && <span className="three-col-section">{hero.kicker}</span>}
+        <h1>{hero ? hero.headline : 'ReportersDesk'}</h1>
+        {hero && <p className="immersive-strap">{hero.strap}</p>}
+        {hero && (
+          <a className="audio-toggle" href={hero.href}>
+            {hero.kind === 'story' ? 'Read the investigation →' : 'Explore the desk →'}
           </a>
         )}
         {panels.length > 0 && <span className="immersive-scrollcue">Scroll ↓</span>}
       </header>
 
-      {panels.map((s) => (
+      {panels.map((c, i) => (
         <section
-          key={s.id}
+          key={i}
           className="chapter"
-          style={s.heroUrl ? { backgroundImage: `url(${s.heroUrl})` } : undefined}
+          style={c.heroUrl ? { backgroundImage: `url(${c.heroUrl})` } : undefined}
         >
           <div className="chapter-text">
-            <span className="three-col-section">{s.sectionName}</span>
-            <h2>{s.headline}</h2>
-            <p>{s.strap}</p>
-            <a href={s.href}>Read →</a>
+            <span className="three-col-section">{c.kicker}</span>
+            <h2>{c.headline}</h2>
+            <p>{c.strap}</p>
+            <a href={c.href}>{c.kind === 'story' ? 'Read →' : 'Explore →'}</a>
           </div>
         </section>
       ))}
