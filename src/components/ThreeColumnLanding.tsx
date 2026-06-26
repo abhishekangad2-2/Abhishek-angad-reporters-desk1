@@ -24,7 +24,7 @@ export default function ThreeColumnLanding({ data }: { data: LandingData }) {
         intensity={0.75}
         focusIndex={hovered}
       />
-      <Masthead sections={data.sections} />
+      <Masthead sections={data.sections} labels={data.labels} />
 
       {cards.length > 0 ? (
         <div className="three-col-grid">

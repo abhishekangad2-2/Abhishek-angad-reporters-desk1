@@ -16,7 +16,7 @@ export default function ZPatternLanding({ data }: { data: LandingData }) {
         lineColor="#3e6b66"
         intensity={0.35}
       />
-      <Masthead sections={data.sections} />
+      <Masthead sections={data.sections} labels={data.labels} />
 
       {rows.map((c, i) => (
         <section key={i} className={`z-row ${i % 2 === 1 ? 'z-row--reversed' : ''}`}>

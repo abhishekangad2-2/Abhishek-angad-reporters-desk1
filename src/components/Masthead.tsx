@@ -1,23 +1,25 @@
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
-import { translateBatch } from '@/lib/translate.server'
 import type { LandingSection } from '@/lib/landing'
 
-/** The shared shell masthead — rendered identically by all four landing
- *  templates. Reads the locale cookie and translates the small UI labels
- *  (eyebrow, editor-login button) so the chrome matches the chosen language. */
-export default async function Masthead({ sections = [] }: { sections?: LandingSection[] }) {
-  const raw = (await cookies()).get(LOCALE_COOKIE)?.value
-  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE
-  const [estLabel, editorLabel] = await translateBatch(['Est. 2026', 'Editor login'], locale)
+/** The shared shell masthead — pure, client+server safe. Translated chrome
+ *  strings are passed in as props by the (server) caller so this file never
+ *  pulls server-only Vertex deps into the client bundle. */
+export default function Masthead({
+  sections = [],
+  labels,
+}: {
+  sections?: LandingSection[]
+  labels?: { est?: string; editor?: string }
+}) {
+  const est = labels?.est || 'Est. 2026'
+  const editor = labels?.editor || 'Editor login'
 
   return (
     <header className="site-masthead">
       <div className="mh-bar">
-        <span className="mh-eyebrow">{estLabel}</span>
+        <span className="mh-eyebrow">{est}</span>
         <Link href="/admin" className="mh-editor">
-          {editorLabel}
+          {editor}
         </Link>
       </div>
 

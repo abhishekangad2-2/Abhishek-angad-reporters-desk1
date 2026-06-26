@@ -56,7 +56,7 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
         lineColor="#3e6b66"
         intensity={intensity}
       />
-      <Masthead sections={data.sections} />
+      <Masthead sections={data.sections} labels={data.labels} />
 
       <header className="immersive-hero">
         {hero && <span className="three-col-section">{hero.kicker}</span>}

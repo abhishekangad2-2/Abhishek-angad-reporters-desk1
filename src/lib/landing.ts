@@ -34,11 +34,15 @@ export type LandingLabels = {
   editorialDesk: string
   /** Template for desk-card strap; `{desk}` is replaced with the desk name. */
   deskStrap: string
+  est: string
+  editor: string
 }
 
 export const DEFAULT_LABELS: LandingLabels = {
   editorialDesk: 'Editorial Desk',
   deskStrap: 'Reporting and live dispatches from the {desk} desk.',
+  est: 'Est. 2026',
+  editor: 'Editor login',
 }
 
 export type LandingData = {

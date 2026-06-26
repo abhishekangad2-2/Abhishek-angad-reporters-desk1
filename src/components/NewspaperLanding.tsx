@@ -20,7 +20,7 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
           lineColor="#b43d2a"
           intensity={0.16}
         />
-        <Masthead sections={data.sections} />
+        <Masthead sections={data.sections} labels={data.labels} />
       </div>
 
       {lead ? (

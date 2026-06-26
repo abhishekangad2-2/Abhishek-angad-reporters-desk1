@@ -114,14 +114,16 @@ export async function translateLandingData(data: LandingData, localeCode: string
     description: sec[i * 2 + 1] || s.description,
   }))
 
-  // Translate the small UI labels that buildCards needs for desk backfills.
-  const [editorialDesk, deskStrap] = await translateBatch(
-    [DEFAULT_LABELS.editorialDesk, DEFAULT_LABELS.deskStrap],
+  // Translate the small UI chrome strings (masthead + buildCards backfills).
+  const [editorialDesk, deskStrap, est, editor] = await translateBatch(
+    [DEFAULT_LABELS.editorialDesk, DEFAULT_LABELS.deskStrap, DEFAULT_LABELS.est, DEFAULT_LABELS.editor],
     localeCode,
   )
   const labels: LandingLabels = {
     editorialDesk: editorialDesk || DEFAULT_LABELS.editorialDesk,
     deskStrap: deskStrap || DEFAULT_LABELS.deskStrap,
+    est: est || DEFAULT_LABELS.est,
+    editor: editor || DEFAULT_LABELS.editor,
   }
 
   return { stories, sections, labels }
