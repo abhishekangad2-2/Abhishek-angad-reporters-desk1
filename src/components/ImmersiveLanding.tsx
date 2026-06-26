@@ -4,28 +4,22 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Masthead from './Masthead'
-import FooterTabs from './FooterTabs'
-import LiveDispatchesWidget from './LiveDispatches'
 import PlexusBackground from './PlexusBackground'
-import type { ImmersiveChapter } from '../../lib/types'
+import type { LandingData } from '@/lib/landing'
 
-gsap.registerPlugin(ScrollTrigger)
-
-export default function ImmersiveLanding({
-  headline,
-  audioSrc,
-  chapters,
-}: {
-  headline: string
-  audioSrc: string
-  chapters: ImmersiveChapter[]
-}) {
+/** Phase 9 — immersive scrollytelling. Plexus is load-bearing: its density
+ *  and brightness are tied to scroll progress, so the network "connects more
+ *  dots" as the reader descends. Footer + Live Dispatches come from the
+ *  shared shell in layout.tsx. */
+export default function ImmersiveLanding({ data }: { data: LandingData }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const audioRef = useRef<HTMLAudioElement>(null)
   const [intensity, setIntensity] = useState(0.25)
-  const [playing, setPlaying] = useState(false)
+
+  const [lead, ...rest] = data.stories
+  const panels = rest.slice(0, 5)
 
   useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger)
     const chapterEls = containerRef.current?.querySelectorAll<HTMLElement>('.chapter')
     const triggers: ScrollTrigger[] = []
 
@@ -36,15 +30,12 @@ export default function ImmersiveLanding({
         {
           opacity: 1,
           y: 0,
-          scrollTrigger: { trigger: el, start: 'top 75%', end: 'top 25%', scrub: true },
+          scrollTrigger: { trigger: el, start: 'top 80%', end: 'top 35%', scrub: true },
         },
       )
       if (anim.scrollTrigger) triggers.push(anim.scrollTrigger)
     })
 
-    // Ties the Plexus network's density/brightness directly to how far
-    // into the story the reader has scrolled — the "investigation
-    // connecting more dots" effect described in the design brief.
     const intensityTrigger = ScrollTrigger.create({
       trigger: containerRef.current,
       start: 'top top',
@@ -56,15 +47,8 @@ export default function ImmersiveLanding({
     return () => triggers.forEach((t) => t.kill())
   }, [])
 
-  function toggleAudio() {
-    if (!audioRef.current) return
-    if (playing) audioRef.current.pause()
-    else audioRef.current.play()
-    setPlaying(!playing)
-  }
-
   return (
-    <main className="landing landing--immersive" ref={containerRef}>
+    <div className="landing landing--immersive" ref={containerRef}>
       <PlexusBackground
         className="landing-canvas landing-canvas--fixed"
         nodeCount={120}
@@ -72,27 +56,34 @@ export default function ImmersiveLanding({
         lineColor="#3e6b66"
         intensity={intensity}
       />
+      <Masthead sections={data.sections} />
 
       <header className="immersive-hero">
-        <Masthead />
-        <h1>{headline}</h1>
-        <button className="audio-toggle" onClick={toggleAudio}>
-          {playing ? 'Pause narration' : 'Play narration'}
-        </button>
-        {/* For a richer scrubber with a visual waveform, swap this element
-            for wavesurfer.js — kept as a plain <audio> here to ship the
-            core interaction first. */}
-        <audio ref={audioRef} src={audioSrc} />
+        {lead && <span className="three-col-section">{lead.sectionName}</span>}
+        <h1>{lead ? lead.headline : 'ReportersDesk'}</h1>
+        {lead && <p className="immersive-strap">{lead.strap}</p>}
+        {lead && (
+          <a className="audio-toggle" href={lead.href}>
+            Read the investigation →
+          </a>
+        )}
+        {panels.length > 0 && <span className="immersive-scrollcue">Scroll ↓</span>}
       </header>
 
-      {chapters.map((c) => (
-        <section key={c.id} className="chapter" style={{ backgroundImage: `url(${c.backgroundImage})` }}>
-          <p className="chapter-text">{c.text}</p>
+      {panels.map((s) => (
+        <section
+          key={s.id}
+          className="chapter"
+          style={s.heroUrl ? { backgroundImage: `url(${s.heroUrl})` } : undefined}
+        >
+          <div className="chapter-text">
+            <span className="three-col-section">{s.sectionName}</span>
+            <h2>{s.headline}</h2>
+            <p>{s.strap}</p>
+            <a href={s.href}>Read →</a>
+          </div>
         </section>
       ))}
-
-      <LiveDispatchesWidget />
-      <FooterTabs />
-    </main>
+    </div>
   )
 }

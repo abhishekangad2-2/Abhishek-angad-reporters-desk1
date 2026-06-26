@@ -453,10 +453,10 @@ a {
   font-size: clamp(1.8rem, 4vw, 3rem);
 }
 
+/* Page-level proximity snap only — no fixed-height scroll container, so the
+   shared footer below <main> stays reachable instead of being trapped. */
 .landing--z-pattern {
-  scroll-snap-type: y mandatory;
-  overflow-y: auto;
-  height: 100vh;
+  scroll-snap-type: y proximity;
 }
 
 @media (max-width: 800px) {
@@ -571,4 +571,251 @@ a {
   max-width: 640px;
   font-size: 1.25rem;
   line-height: 1.6;
+}
+
+.chapter-text h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.05;
+  margin: 0.4rem 0 0.6rem;
+}
+
+.chapter-text p {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  margin: 0 0 1rem;
+}
+
+.chapter-text a {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.immersive-strap {
+  max-width: 700px;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.5;
+  opacity: 0.82;
+}
+
+.immersive-scrollcue {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-top: 2.5rem;
+}
+
+/* ---------- Shared shell masthead ---------- */
+.site-masthead {
+  position: relative;
+  z-index: 3;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 0;
+  color: inherit;
+}
+
+.mh-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mh-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.mh-editor {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.mh-editor:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.mh-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0 1rem;
+}
+
+.mh-sub {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.mh-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-decoration: none;
+}
+
+.mh-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.4rem;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  padding: 0.7rem 0;
+  margin-top: 0.5rem;
+}
+
+.mh-nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  opacity: 0.75;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.mh-nav-link:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* ---------- Landing helpers ---------- */
+.landing-empty {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  opacity: 0.6;
+  padding: 4rem 1rem;
+}
+
+.three-col-card {
+  min-height: 40vh;
+}
+
+.three-col-strap {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.z-row-image {
+  background-color: var(--paper-newsprint);
+}
+
+.z-row-text .three-col-section {
+  color: var(--accent);
+}
+
+.z-row-text p {
+  max-width: 38ch;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  margin: 0.75rem 0 1.25rem;
+}
+
+.z-row-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.newspaper-lead-img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: grayscale(1);
+}
+
+.newspaper-lead-link {
+  text-decoration: none;
+}
+
+.newspaper-secondary {
+  display: flex;
+  flex-direction: column;
+}
+
+.newspaper-sec-item {
+  display: block;
+  text-decoration: none;
+  border-bottom: 1px solid #cfc8b6;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.newspaper-secondary h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.1;
+  margin: 0.3rem 0;
+}
+
+.newspaper-secondary p {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.newspaper-briefs h4 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.4rem;
+}
+
+.newspaper-briefs ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.newspaper-briefs li {
+  border-bottom: 1px solid #cfc8b6;
+  padding: 0.5rem 0;
+}
+
+.newspaper-briefs a {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .mh-nav {
+    gap: 0.3rem 0.9rem;
+  }
 }
