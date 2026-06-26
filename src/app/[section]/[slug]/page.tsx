@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
@@ -23,6 +24,51 @@ const TEMPLATE_ALIASES: Record<string, string> = {
   template_2: 'template_2',
   template_3: 'template_3',
   template_4: 'template_4',
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ section: string; slug: string }>
+}): Promise<Metadata> {
+  try {
+    const { section: sectionSlug, slug } = await params
+    const payload = await getPayload({ config })
+    const sec = await payload.find({
+      collection: 'sections',
+      where: { slug: { equals: sectionSlug } },
+      limit: 1,
+    })
+    const section = sec.docs[0]
+    if (!section) return {}
+    const res = await payload.find({
+      collection: 'stories',
+      where: { slug: { equals: slug }, section: { equals: section.id } },
+      limit: 1,
+      depth: 1,
+    })
+    const story: any = res.docs[0]
+    if (!story) return {}
+    const seo = story.seoMeta || {}
+    const title: string = seo.title || story.headline
+    const description: string = seo.description || story.strap
+    const img =
+      story.heroMedia && typeof story.heroMedia === 'object' ? story.heroMedia.url : undefined
+    return {
+      title,
+      description,
+      keywords: seo.keywords || undefined,
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+        images: img ? [{ url: img }] : undefined,
+      },
+      twitter: { card: 'summary_large_image', title, description },
+    }
+  } catch {
+    return {}
+  }
 }
 
 export default async function StoryPage({

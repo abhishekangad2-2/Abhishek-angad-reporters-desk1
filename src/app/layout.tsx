@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { cookies } from "next/headers";
+import Script from "next/script";
 import "./globals.css";
 import LiveDispatchesWidget from "@/components/LiveDispatchesWidget";
 import FooterTabs from "@/components/FooterTabs";
@@ -41,6 +42,7 @@ export default async function RootLayout({
   const raw = cookieStore.get(LOCALE_COOKIE)?.value;
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const dir = localeByCode(locale).dir ?? "ltr";
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html
@@ -55,6 +57,17 @@ export default async function RootLayout({
         <LanguageSwitcher current={locale} />
         <LiveDispatchesWidget />
         <FooterTabs />
+        {gaId && (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
+            <Script id="ga4-init" strategy="afterInteractive">{`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${gaId}');
+            `}</Script>
+          </>
+        )}
       </body>
     </html>
   );
