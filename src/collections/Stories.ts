@@ -3,6 +3,7 @@ import { generateReadDeeperHook } from '../hooks/generateReadDeeper'
 import { LayoutPicker } from '../components/admin/LayoutPicker'
 import { AccentThemePicker } from '../components/admin/AccentThemePicker'
 import { PublishGateChecklist } from '../components/admin/PublishGateChecklist'
+import { isEditorOrAbove, isReporterOrAbove, roleOf } from '../lib/access'
 
 const SinglePictureBlock: Block = {
   slug: 'SinglePicture',
@@ -207,13 +208,9 @@ export const Stories: CollectionConfig = {
   },
   access: {
     read: () => true, // Public can read
-    create: ({ req: { user } }) => Boolean(user), // Any authenticated user can create
-    update: ({ req: { user } }) => Boolean(user), // Field-level access controls the status
-    delete: ({ req: { user } }) => {
-      // Only admins and editors can delete
-      if (!user) return false
-      return user.role === 'admin' || user.role === 'editor'
-    },
+    create: isReporterOrAbove,
+    update: ({ req }) => Boolean(req.user), // Field/beforeChange enforces what they can change
+    delete: isEditorOrAbove,
   },
   versions: {
     maxPerDoc: 50, // Revision history
@@ -221,6 +218,33 @@ export const Stories: CollectionConfig = {
   hooks: {
     beforeChange: [
       generateReadDeeperHook,
+      // Role-aware workflow guard. Editor+ may publish/schedule/archive; lower
+      // roles are capped at draft/in-review. Contributors can only ever set
+      // status=draft (they can't move their own piece into review).
+      async ({ data, req, operation, originalDoc }) => {
+        const role = roleOf(req)
+        if (!role || role === 'admin' || role === 'editor') return data
+        const blocked = ['published', 'scheduled', 'archived']
+        const next = data?.status as string | undefined
+        if (next && blocked.includes(next)) {
+          throw new Error(`Only editors and admins can move a story to "${next}".`)
+        }
+        if (role === 'contributor') {
+          if (next && next !== 'draft') {
+            throw new Error('Contributors can only save stories as drafts.')
+          }
+          // Contributors can't edit other authors' drafts.
+          if (operation === 'update' && originalDoc) {
+            const authors: any[] = (originalDoc as any).author || []
+            const ownsIt = authors.some((a: any) => {
+              const id = typeof a === 'object' && a !== null ? a.id : a
+              return id === req.user?.id
+            })
+            if (!ownsIt) throw new Error('Contributors can only edit their own drafts.')
+          }
+        }
+        return data
+      },
       async ({ data, req }) => {
         // `section` is a relationship, so data.section is an id (or, if passed
         // populated, an object) — not the slug. Resolve the slug before gating,
@@ -246,6 +270,30 @@ export const Stories: CollectionConfig = {
         }
         return data
       }
+    ],
+    afterChange: [
+      // Workflow audit: log every status transition (Draft→Review→Scheduled→
+      // Published→Archived) to the audit-logs collection. Failures are
+      // swallowed so a logging hiccup never blocks the editorial action.
+      async ({ doc, previousDoc, req, operation }) => {
+        try {
+          const prev = (previousDoc as any)?.status
+          const next = (doc as any)?.status
+          if (operation !== 'create' && prev === next) return
+          await req.payload.create({
+            collection: 'audit-logs',
+            data: {
+              action: operation === 'create' ? `story.create:${next}` : `story.status:${prev}→${next}`,
+              collectionName: 'stories',
+              documentId: String(doc.id),
+              user: req.user?.id,
+              details: { headline: (doc as any).headline, from: prev, to: next },
+            },
+          })
+        } catch {
+          /* never block editorial actions on audit log failure */
+        }
+      },
     ],
   },
   fields: [
