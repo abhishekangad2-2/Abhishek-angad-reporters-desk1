@@ -37,7 +37,17 @@ export default buildConfig({
   plugins: [
     gcsStorage({
       collections: {
-        media: true,
+        // When MEDIA_CDN_BASE_URL is set, media is served as direct Cloud CDN
+        // URLs (the LB + backend bucket in front of the GCS bucket). Unset →
+        // default Payload-served URLs, so this is safe to ship before DNS/cert
+        // are live; flipping the CDN on is just setting the env var + redeploy.
+        media: process.env.MEDIA_CDN_BASE_URL
+          ? {
+              disablePayloadAccessControl: true,
+              generateFileURL: ({ filename, prefix }: any) =>
+                `${process.env.MEDIA_CDN_BASE_URL}/${prefix ? `${prefix}/` : ''}${filename}`,
+            }
+          : true,
       },
       bucket: process.env.GCS_BUCKET_NAME || 'reportersdesk-media',
       options: {
