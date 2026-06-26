@@ -40,6 +40,7 @@ jobs:
           env_vars: |
             GCS_BUCKET_NAME=reportersdesk-media-secret-walker-497804-d5
             GCS_PROJECT_ID=secret-walker-497804-d5
+            MEDIA_CDN_BASE_URL=https://cdn.reportersdesk.abhishekangad.com
             RAZORPAY_KEY_ID=none
             RAZORPAY_KEY_SECRET=none
             RAZORPAY_PLAN_ID_READER=none
