@@ -66,6 +66,129 @@ const GalleryAudioVideoBlock: Block = {
   ],
 }
 
+const FullBleedImageBlock: Block = {
+  slug: 'FullBleedImage',
+  labels: { singular: 'Full-bleed image', plural: 'Full-bleed images' },
+  fields: [
+    { name: 'image', type: 'upload', relationTo: 'media', required: true },
+    { name: 'overlayText', type: 'text', label: 'Overlay headline (optional)' },
+    { name: 'credit', type: 'text' },
+  ],
+}
+
+const ImageComparisonBlock: Block = {
+  slug: 'ImageComparison',
+  labels: { singular: 'Before / after', plural: 'Before / after' },
+  fields: [
+    { name: 'beforeImage', type: 'upload', relationTo: 'media', required: true },
+    { name: 'afterImage', type: 'upload', relationTo: 'media', required: true },
+    { name: 'beforeLabel', type: 'text', defaultValue: 'Before' },
+    { name: 'afterLabel', type: 'text', defaultValue: 'After' },
+    { name: 'caption', type: 'text' },
+  ],
+}
+
+const PullQuoteBlock: Block = {
+  slug: 'PullQuote',
+  labels: { singular: 'Pull quote', plural: 'Pull quotes' },
+  fields: [
+    { name: 'quote', type: 'textarea', required: true },
+    { name: 'attribution', type: 'text' },
+  ],
+}
+
+const DiptychBlock: Block = {
+  slug: 'Diptych',
+  labels: { singular: 'Two-up images', plural: 'Two-up images' },
+  fields: [
+    { name: 'leftImage', type: 'upload', relationTo: 'media', required: true },
+    { name: 'leftCaption', type: 'text' },
+    { name: 'rightImage', type: 'upload', relationTo: 'media', required: true },
+    { name: 'rightCaption', type: 'text' },
+  ],
+}
+
+const VideoEmbedBlock: Block = {
+  slug: 'VideoEmbed',
+  labels: { singular: 'Video', plural: 'Videos' },
+  fields: [
+    { name: 'videoFile', type: 'upload', relationTo: 'media', label: 'Uploaded video (served as HLS)' },
+    { name: 'embedUrl', type: 'text', label: 'or external URL (YouTube / Vimeo)' },
+    { name: 'caption', type: 'text' },
+  ],
+}
+
+const AudioClipBlock: Block = {
+  slug: 'AudioClip',
+  labels: { singular: 'Audio clip', plural: 'Audio clips' },
+  fields: [
+    { name: 'audioFile', type: 'upload', relationTo: 'media', required: true },
+    { name: 'title', type: 'text' },
+    { name: 'caption', type: 'text' },
+  ],
+}
+
+const StatHighlightBlock: Block = {
+  slug: 'StatHighlight',
+  labels: { singular: 'Stat highlight', plural: 'Stat highlights' },
+  fields: [
+    { name: 'intro', type: 'text' },
+    {
+      name: 'stats',
+      type: 'array',
+      required: true,
+      fields: [
+        { name: 'value', type: 'text', required: true },
+        { name: 'label', type: 'text', required: true },
+      ],
+    },
+  ],
+}
+
+const RedactedDocumentBlock: Block = {
+  slug: 'RedactedDocument',
+  labels: { singular: 'Source document', plural: 'Source documents' },
+  fields: [
+    { name: 'documentImage', type: 'upload', relationTo: 'media', required: true },
+    { name: 'sourceLabel', type: 'text', defaultValue: 'Source document' },
+    { name: 'caption', type: 'text' },
+  ],
+}
+
+const TimelineBlock: Block = {
+  slug: 'Timeline',
+  labels: { singular: 'Timeline', plural: 'Timelines' },
+  fields: [
+    {
+      name: 'entries',
+      type: 'array',
+      required: true,
+      fields: [
+        { name: 'date', type: 'text', required: true },
+        { name: 'title', type: 'text', required: true },
+        { name: 'detail', type: 'textarea' },
+      ],
+    },
+  ],
+}
+
+// The full Visual Media toolkit — shared by the article body and the
+// dedicated Visual Media Studio tab. 12 formats.
+const VISUAL_MEDIA_BLOCKS: Block[] = [
+  SinglePictureBlock,
+  TextPhotoBlock,
+  GalleryAudioVideoBlock,
+  FullBleedImageBlock,
+  ImageComparisonBlock,
+  PullQuoteBlock,
+  DiptychBlock,
+  VideoEmbedBlock,
+  AudioClipBlock,
+  StatHighlightBlock,
+  RedactedDocumentBlock,
+  TimelineBlock,
+]
+
 export const Stories: CollectionConfig = {
   slug: 'stories',
   admin: {
@@ -161,9 +284,7 @@ export const Stories: CollectionConfig = {
                   slug: 'Prose',
                   fields: [{ name: 'content', type: 'richText', required: true }]
                 },
-                SinglePictureBlock,
-                TextPhotoBlock,
-                GalleryAudioVideoBlock,
+                ...VISUAL_MEDIA_BLOCKS,
               ],
             },
             {
@@ -367,12 +488,12 @@ export const Stories: CollectionConfig = {
         },
         {
           label: 'Visual Media Studio',
-          description: 'For Visual & Audio Investigations: Specialized media blocks.',
+          description: 'For Visual & Audio Investigations: 12 specialized media formats.',
           fields: [
             {
               name: 'visualMedia',
               type: 'blocks',
-              blocks: [SinglePictureBlock, TextPhotoBlock, GalleryAudioVideoBlock],
+              blocks: VISUAL_MEDIA_BLOCKS,
             },
           ]
         }

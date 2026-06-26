@@ -1108,3 +1108,258 @@ a {
   right: auto;
   left: 0;
 }
+
+/* ---------- Visual media formats ---------- */
+.vm-cap {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+}
+
+.vm-credit {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  margin-top: 0.3rem;
+  text-align: right;
+}
+
+.vm-fullbleed {
+  position: relative;
+  margin: 2.5rem 0;
+}
+
+.vm-fullbleed-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.vm-fullbleed-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(20, 23, 28, 0.82), transparent);
+  color: var(--paper-cool);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  line-height: 1.1;
+}
+
+.vm-compare,
+.vm-diptych {
+  margin: 2rem 0;
+}
+
+.vm-compare-grid,
+.vm-diptych-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.vm-compare-cell {
+  position: relative;
+}
+
+.vm-compare-cell img,
+.vm-diptych-cell img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.vm-tag {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: var(--ink);
+  color: var(--paper-cool);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.5rem;
+}
+
+.vm-pullquote {
+  margin: 2.5rem 0;
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.vm-pullquote p {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1.25;
+  font-style: italic;
+  margin: 0;
+}
+
+.vm-pullquote-cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.vm-video {
+  margin: 2rem 0;
+}
+
+.vm-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.vm-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.vm-audio {
+  margin: 2rem 0;
+  border: 1px solid var(--ink);
+  padding: 1rem;
+}
+
+.vm-audio-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.vm-audio-el {
+  width: 100%;
+}
+
+.vm-stats {
+  margin: 2.5rem 0;
+}
+
+.vm-stats-intro {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+}
+
+.vm-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.5rem;
+}
+
+.vm-stat {
+  display: flex;
+  flex-direction: column;
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+}
+
+.vm-stat-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.vm-stat-label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+}
+
+.vm-doc {
+  margin: 2rem 0;
+}
+
+.vm-doc-frame {
+  position: relative;
+  border: 1px solid var(--ink);
+  background: #fff;
+  padding: 0.5rem;
+}
+
+.vm-doc-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: grayscale(1) contrast(1.1);
+}
+
+.vm-doc-stamp {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  transform: rotate(6deg);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.25rem 0.6rem;
+}
+
+.vm-timeline {
+  list-style: none;
+  margin: 2.5rem 0;
+  padding: 0;
+  border-left: 2px solid var(--ink);
+}
+
+.vm-timeline-item {
+  position: relative;
+  padding: 0 0 1.5rem 1.5rem;
+}
+
+.vm-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 0.3rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.vm-timeline-date {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.vm-timeline-title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 0.2rem;
+}
+
+.vm-timeline-detail {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin: 0.3rem 0 0;
+}

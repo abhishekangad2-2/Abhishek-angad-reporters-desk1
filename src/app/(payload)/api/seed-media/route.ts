@@ -22,6 +22,36 @@ export async function GET(req: Request) {
 
   try {
     const payload = await getPayload({ config: configPromise })
+
+    // ?addblocks=1 — append sample visual-media blocks to the published story's
+    // body so the new formats can be verified rendering. Idempotent.
+    if (url.searchParams.get('addblocks') === '1') {
+      const stories = await payload.find({
+        collection: 'stories',
+        where: { status: { equals: 'published' } },
+        limit: 1,
+        depth: 0,
+      })
+      const story = stories.docs[0]
+      if (!story) return NextResponse.json({ error: 'no story' }, { status: 404 })
+      const existing = Array.isArray((story as any).layout) ? (story as any).layout : []
+      const has = existing.some((b: any) => b?.blockType === 'PullQuote')
+      const sample = has
+        ? []
+        : [
+            { blockType: 'PullQuote', quote: 'They walk farther each year for water that used to be at their doorstep.', attribution: 'A villager in the foothills' },
+            { blockType: 'StatHighlight', intro: 'The retreat, by the numbers', stats: [{ value: '3', label: 'districts surveyed' }, { value: '40%', label: 'springs dry by May' }, { value: '6 km', label: 'average daily walk for water' }] },
+            { blockType: 'Timeline', entries: [{ date: '1998', title: 'First springs recorded drying', detail: 'Seasonal sources begin failing earlier.' }, { date: '2015', title: 'Snowline retreat accelerates', detail: 'Satellite data shows measurable loss.' }, { date: '2026', title: 'Water points relocated', detail: 'Daily walks double in three districts.' }] },
+            { blockType: 'FullBleedImage', image: 2, overlayText: 'A once-perennial spring, now dry', credit: 'Lorem Picsum' },
+          ]
+      const updated = await payload.update({
+        collection: 'stories',
+        id: story.id,
+        data: { layout: [...existing, ...sample] },
+      })
+      return NextResponse.json({ success: true, appended: sample.length, total: (updated as any).layout?.length })
+    }
+
     const created: any[] = []
 
     for (const img of IMAGES) {

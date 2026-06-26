@@ -189,6 +189,170 @@ function GalleryBlock({ block }: { block: any }) {
   )
 }
 
+function FullBleedBlock({ block }: { block: any }) {
+  const url = getUrl(block.image)
+  if (!url) return null
+  return (
+    <figure className="vm-fullbleed">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={url} alt={block.overlayText ?? ''} className="vm-fullbleed-img" />
+      {block.overlayText && <figcaption className="vm-fullbleed-overlay">{block.overlayText}</figcaption>}
+      {block.credit && <span className="vm-credit">{block.credit}</span>}
+    </figure>
+  )
+}
+
+function ComparisonBlock({ block }: { block: any }) {
+  const a = getUrl(block.beforeImage)
+  const b = getUrl(block.afterImage)
+  if (!a || !b) return null
+  return (
+    <figure className="vm-compare">
+      <div className="vm-compare-grid">
+        <div className="vm-compare-cell">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={a} alt={block.beforeLabel ?? 'Before'} />
+          <span className="vm-tag">{block.beforeLabel || 'Before'}</span>
+        </div>
+        <div className="vm-compare-cell">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={b} alt={block.afterLabel ?? 'After'} />
+          <span className="vm-tag">{block.afterLabel || 'After'}</span>
+        </div>
+      </div>
+      {block.caption && <figcaption className="vm-cap">{block.caption}</figcaption>}
+    </figure>
+  )
+}
+
+function PullQuoteBlk({ block }: { block: any }) {
+  if (!block.quote) return null
+  return (
+    <blockquote className="vm-pullquote">
+      <p>{block.quote}</p>
+      {block.attribution && <cite className="vm-pullquote-cite">{block.attribution}</cite>}
+    </blockquote>
+  )
+}
+
+function DiptychBlk({ block }: { block: any }) {
+  const l = getUrl(block.leftImage)
+  const r = getUrl(block.rightImage)
+  return (
+    <figure className="vm-diptych">
+      <div className="vm-diptych-grid">
+        {l && (
+          <div className="vm-diptych-cell">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={l} alt={block.leftCaption ?? ''} />
+            {block.leftCaption && <figcaption className="vm-cap">{block.leftCaption}</figcaption>}
+          </div>
+        )}
+        {r && (
+          <div className="vm-diptych-cell">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={r} alt={block.rightCaption ?? ''} />
+            {block.rightCaption && <figcaption className="vm-cap">{block.rightCaption}</figcaption>}
+          </div>
+        )}
+      </div>
+    </figure>
+  )
+}
+
+function toEmbed(url: string): string {
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`
+  const vm = url.match(/vimeo\.com\/(\d+)/)
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`
+  return url
+}
+
+function VideoBlock({ block }: { block: any }) {
+  const file = block.videoFile
+  const fileUrl = getUrl(file)
+  const fileId = file && typeof file === 'object' ? file.id : undefined
+  return (
+    <figure className="vm-video">
+      {fileUrl ? (
+        <HlsVideo trackId={fileId} fallbackUrl={fileUrl} />
+      ) : block.embedUrl ? (
+        <div className="vm-video-frame">
+          <iframe
+            src={toEmbed(block.embedUrl)}
+            title={block.caption ?? 'Video'}
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            loading="lazy"
+          />
+        </div>
+      ) : null}
+      {block.caption && <figcaption className="vm-cap">{block.caption}</figcaption>}
+    </figure>
+  )
+}
+
+function AudioBlock({ block }: { block: any }) {
+  const url = getUrl(block.audioFile)
+  if (!url) return null
+  return (
+    <figure className="vm-audio">
+      {block.title && <div className="vm-audio-title">{block.title}</div>}
+      <audio src={url} controls className="vm-audio-el" />
+      {block.caption && <figcaption className="vm-cap">{block.caption}</figcaption>}
+    </figure>
+  )
+}
+
+function StatBlock({ block }: { block: any }) {
+  if (!Array.isArray(block.stats) || block.stats.length === 0) return null
+  return (
+    <div className="vm-stats">
+      {block.intro && <p className="vm-stats-intro">{block.intro}</p>}
+      <div className="vm-stats-grid">
+        {block.stats.map((s: any, i: number) => (
+          <div key={i} className="vm-stat">
+            <span className="vm-stat-value">{s.value}</span>
+            <span className="vm-stat-label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RedactedDocBlock({ block }: { block: any }) {
+  const url = getUrl(block.documentImage)
+  if (!url) return null
+  return (
+    <figure className="vm-doc">
+      <div className="vm-doc-frame">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt={block.caption ?? 'Source document'} />
+        <span className="vm-doc-stamp">{block.sourceLabel || 'Source document'}</span>
+      </div>
+      {block.caption && <figcaption className="vm-cap">{block.caption}</figcaption>}
+    </figure>
+  )
+}
+
+function TimelineRenderBlock({ block }: { block: any }) {
+  if (!Array.isArray(block.entries) || block.entries.length === 0) return null
+  return (
+    <ol className="vm-timeline">
+      {block.entries.map((e: any, i: number) => (
+        <li key={i} className="vm-timeline-item">
+          <span className="vm-timeline-date">{e.date}</span>
+          <div className="vm-timeline-body">
+            <span className="vm-timeline-title">{e.title}</span>
+            {e.detail && <p className="vm-timeline-detail">{e.detail}</p>}
+          </div>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
 // ────────────────────────────── Main export ──────────────────────────────────
 
 /**
@@ -214,6 +378,24 @@ export function LayoutRenderer({ layout }: { layout: any[] }) {
             return <TextPhotoBlock key={i} block={block} />
           case 'GalleryAudioVideo':
             return <GalleryBlock key={i} block={block} />
+          case 'FullBleedImage':
+            return <FullBleedBlock key={i} block={block} />
+          case 'ImageComparison':
+            return <ComparisonBlock key={i} block={block} />
+          case 'PullQuote':
+            return <PullQuoteBlk key={i} block={block} />
+          case 'Diptych':
+            return <DiptychBlk key={i} block={block} />
+          case 'VideoEmbed':
+            return <VideoBlock key={i} block={block} />
+          case 'AudioClip':
+            return <AudioBlock key={i} block={block} />
+          case 'StatHighlight':
+            return <StatBlock key={i} block={block} />
+          case 'RedactedDocument':
+            return <RedactedDocBlock key={i} block={block} />
+          case 'Timeline':
+            return <TimelineRenderBlock key={i} block={block} />
           default:
             return null
         }
