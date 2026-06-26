@@ -1,9 +1,5 @@
-import {
-  getLandingData,
-  isLandingTemplate,
-  DEFAULT_TEMPLATE,
-  type LandingTemplate,
-} from '@/lib/landing'
+import { isLandingTemplate, DEFAULT_TEMPLATE, type LandingTemplate } from '@/lib/landing'
+import { getLandingData } from '@/lib/landing.server'
 import ThreeColumnLanding from '@/components/ThreeColumnLanding'
 import ZPatternLanding from '@/components/ZPatternLanding'
 import NewspaperLanding from '@/components/NewspaperLanding'
