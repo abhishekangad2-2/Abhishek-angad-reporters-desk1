@@ -4,6 +4,10 @@ export const Polls: CollectionConfig = {
   slug: 'polls',
   admin: {
     useAsTitle: 'question',
+    group: 'Admin Console',
+    defaultColumns: ['question', 'active', 'opensAt', 'closesAt'],
+    listSearchableFields: ['question'],
+    description: 'Reader polls — open/close windows, live vote counts on each option.',
   },
   fields: [
     {

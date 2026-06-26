@@ -4,6 +4,10 @@ export const Subscriptions: CollectionConfig = {
   slug: 'subscriptions',
   admin: {
     useAsTitle: 'id',
+    group: 'Admin Console',
+    defaultColumns: ['user', 'plan', 'status', 'expiresAt'],
+    listSearchableFields: ['plan', 'status'],
+    description: 'Active subscriptions. Filter by plan or status for a quick subscriber dashboard.',
   },
   access: {
     create: () => false,

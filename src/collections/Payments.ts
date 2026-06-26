@@ -4,6 +4,9 @@ export const Payments: CollectionConfig = {
   slug: 'payments',
   admin: {
     useAsTitle: 'razorpayPaymentId',
+    group: 'Admin Console',
+    defaultColumns: ['razorpayPaymentId', 'status', 'amount', 'createdAt'],
+    listSearchableFields: ['razorpayPaymentId', 'status'],
     description: 'Individual payment transactions recorded from Razorpay webhooks.',
   },
   access: {

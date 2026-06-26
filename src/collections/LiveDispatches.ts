@@ -4,7 +4,8 @@ export const LiveDispatches: CollectionConfig = {
   slug: 'live-dispatches',
   admin: {
     useAsTitle: 'headline',
-    description: 'Short-form live updates and dispatches.',
+    group: 'Admin Console',
+    description: 'Short-form live updates that appear in the floating widget across the site.',
   },
   fields: [
     {

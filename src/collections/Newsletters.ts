@@ -4,6 +4,10 @@ export const Newsletters: CollectionConfig = {
   slug: 'newsletters',
   admin: {
     useAsTitle: 'subject',
+    group: 'Admin Console',
+    defaultColumns: ['subject', 'status', 'sendDate', 'openCount', 'clickCount'],
+    listSearchableFields: ['subject', 'status'],
+    description: 'Newsletter campaigns — compose, schedule, send, and watch opens/clicks.',
   },
   hooks: {
     afterChange: [
