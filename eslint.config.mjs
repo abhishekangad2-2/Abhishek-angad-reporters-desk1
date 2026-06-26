@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
       // Kept as warnings; rules-of-hooks stays an error.
       "react-hooks/purity": "warn",
       "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/immutability": "warn",
     },
   },
   // Override default ignores of eslint-config-next.

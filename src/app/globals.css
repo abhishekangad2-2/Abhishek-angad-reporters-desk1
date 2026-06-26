@@ -1026,3 +1026,85 @@ a {
   padding: 0.6rem 1rem;
   text-decoration: none;
 }
+
+/* ---------- Language switcher widget ---------- */
+.lang-widget {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  font-family: var(--font-mono);
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--ink);
+  color: var(--paper-cool);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.lang-list {
+  list-style: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin: 0 0 0.4rem;
+  padding: 0;
+  min-width: 190px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--paper-cool);
+  border: 1px solid var(--ink);
+}
+
+.lang-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #d8d5cb;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.lang-item:hover {
+  background: var(--paper-newsprint);
+}
+
+.lang-item--active {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.lang-en {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+}
+
+/* Keep the switcher clear of the bottom-left Live Dispatches widget on
+   narrow screens by letting it sit just above the footer. */
+[dir='rtl'] .lang-widget {
+  right: auto;
+  left: 1.25rem;
+}
+
+[dir='rtl'] .lang-list {
+  right: auto;
+  left: 0;
+}

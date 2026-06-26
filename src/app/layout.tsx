@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import LiveDispatchesWidget from "@/components/LiveDispatchesWidget";
 import FooterTabs from "@/components/FooterTabs";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE, localeByCode } from "@/lib/i18n";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -29,20 +32,27 @@ export const metadata: Metadata = {
   description: "Independent Journalism",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get(LOCALE_COOKIE)?.value;
+  const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
+  const dir = localeByCode(locale).dir ?? "ltr";
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={dir}
       className={`${fraunces.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
         <main className="flex-1">
           {children}
         </main>
+        <LanguageSwitcher current={locale} />
         <LiveDispatchesWidget />
         <FooterTabs />
       </body>
