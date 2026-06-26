@@ -29,7 +29,7 @@ export default function HlsVideo({
     const manifest = trackId != null ? `${MEDIA_BASE}/transcoded/${trackId}/manifest.m3u8` : null
     let hls: any
     let cancelled = false
-    const useFallback = () => {
+    const applyFallback = () => {
       if (!cancelled && video.src !== fallbackUrl) video.src = fallbackUrl
     }
 
@@ -41,7 +41,7 @@ export default function HlsVideo({
       // Safari / iOS play HLS natively.
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = manifest
-        video.addEventListener('error', useFallback, { once: true })
+        video.addEventListener('error', applyFallback, { once: true })
         return
       }
       try {
@@ -53,14 +53,14 @@ export default function HlsVideo({
           hls.on(Hls.Events.ERROR, (_evt: unknown, data: any) => {
             if (data?.fatal) {
               try { hls.destroy() } catch {}
-              useFallback()
+              applyFallback()
             }
           })
         } else {
-          useFallback()
+          applyFallback()
         }
       } catch {
-        useFallback()
+        applyFallback()
       }
     })()
 
