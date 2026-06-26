@@ -622,6 +622,30 @@ a {
   margin-top: 2.5rem;
 }
 
+.immersive-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  z-index: 60;
+}
+
+.chapter-text--left {
+  margin-right: auto;
+  margin-left: 5vw;
+  text-align: left;
+}
+
+.chapter-text--right {
+  margin-left: auto;
+  margin-right: 5vw;
+  text-align: left;
+}
+
 /* ---------- Shared shell masthead ---------- */
 .site-masthead {
   position: relative;
