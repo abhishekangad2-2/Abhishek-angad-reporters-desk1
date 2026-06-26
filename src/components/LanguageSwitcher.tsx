@@ -1,20 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { LOCALES, LOCALE_COOKIE, localeByCode } from '@/lib/i18n'
 
-/** Small floating language switcher. Sets the rd_lang cookie and refreshes so
- *  server components re-render translated content. */
+/** Small floating language switcher. Sets the rd_lang cookie (for persistence)
+ *  and navigates to ?lang=<code> with a full load, which forces a fresh server
+ *  render that reads the locale and translates. */
 export default function LanguageSwitcher({ current }: { current: string }) {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
   const cur = localeByCode(current)
 
   function pick(code: string) {
     document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`
-    setOpen(false)
-    if (code !== current) router.refresh()
+    const u = new URL(window.location.href)
+    if (code === 'en') u.searchParams.delete('lang')
+    else u.searchParams.set('lang', code)
+    window.location.href = u.toString()
   }
 
   return (

@@ -20,7 +20,9 @@ export default async function Home({
   const template: LandingTemplate = isLandingTemplate(requested) ? requested : DEFAULT_TEMPLATE
 
   const cookieStore = await cookies()
-  const localeRaw = cookieStore.get(LOCALE_COOKIE)?.value
+  // ?lang= wins (forces a fresh translated render); cookie persists the choice.
+  const localeRaw =
+    (typeof sp.lang === 'string' ? sp.lang : undefined) ?? cookieStore.get(LOCALE_COOKIE)?.value
   const locale = isLocale(localeRaw) ? localeRaw : DEFAULT_LOCALE
 
   let data = await getLandingData()
