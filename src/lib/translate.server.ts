@@ -99,3 +99,55 @@ export async function translateLandingData(data: LandingData, localeCode: string
 
   return { stories, sections }
 }
+
+/** Translate a Lexical rich-text value in place-of-structure: deep-clone, swap
+ *  only the text-node strings, leave headings/lists/links/formatting intact. */
+async function translateLexical(content: any, localeCode: string): Promise<any> {
+  if (!content?.root) return content
+  const clone = JSON.parse(JSON.stringify(content))
+  const nodes: any[] = []
+  const walk = (n: any) => {
+    if (!n) return
+    if (n.type === 'text' && typeof n.text === 'string') nodes.push(n)
+    if (Array.isArray(n.children)) n.children.forEach(walk)
+  }
+  walk(clone.root)
+  if (nodes.length === 0) return clone
+  const translated = await translateBatch(nodes.map((n) => n.text), localeCode)
+  nodes.forEach((n, i) => {
+    n.text = translated[i] ?? n.text
+  })
+  return clone
+}
+
+/** Translate a full story document (headline/strap/caption/section name + the
+ *  Prose blocks in the body) for the story templates. */
+export async function translateStory(story: any, localeCode: string): Promise<any> {
+  if (localeCode === 'en' || !story) return story
+
+  const sectionObj = story.section && typeof story.section === 'object' ? story.section : null
+  const [tHead, tStrap, tCap, tSec] = await translateBatch(
+    [story.headline ?? '', story.strap ?? '', story.caption ?? '', sectionObj?.name ?? ''],
+    localeCode,
+  )
+
+  const out: any = {
+    ...story,
+    headline: tHead || story.headline,
+    strap: tStrap || story.strap,
+    caption: tCap || story.caption,
+  }
+  if (sectionObj) out.section = { ...sectionObj, name: tSec || sectionObj.name }
+
+  if (Array.isArray(story.layout)) {
+    out.layout = await Promise.all(
+      story.layout.map(async (block: any) =>
+        block?.blockType === 'Prose' && block.content?.root
+          ? { ...block, content: await translateLexical(block.content, localeCode) }
+          : block,
+      ),
+    )
+  }
+
+  return out
+}

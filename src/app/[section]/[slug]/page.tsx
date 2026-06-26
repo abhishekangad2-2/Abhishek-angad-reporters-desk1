@@ -1,7 +1,10 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
 
+import { translateStory } from '@/lib/translate.server'
+import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
 import Template1 from '@/components/templates/Template1'
 import Template2 from '@/components/templates/Template2'
 import Template3 from '@/components/templates/Template3'
@@ -56,7 +59,15 @@ export default async function StoryPage({
     notFound()
   }
 
-  const story = stories.docs[0]
+  let story = stories.docs[0]
+
+  // Translate the story (header + Lexical body) when a non-English locale is
+  // selected via ?lang= or the rd_lang cookie.
+  const cookieStore = await cookies()
+  const localeRaw =
+    (typeof sp.lang === 'string' ? sp.lang : undefined) ?? cookieStore.get(LOCALE_COOKIE)?.value
+  const locale = isLocale(localeRaw) ? localeRaw : DEFAULT_LOCALE
+  if (locale !== DEFAULT_LOCALE) story = await translateStory(story, locale)
 
   // ?template= preview override — view this story in any of the four designs
   // without re-saving its CMS layout_type. Falls back to the saved layout_type.
