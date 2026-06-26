@@ -14,6 +14,34 @@ const IMAGES = [
   { seed: 'city-square', alt: 'A crowd gathered in a city square at dusk' },
 ]
 
+function lex(text: string) {
+  return {
+    root: {
+      type: 'root',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      children: [
+        {
+          type: 'paragraph',
+          format: '',
+          indent: 0,
+          version: 1,
+          direction: 'ltr',
+          children: [{ type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text, version: 1 }],
+        },
+      ],
+    },
+  }
+}
+
+const CHAPTERS = [
+  { chapterTitle: 'The vanishing springs', alignment: 'left', backgroundMedia: 3, content: lex('For generations the springs ran year-round. Now they fail by May, and families notice the silence where water once moved.') },
+  { chapterTitle: 'Walking for water', alignment: 'right', backgroundMedia: 2, content: lex('Where a spring once sat at the doorstep, households now walk up to six kilometres a day — mostly women and children, mostly before dawn.') },
+  { chapterTitle: 'A warming signal', alignment: 'center', backgroundMedia: 4, content: lex('Across three districts, satellite records tie the drying to a retreating snowline — a local face on a planetary shift.') },
+]
+
 export async function GET(req: Request) {
   const url = new URL(req.url)
   if (url.searchParams.get('secret') !== SEED_TOKEN) {
@@ -50,6 +78,30 @@ export async function GET(req: Request) {
         data: { layout: [...existing, ...sample] },
       })
       return NextResponse.json({ success: true, appended: sample.length, total: (updated as any).layout?.length })
+    }
+
+    // ?addchapters=1 — populate the published story's scrollytellingChapters
+    // (an existing field/table, schema-safe) so the immersive builder can be
+    // demoed/verified. Idempotent.
+    if (url.searchParams.get('addchapters') === '1') {
+      const stories = await payload.find({
+        collection: 'stories',
+        where: { status: { equals: 'published' } },
+        limit: 1,
+        depth: 0,
+      })
+      const story = stories.docs[0]
+      if (!story) return NextResponse.json({ error: 'no story' }, { status: 404 })
+      const existing = (story as any).scrollytellingChapters
+      if (Array.isArray(existing) && existing.length > 0) {
+        return NextResponse.json({ success: true, already: existing.length })
+      }
+      const updated = await payload.update({
+        collection: 'stories',
+        id: story.id,
+        data: { scrollytellingChapters: CHAPTERS },
+      })
+      return NextResponse.json({ success: true, chapters: (updated as any).scrollytellingChapters?.length })
     }
 
     const created: any[] = []
