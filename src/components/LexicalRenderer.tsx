@@ -18,6 +18,7 @@
 import Image from 'next/image'
 import React from 'react'
 import HlsVideo from './HlsVideo'
+import { WavePlayer } from './WavePlayer'
 
 // ─────────────────────────── Lexical node renderer ───────────────────────────
 
@@ -181,7 +182,10 @@ function GalleryBlock({ block }: { block: any }) {
             // Plays the Transcoder HLS rendition when ready, else the original.
             <HlsVideo trackId={trackId} fallbackUrl={trackUrl} />
           ) : (
-            <audio src={trackUrl} controls className="w-full" />
+            <WavePlayer
+              src={trackUrl}
+              transcript={track && typeof track === 'object' ? (track.transcript ?? null) : null}
+            />
           )}
         </div>
       )}
@@ -295,10 +299,12 @@ function VideoBlock({ block }: { block: any }) {
 function AudioBlock({ block }: { block: any }) {
   const url = getUrl(block.audioFile)
   if (!url) return null
+  const transcript = block.audioFile && typeof block.audioFile === 'object'
+    ? (block.audioFile.transcript ?? null)
+    : null
   return (
     <figure className="vm-audio">
-      {block.title && <div className="vm-audio-title">{block.title}</div>}
-      <audio src={url} controls className="vm-audio-el" />
+      <WavePlayer src={url} title={block.title} transcript={transcript} />
       {block.caption && <figcaption className="vm-cap">{block.caption}</figcaption>}
     </figure>
   )
