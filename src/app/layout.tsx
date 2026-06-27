@@ -3,9 +3,7 @@ import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
-import LiveDispatchesWidget from "@/components/LiveDispatchesWidget";
-import FooterTabs from "@/components/FooterTabs";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import SiteChrome from "@/components/SiteChrome";
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE, localeByCode } from "@/lib/i18n";
 
 const fraunces = Fraunces({
@@ -54,9 +52,7 @@ export default async function RootLayout({
         <main className="flex-1">
           {children}
         </main>
-        <LanguageSwitcher current={locale} />
-        <LiveDispatchesWidget />
-        <FooterTabs />
+        <SiteChrome current={locale} />
         {gaId && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />

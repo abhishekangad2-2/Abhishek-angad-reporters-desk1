@@ -1271,6 +1271,132 @@ a {
   width: 100%;
 }
 
+/* Editor login (/admin-login) — branded, standalone */
+.rd-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: var(--paper-cool, #efeee8);
+}
+.rd-login__card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border: 1px solid var(--ink, #14171c);
+  padding: 2.5rem 2rem;
+  box-shadow: 8px 8px 0 rgba(20, 23, 28, 0.08);
+}
+.rd-login__brand {
+  text-align: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(20, 23, 28, 0.12);
+  padding-bottom: 1.5rem;
+}
+.rd-login__kicker {
+  font-family: var(--font-ibm-plex-mono, monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent, #b43d2a);
+}
+.rd-login__title {
+  font-family: var(--font-fraunces, Georgia, serif);
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.1;
+  margin: 0.35rem 0 0.15rem;
+  color: var(--ink, #14171c);
+}
+.rd-login__sub {
+  font-family: var(--font-ibm-plex-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: rgba(20, 23, 28, 0.6);
+  margin: 0;
+}
+.rd-login__form { display: block; }
+.rd-login__fieldset { border: 0; padding: 0; margin: 0; }
+.rd-login__h2 {
+  font-family: var(--font-fraunces, Georgia, serif);
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+}
+.rd-login__label {
+  display: block;
+  font-family: var(--font-ibm-plex-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(20, 23, 28, 0.7);
+  margin-bottom: 1.1rem;
+}
+.rd-login__input {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  font-family: var(--font-ibm-plex-sans, system-ui, sans-serif);
+  font-size: 1rem;
+  color: var(--ink, #14171c);
+  background: var(--paper-cool, #efeee8);
+  border: 1px solid rgba(20, 23, 28, 0.25);
+  border-radius: 0;
+}
+.rd-login__input:focus {
+  outline: none;
+  border-color: var(--accent, #b43d2a);
+  background: #fff;
+}
+.rd-login__input--code {
+  font-family: var(--font-ibm-plex-mono, monospace);
+  letter-spacing: 0.4em;
+  text-align: center;
+  font-size: 1.3rem;
+}
+.rd-login__btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-ibm-plex-sans, system-ui, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper-cool, #efeee8);
+  background: var(--ink, #14171c);
+  border: 1px solid var(--ink, #14171c);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rd-login__btn:hover:not(:disabled) {
+  background: var(--accent, #b43d2a);
+  border-color: var(--accent, #b43d2a);
+}
+.rd-login__btn:disabled { opacity: 0.55; cursor: default; }
+.rd-login__text { font-family: var(--font-ibm-plex-sans, system-ui, sans-serif); font-size: 0.9rem; color: var(--ink, #14171c); margin: 0 0 1rem; line-height: 1.5; }
+.rd-login__hint { font-family: var(--font-ibm-plex-sans, system-ui, sans-serif); font-size: 0.8rem; color: rgba(20, 23, 28, 0.6); margin: 0.75rem 0; }
+.rd-login__error {
+  font-family: var(--font-ibm-plex-sans, system-ui, sans-serif);
+  font-size: 0.85rem;
+  color: var(--accent, #b43d2a);
+  background: rgba(180, 61, 42, 0.08);
+  border-left: 2px solid var(--accent, #b43d2a);
+  padding: 0.5rem 0.75rem;
+  margin: 0 0 1rem;
+}
+.rd-login__qr { display: block; max-width: 200px; margin: 0 auto 0.5rem; }
+.rd-login__backup {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fff8e6;
+  border: 1px solid #e6c200;
+}
+.rd-login__backup-title { font-family: var(--font-ibm-plex-sans, system-ui, sans-serif); font-weight: 700; font-size: 0.85rem; margin: 0 0 0.5rem; }
+.rd-login__backup-codes { display: block; white-space: pre-wrap; font-family: var(--font-ibm-plex-mono, monospace); font-size: 0.85rem; line-height: 1.7; }
+
 /* WaveSurfer audio player */
 .wave-player {
   margin: 0;

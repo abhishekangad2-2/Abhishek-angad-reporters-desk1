@@ -139,112 +139,119 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div style={{ maxWidth: '400px', margin: '100px auto', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>ReportersDesk Admin</h1>
+    <div className="rd-login">
+      <div className="rd-login__card">
+        <div className="rd-login__brand">
+          <span className="rd-login__kicker">Editor access</span>
+          <h1 className="rd-login__title">ReportersDesk</h1>
+          <p className="rd-login__sub">Abhishek Angad Ink</p>
+        </div>
 
-      {step === 'credentials' && (
-        <form onSubmit={handleCredentialsSubmit}>
-          <fieldset disabled={loading}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label>
+        {step === 'credentials' && (
+          <form onSubmit={handleCredentialsSubmit} className="rd-login__form">
+            <fieldset disabled={loading} className="rd-login__fieldset">
+              <label className="rd-login__label">
                 Email
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{ display: 'block', width: '100%', marginTop: '0.5rem' }}
+                  autoComplete="username"
+                  className="rd-login__input"
                 />
               </label>
-            </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label>
+              <label className="rd-login__label">
                 Password
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  style={{ display: 'block', width: '100%', marginTop: '0.5rem' }}
+                  autoComplete="current-password"
+                  className="rd-login__input"
                 />
               </label>
-            </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <button type="submit">{loading ? 'Logging in...' : 'Login'}</button>
-          </fieldset>
-        </form>
-      )}
-
-      {step === 'enrollment' && (
-        <div>
-          <h2>Set Up Two-Factor Authentication</h2>
-          {!qrDataUrl ? (
-            <div>
-              <p>You need to set up 2FA to access the admin panel.</p>
-              <button onClick={handleEnrollmentStart} disabled={enrollmentLoading}>
-                {enrollmentLoading ? 'Starting...' : 'Start Enrollment'}
+              {error && <p className="rd-login__error">{error}</p>}
+              <button type="submit" className="rd-login__btn">
+                {loading ? 'Logging in…' : 'Log in'}
               </button>
-            </div>
-          ) : (
-            <div>
-              <p>Scan this QR code with your authenticator app:</p>
-              <img src={qrDataUrl} alt="2FA QR Code" style={{ maxWidth: '200px' }} />
-              <p style={{ fontSize: '0.9rem', color: '#666' }}>
-                After scanning, enter the 6-digit code from your authenticator app:
-              </p>
-              <form onSubmit={handleEnrollmentConfirm}>
-                <fieldset disabled={enrollmentLoading}>
-                  <input
-                    type="text"
-                    value={enrollmentCode}
-                    onChange={(e) => setEnrollmentCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000"
-                    maxLength={6}
-                    pattern="\d{6}"
-                    required
-                    style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
-                  />
-                  {error && <p style={{ color: 'red' }}>{error}</p>}
-                  <button type="submit">{enrollmentLoading ? 'Confirming...' : 'Confirm & Verify'}</button>
-                </fieldset>
-              </form>
-              {backupCodes.length > 0 && (
-                <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#fff3cd', borderRadius: '4px' }}>
-                  <p style={{ fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>⚠️ Save your backup codes now:</p>
-                  <code style={{ display: 'block', whiteSpace: 'pre-wrap', fontSize: '0.85rem' }}>
-                    {backupCodes.join('\n')}
-                  </code>
-                  <p style={{ fontSize: '0.85rem', margin: '0.5rem 0 0 0' }}>
-                    Keep these in a safe place. Each can be used once if you lose access to your authenticator.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+            </fieldset>
+          </form>
+        )}
 
-      {step === 'totp-input' && (
-        <form onSubmit={handleTotpSubmit}>
-          <fieldset disabled={loading}>
-            <p>Enter the 6-digit code from your authenticator app:</p>
-            <div style={{ marginBottom: '1rem' }}>
+        {step === 'enrollment' && (
+          <div className="rd-login__form">
+            <h2 className="rd-login__h2">Set up two-factor authentication</h2>
+            {!qrDataUrl ? (
+              <>
+                <p className="rd-login__text">You need to set up 2FA to access the admin panel.</p>
+                <button onClick={handleEnrollmentStart} disabled={enrollmentLoading} className="rd-login__btn">
+                  {enrollmentLoading ? 'Starting…' : 'Start enrollment'}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="rd-login__text">Scan this QR code with your authenticator app:</p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={qrDataUrl} alt="2FA QR Code" className="rd-login__qr" />
+                <p className="rd-login__hint">After scanning, enter the 6-digit code:</p>
+                <form onSubmit={handleEnrollmentConfirm}>
+                  <fieldset disabled={enrollmentLoading} className="rd-login__fieldset">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={enrollmentCode}
+                      onChange={(e) => setEnrollmentCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
+                      maxLength={6}
+                      pattern="\d{6}"
+                      required
+                      className="rd-login__input rd-login__input--code"
+                    />
+                    {error && <p className="rd-login__error">{error}</p>}
+                    <button type="submit" className="rd-login__btn">
+                      {enrollmentLoading ? 'Confirming…' : 'Confirm & verify'}
+                    </button>
+                  </fieldset>
+                </form>
+                {backupCodes.length > 0 && (
+                  <div className="rd-login__backup">
+                    <p className="rd-login__backup-title">⚠️ Save your backup codes now</p>
+                    <code className="rd-login__backup-codes">{backupCodes.join('\n')}</code>
+                    <p className="rd-login__hint">
+                      Keep these safe. Each can be used once if you lose your authenticator.
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {step === 'totp-input' && (
+          <form onSubmit={handleTotpSubmit} className="rd-login__form">
+            <fieldset disabled={loading} className="rd-login__fieldset">
+              <p className="rd-login__text">Enter the 6-digit code from your authenticator app:</p>
               <input
                 type="text"
+                inputMode="numeric"
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
                 pattern="\d{6}"
                 required
-                style={{ display: 'block', width: '100%' }}
+                className="rd-login__input rd-login__input--code"
               />
-            </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <button type="submit">{loading ? 'Verifying...' : 'Verify & Login'}</button>
-          </fieldset>
-        </form>
-      )}
+              {error && <p className="rd-login__error">{error}</p>}
+              <button type="submit" className="rd-login__btn">
+                {loading ? 'Verifying…' : 'Verify & log in'}
+              </button>
+            </fieldset>
+          </form>
+        )}
+      </div>
     </div>
   )
 }
