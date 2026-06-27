@@ -169,6 +169,9 @@ export async function GET(req: Request) {
         return NextResponse.json({ success: true, video: videoId, story: existingStory.docs[0].id, note: 'exists' })
       }
 
+      const videoUsers = await payload.find({ collection: 'users', limit: 1, depth: 0 })
+      const videoAdminId = videoUsers.docs[0]?.id
+
       const story = await payload.create({
         collection: 'stories',
         data: {
@@ -184,6 +187,7 @@ export async function GET(req: Request) {
           status: 'published',
           heroMedia: posterId,
           layout_type: 'template_3',
+          author: videoAdminId ? [videoAdminId] : [],
         } as any,
       })
       return NextResponse.json({ success: true, video: videoId, story: story.id })
@@ -201,6 +205,9 @@ export async function GET(req: Request) {
     const mediaIds = media.docs.map((m: any) => m.id)
     const pickHero = (i: number): number | undefined =>
       mediaIds.length ? mediaIds[i % mediaIds.length] : undefined
+
+    const users = await payload.find({ collection: 'users', limit: 1, depth: 0 })
+    const adminId = users.docs[0]?.id
 
     const created: any[] = []
     const skipped: string[] = []
@@ -229,6 +236,7 @@ export async function GET(req: Request) {
             status: 'published',
             heroMedia: pickHero(i),
             layout_type: s.layout_type as any,
+            author: adminId ? [adminId] : [],
           } as any,
         })
         created.push({ id: doc.id, slug: s.slug, headline: s.headline })

@@ -188,6 +188,9 @@ export async function GET(req: Request) {
 
     const bicycleId = mediaIds['IMG20260410180308.jpg']
 
+    const adminUsers = await payload.find({ collection: 'users', limit: 1, depth: 0 })
+    const adminId = adminUsers.docs[0]?.id
+
     // ── 2. WB SIR story ─────────────────────────────────────────────────────
     let storyResult: any = null
     if (doStory) {
@@ -222,7 +225,7 @@ export async function GET(req: Request) {
             caption:
               'A man with his bicycle near a polling booth in West Bengal, April 2026. Photo: Abhishek Angad',
             section: section?.id,
-            authorName: 'Abhishek Angad',
+            author: adminId ? [adminId] : [],
             publishedAt: new Date('2026-04-27T06:00:00.000Z').toISOString(),
             layout: [
               { blockType: 'Prose', content: lexicalBody(WB_PARAGRAPHS) },
@@ -274,7 +277,7 @@ export async function GET(req: Request) {
               'A photo essay from Jharkhand — district hospitals, village health camps, community workers, and the long aftermath of Covid-19. All photographs by Abhishek Angad.',
             caption: 'Photographs from Jharkhand, 2024–2026. Photo credit: Abhishek Angad',
             section: section?.id,
-            authorName: 'Abhishek Angad',
+            author: adminId ? [adminId] : [],
             layout: [
               {
                 blockType: 'Prose',
