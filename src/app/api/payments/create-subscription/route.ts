@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 // Plan configuration — single source of truth for pricing.
 // The actual Razorpay plan IDs must be created in the Razorpay dashboard
@@ -16,6 +17,11 @@ const PLAN_MAP: Record<string, { razorpayPlanId: string; amountPaise: number }> 
 }
 
 export async function POST(req: NextRequest) {
+  // 5 subscription creation attempts per IP per 10 minutes
+  if (!checkRateLimit(`payment:${getClientIp(req)}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many requests. Try again later.' }, { status: 429 })
+  }
+
   const keyId = process.env.RAZORPAY_KEY_ID
   const keySecret = process.env.RAZORPAY_KEY_SECRET
 

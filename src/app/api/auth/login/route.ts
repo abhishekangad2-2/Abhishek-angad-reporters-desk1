@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import { getPayload } from 'payload'
 import config from '../../../../payload.config'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 const PENDING_2FA_SECRET = process.env.PENDING_2FA_SECRET!
 const PENDING_2FA_TTL = '5m'
 
 export async function POST(req: NextRequest) {
+  // 5 attempts per IP per 15 minutes
+  if (!checkRateLimit(`login:${getClientIp(req)}`, 5, 15 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many login attempts. Try again later.' }, { status: 429 })
+  }
+
   const { email, password } = await req.json()
   if (!email || !password) {
     return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 })
