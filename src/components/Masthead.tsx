@@ -18,7 +18,7 @@ export default function Masthead({
     <header className="site-masthead">
       <div className="mh-bar">
         <span className="mh-eyebrow">{est}</span>
-        <Link href="/admin" className="mh-editor">
+        <Link href="/cms" className="mh-editor">
           {editor}
         </Link>
       </div>

@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose'
 const SESSION_COOKIE = 'rd_session'
 
 // This middleware only runs for the paths in `config.matcher` below (the
-// Payload admin, mounted at /admin). Every request that reaches here must
+// Payload admin, mounted at /cms). Every request that reaches here must
 // carry a valid 2FA session cookie or it is redirected to the custom login.
 // NOTE: the matcher deliberately does NOT include /admin-login or /api/auth,
 // so those stay reachable without a session.
@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Match the admin index (/admin) AND everything under it (/admin/...).
-  // '/admin/:path*' alone does not match the bare /admin path.
-  matcher: ['/admin', '/admin/:path*'],
+  // Match the admin index (/cms) AND everything under it (/cms/...).
+  // '/cms/:path*' alone does not match the bare /cms path.
+  matcher: ['/cms', '/cms/:path*'],
 }

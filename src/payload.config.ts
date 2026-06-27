@@ -25,6 +25,11 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  // Admin panel mounted at /cms (branded), not the Payload default /admin.
+  // Must stay in sync with the (payload)/cms route folder + middleware matcher.
+  routes: {
+    admin: '/cms',
+  },
   admin: {
     user: Users.slug,
   },
