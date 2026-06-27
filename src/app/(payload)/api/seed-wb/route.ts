@@ -189,7 +189,19 @@ export async function GET(req: Request) {
     const bicycleId = mediaIds['IMG20260410180308.jpg']
 
     const adminUsers = await payload.find({ collection: 'users', limit: 1, depth: 0 })
-    const adminId = adminUsers.docs[0]?.id
+    const adminUser = adminUsers.docs[0]
+    const adminId = adminUser?.id
+    // Ensure admin has Abhishek Angad as display name for byline rendering
+    if (adminUser && (!adminUser.firstName || !adminUser.lastName)) {
+      await payload.update({
+        collection: 'users',
+        id: adminId,
+        data: {
+          firstName: (adminUser.firstName as string | undefined) || 'Abhishek',
+          lastName: (adminUser.lastName as string | undefined) || 'Angad',
+        } as any,
+      })
+    }
 
     // ── 2. WB SIR story ─────────────────────────────────────────────────────
     let storyResult: any = null

@@ -207,7 +207,18 @@ export async function GET(req: Request) {
       mediaIds.length ? mediaIds[i % mediaIds.length] : undefined
 
     const users = await payload.find({ collection: 'users', limit: 1, depth: 0 })
-    const adminId = users.docs[0]?.id
+    const adminUser = users.docs[0]
+    const adminId = adminUser?.id
+    if (adminUser && (!adminUser.firstName || !adminUser.lastName)) {
+      await payload.update({
+        collection: 'users',
+        id: adminId,
+        data: {
+          firstName: (adminUser.firstName as string | undefined) || 'Abhishek',
+          lastName: (adminUser.lastName as string | undefined) || 'Angad',
+        } as any,
+      })
+    }
 
     const created: any[] = []
     const skipped: string[] = []
