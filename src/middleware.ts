@@ -9,6 +9,16 @@ const SESSION_COOKIE = 'rd_session'
 // NOTE: the matcher deliberately does NOT include /admin-login or /api/auth,
 // so those stay reachable without a session.
 export async function middleware(request: NextRequest) {
+  // Optional IP allowlist for the admin. Configured via the ADMIN_IP_ALLOWLIST
+  // env var (comma-separated IPs/prefixes). Fail-open: if unset, no restriction.
+  const allow = (process.env.ADMIN_IP_ALLOWLIST || '').split(',').map((s) => s.trim()).filter(Boolean)
+  if (allow.length > 0) {
+    const fwd = request.headers.get('x-forwarded-for') || ''
+    const ip = fwd.split(',')[0].trim()
+    const ok = ip && allow.some((a) => ip === a || ip.startsWith(a))
+    if (!ok) return new NextResponse('Forbidden', { status: 403 })
+  }
+
   const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
 
   if (!sessionToken) {
