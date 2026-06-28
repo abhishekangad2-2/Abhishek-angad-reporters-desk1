@@ -366,69 +366,108 @@ a {
   height: 180px;
 }
 
-/* Three-column template */
+/* Three-column template — photo-led tiles floating over the full-bleed Plexus.
+   Hover lifts the tile on the z-axis, sharpens it and dims the others. */
 .three-col-grid {
   position: relative;
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  min-height: calc(100vh - 230px);
+  grid-auto-rows: minmax(220px, 42vh);
+  gap: clamp(10px, 1.1vw, 18px);
+  padding: clamp(0.75rem, 1.6vw, 1.6rem);
 }
 
-/* Minimal text columns floating OVER the full-bleed Plexus — no opaque image
-   cards, so the 3D network is the background. Hover lifts the column on the
-   z-axis and dims the others. */
 .three-col-card {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 0.5rem;
-  padding: 2.5rem 2rem;
+  border-radius: 3px;
+  background: #14171c;
+  padding: clamp(1rem, 1.4vw, 1.6rem);
   text-decoration: none;
-  color: var(--ink);
-  border-right: 1px solid rgba(20, 23, 28, 0.18);
-  transition: transform 0.45s ease, background 0.45s ease, opacity 0.45s ease;
+  color: var(--paper-glow, #f5f3ec);
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.5s ease, opacity 0.45s ease, filter 0.45s ease;
 }
 
-.three-col-card:last-child {
-  border-right: none;
+/* text-only fallback tile (editorial-desk backfill, no hero image) */
+.three-col-card:not(.three-col-card--photo) {
+  background: linear-gradient(160deg, rgba(20, 23, 28, 0.9), rgba(12, 14, 17, 0.7));
+  border: 1px solid rgba(245, 243, 236, 0.1);
+}
+
+.three-col-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.three-col-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(7, 8, 10, 0.92) 4%, rgba(7, 8, 10, 0.35) 50%, rgba(7, 8, 10, 0.04) 100%);
 }
 
 .three-col-card:hover {
-  background: rgba(239, 238, 232, 0.45);
-  transform: translateY(-8px);
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 36px 72px -24px rgba(0, 0, 0, 0.7);
+  z-index: 5;
+}
+
+.three-col-card:hover .three-col-img {
+  transform: scale(1.06);
 }
 
 .three-col-card--dim {
-  opacity: 0.4;
+  opacity: 0.55;
+  filter: brightness(0.7);
 }
 
 .three-col-index {
-  font-family: var(--font-display);
-  font-size: 3.2rem;
-  line-height: 1;
-  opacity: 0.22;
+  position: absolute;
+  top: 0.7rem;
+  right: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(245, 243, 236, 0.5);
+  z-index: 1;
+}
+
+.three-col-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
 .three-col-section {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #e6b8ac;
 }
 
 .three-col-headline {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2.2vw, 2.1rem);
-  line-height: 1.05;
-  max-width: 16ch;
+  font-size: clamp(1.2rem, 1.6vw, 1.7rem);
+  line-height: 1.08;
+  max-width: 22ch;
   margin: 0;
+  color: var(--paper-glow, #f5f3ec);
 }
 
 @media (max-width: 800px) {
   .three-col-grid {
     grid-template-columns: 1fr;
+    grid-auto-rows: minmax(200px, 34vh);
   }
 }
 

@@ -32,13 +32,22 @@ export default function ThreeColumnLanding({ data }: { data: LandingData }) {
             <a
               key={i}
               href={c.href}
-              className={`three-col-card ${hovered !== null && hovered !== i ? 'three-col-card--dim' : ''}`}
+              className={`three-col-card ${c.heroUrl ? 'three-col-card--photo' : ''} ${hovered !== null && hovered !== i ? 'three-col-card--dim' : ''}`}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
             >
+              {c.heroUrl && (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="three-col-img" src={c.heroUrl} alt="" loading="lazy" />
+                  <span className="three-col-scrim" />
+                </>
+              )}
               <span className="three-col-index">0{i + 1}</span>
-              <span className="three-col-section">{c.kicker}</span>
-              <h2 className="three-col-headline">{c.headline}</h2>
+              <span className="three-col-body">
+                <span className="three-col-section">{c.kicker}</span>
+                <h2 className="three-col-headline">{c.headline}</h2>
+              </span>
             </a>
           ))}
         </div>
