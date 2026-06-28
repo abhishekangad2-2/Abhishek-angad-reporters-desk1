@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isEditorOrAbove } from '../lib/access'
 
 // Minimal Lexical → HTML for newsletter content. Handles paragraphs, headings,
 // bold/italic, lists, blockquotes, and links — enough for newsroom dispatches
