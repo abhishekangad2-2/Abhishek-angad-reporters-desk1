@@ -1,7 +1,14 @@
 import type { CollectionConfig } from 'payload'
+import { isEditorOrAbove } from '../lib/access'
 
 export const Issues: CollectionConfig = {
   slug: 'issues',
+  access: {
+    read: () => true, // Public site taxonomy
+    create: isEditorOrAbove,
+    update: isEditorOrAbove,
+    delete: isEditorOrAbove,
+  },
   admin: {
     useAsTitle: 'title',
   },

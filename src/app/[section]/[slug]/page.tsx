@@ -43,7 +43,11 @@ export async function generateMetadata({
     if (!section) return {}
     const res = await payload.find({
       collection: 'stories',
-      where: { slug: { equals: slug }, section: { equals: section.id } },
+      where: {
+        slug: { equals: slug },
+        section: { equals: section.id },
+        status: { equals: 'published' },
+      },
       limit: 1,
       depth: 1,
     })
@@ -98,6 +102,7 @@ export default async function StoryPage({
     where: {
       slug: { equals: slug },
       section: { equals: section.id },
+      status: { equals: 'published' },
     },
     limit: 1,
   })

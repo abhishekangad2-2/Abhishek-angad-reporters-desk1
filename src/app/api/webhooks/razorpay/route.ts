@@ -9,16 +9,18 @@ export async function POST(req: NextRequest) {
 
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET
   if (!secret) {
-    console.warn('RAZORPAY_WEBHOOK_SECRET is not configured. Bypassing webhook signature validation.')
-  } else {
-    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
-    const valid =
-      expected.length === signature.length &&
-      crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
+    // Fail closed: without the secret we cannot verify authenticity, so we must
+    // NOT process the event (otherwise anyone can forge payments/subscriptions).
+    console.error('RAZORPAY_WEBHOOK_SECRET is not configured — rejecting webhook.')
+    return NextResponse.json({ error: 'Webhook not configured.' }, { status: 500 })
+  }
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
+  const valid =
+    expected.length === signature.length &&
+    crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
 
-    if (!valid) {
-      return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 })
-    }
+  if (!valid) {
+    return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 })
   }
 
   const event = JSON.parse(rawBody)

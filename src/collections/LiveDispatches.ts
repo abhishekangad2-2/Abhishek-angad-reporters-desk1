@@ -1,7 +1,16 @@
 import type { CollectionConfig } from 'payload'
+import { isEditorOrAbove, isReporterOrAbove } from '../lib/access'
 
 export const LiveDispatches: CollectionConfig = {
   slug: 'live-dispatches',
+  access: {
+    // Public read (rendered site-wide in the floating widget). Only newsroom
+    // staff can post/edit; deletion is editors-and-above.
+    read: () => true,
+    create: isReporterOrAbove,
+    update: isReporterOrAbove,
+    delete: isEditorOrAbove,
+  },
   admin: {
     useAsTitle: 'headline',
     group: 'Admin Console',

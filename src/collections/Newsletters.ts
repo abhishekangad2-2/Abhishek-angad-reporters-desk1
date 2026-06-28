@@ -39,6 +39,14 @@ function lexicalToHtml(node: any): string {
 
 export const Newsletters: CollectionConfig = {
   slug: 'newsletters',
+  access: {
+    // NOT public: drafts are internal, and update→status:'sent' triggers a real
+    // send to the whole subscriber list. Editors-and-above only, all operations.
+    read: isEditorOrAbove,
+    create: isEditorOrAbove,
+    update: isEditorOrAbove,
+    delete: isEditorOrAbove,
+  },
   admin: {
     useAsTitle: 'subject',
     group: 'Admin Console',

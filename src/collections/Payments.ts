@@ -11,7 +11,7 @@ export const Payments: CollectionConfig = {
   },
   access: {
     read: ({ req: { user } }) => Boolean(user && (user.role === 'admin' || user.role === 'editor')),
-    create: () => true,  // Called by internal webhook route via local API
+    create: () => false, // Webhook writes via Local API (bypasses access); block forged public REST creates
     update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
     delete: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
   },

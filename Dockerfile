@@ -17,6 +17,10 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 # Regenerate Payload types from the schema so payload-types.ts is never stale
 RUN npm run generate:types || true
+# NOTE: the admin importMap (src/app/(payload)/cms/importMap.js) is committed and
+# must be kept in sync by hand when admin/plugin components change — `payload
+# generate:importmap` is not run here because it requires a live DB/GCS init at
+# build time. When adding an admin component, add its entry to importMap.js.
 RUN npm run build
 
 # Production image, copy all the files and run next

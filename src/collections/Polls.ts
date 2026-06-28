@@ -1,7 +1,17 @@
 import type { CollectionConfig } from 'payload'
+import { isEditorOrAbove } from '../lib/access'
 
 export const Polls: CollectionConfig = {
   slug: 'polls',
+  access: {
+    // Public can read polls (rendered on the site). Vote counts update via the
+    // dedicated /api/polls/[id]/vote route (Local API, bypasses access).
+    // Direct REST writes are editors-and-above only.
+    read: () => true,
+    create: isEditorOrAbove,
+    update: isEditorOrAbove,
+    delete: isEditorOrAbove,
+  },
   admin: {
     useAsTitle: 'question',
     group: 'Admin Console',

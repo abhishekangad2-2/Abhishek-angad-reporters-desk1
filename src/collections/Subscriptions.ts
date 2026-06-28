@@ -10,7 +10,8 @@ export const Subscriptions: CollectionConfig = {
     description: 'Active subscriptions. Filter by plan or status for a quick subscriber dashboard.',
   },
   access: {
-    create: () => false,
+    read: ({ req: { user } }) => Boolean(user && (user.role === 'admin' || user.role === 'editor')),
+    create: () => false, // Webhook writes via Local API (bypasses access)
     update: () => false,
     delete: ({ req: { user } }) => user?.role === 'admin',
   },

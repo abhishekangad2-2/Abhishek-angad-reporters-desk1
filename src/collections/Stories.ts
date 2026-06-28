@@ -1,8 +1,5 @@
 import type { Block, CollectionConfig } from 'payload'
 import { generateReadDeeperHook } from '../hooks/generateReadDeeper'
-import { LayoutPicker } from '../components/admin/LayoutPicker'
-import { AccentThemePicker } from '../components/admin/AccentThemePicker'
-import { PublishGateChecklist } from '../components/admin/PublishGateChecklist'
 import { isEditorOrAbove, isReporterOrAbove, roleOf } from '../lib/access'
 
 const SinglePictureBlock: Block = {
@@ -195,7 +192,7 @@ export const Stories: CollectionConfig = {
   admin: {
     useAsTitle: 'headline',
     components: {
-      BeforeDocumentControls: [PublishGateChecklist],
+      BeforeDocumentControls: ['/components/admin/PublishGateChecklist#PublishGateChecklist'],
     },
   },
   access: {
@@ -369,7 +366,7 @@ export const Stories: CollectionConfig = {
               admin: {
                 description: 'Override the desk\'s default accent color (optional)',
                 components: {
-                  Field: AccentThemePicker,
+                  Field: '/components/admin/AccentThemePicker#AccentThemePicker',
                 },
               },
             },
@@ -455,7 +452,7 @@ export const Stories: CollectionConfig = {
               defaultValue: 'template_1',
               admin: {
                 components: {
-                  Field: LayoutPicker,
+                  Field: '/components/admin/LayoutPicker#LayoutPicker',
                 },
               },
             },

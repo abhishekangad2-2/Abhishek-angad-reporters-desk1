@@ -22,6 +22,10 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { GcsClientUploadHandler as GcsClientUploadHandler_rd } from '@payloadcms/storage-gcs/client'
+import { LayoutPicker as LayoutPicker_rd } from '@/components/admin/LayoutPicker'
+import { AccentThemePicker as AccentThemePicker_rd } from '@/components/admin/AccentThemePicker'
+import { PublishGateChecklist as PublishGateChecklist_rd } from '@/components/admin/PublishGateChecklist'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -48,5 +52,9 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_rd,
+  "/components/admin/LayoutPicker#LayoutPicker": LayoutPicker_rd,
+  "/components/admin/AccentThemePicker#AccentThemePicker": AccentThemePicker_rd,
+  "/components/admin/PublishGateChecklist#PublishGateChecklist": PublishGateChecklist_rd
 }
