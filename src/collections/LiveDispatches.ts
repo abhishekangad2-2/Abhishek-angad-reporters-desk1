@@ -42,6 +42,20 @@ export const LiveDispatches: CollectionConfig = {
       },
     },
     {
+      name: 'significance',
+      type: 'select',
+      defaultValue: 'normal',
+      options: [
+        { label: 'Normal', value: 'normal' },
+        { label: 'Significant', value: 'significant' },
+        { label: 'Breaking', value: 'breaking' },
+      ],
+      admin: {
+        description:
+          'Significant / Breaking dispatches get a Plexus-Pulse ripple + flag label in the floating widget.',
+      },
+    },
+    {
       name: 'publishedAt',
       type: 'date',
     },

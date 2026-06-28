@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
-import LiveDispatchesWidget from '@/components/LiveDispatchesWidget'
+import LiveDispatches from '@/components/LiveDispatches'
 import FooterTabs from '@/components/FooterTabs'
 
 // Public-site chrome (language switcher, live dispatches, footer tabs).
@@ -16,7 +16,7 @@ export default function SiteChrome({ current }: { current: string }) {
   return (
     <>
       <LanguageSwitcher current={current} />
-      <LiveDispatchesWidget />
+      <LiveDispatches />
       <FooterTabs />
     </>
   )
