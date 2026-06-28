@@ -30,6 +30,20 @@ function usePrefersReducedMotion() {
   return reduced
 }
 
+function generateRandomVector(nodeCount: number): THREE.Vector3[] {
+  const arr: THREE.Vector3[] = []
+  for (let i = 0; i < nodeCount; i++) {
+    arr.push(
+      new THREE.Vector3((Math.random() - 0.5) * 12, (Math.random() - 0.5) * 7, (Math.random() - 0.5) * 4),
+    )
+  }
+  return arr
+}
+
+function generateVelocities(points: THREE.Vector3[]): THREE.Vector3[] {
+  return points.map(() => new THREE.Vector3((Math.random() - 0.5) * 0.004, (Math.random() - 0.5) * 0.004, 0))
+}
+
 function PlexusScene({
   nodeCount = 80,
   connectDistance = 2.6,
@@ -38,25 +52,21 @@ function PlexusScene({
   intensity = 0.5,
   focusIndex = null,
 }: PlexusBackgroundProps) {
-  const points = useMemo(() => {
-    const arr: THREE.Vector3[] = []
-    for (let i = 0; i < nodeCount; i++) {
-      arr.push(
-        new THREE.Vector3((Math.random() - 0.5) * 12, (Math.random() - 0.5) * 7, (Math.random() - 0.5) * 4),
-      )
-    }
-    return arr
-  }, [nodeCount])
+  const [points, setPoints] = useState<THREE.Vector3[]>([])
+  const [velocities, setVelocities] = useState<THREE.Vector3[]>([])
 
-  const velocities = useMemo(
-    () => points.map(() => new THREE.Vector3((Math.random() - 0.5) * 0.004, (Math.random() - 0.5) * 0.004, 0)),
-    [points],
-  )
+  useEffect(() => {
+    const newPoints = generateRandomVector(nodeCount)
+    setPoints(newPoints)
+    setVelocities(generateVelocities(newPoints))
+  }, [nodeCount])
 
   const pointsRef = useRef<THREE.Points>(null)
   const linesRef = useRef<THREE.LineSegments>(null)
 
   useFrame(() => {
+    if (points.length === 0) return
+
     points.forEach((p, i) => {
       p.add(velocities[i])
       if (Math.abs(p.x) > 6) velocities[i].x *= -1
@@ -93,7 +103,7 @@ function PlexusScene({
     <>
       <points ref={pointsRef}>
         <bufferGeometry>
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <bufferAttribute attach="attributes-position" count={points.length} array={initialPositions} itemSize={3} args={[initialPositions, 3]} />
         </bufferGeometry>
         <pointsMaterial color={color} size={0.06} transparent opacity={intensity} sizeAttenuation />

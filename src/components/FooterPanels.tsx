@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { QRCodeSVG } from 'qrcode.react'
 import type { Poll } from '../../lib/types'
 
@@ -106,7 +107,7 @@ export function NewsletterTab() {
   }
 
   if (status === 'done') {
-    return <p className="footer-panel">You're subscribed. Watch your inbox.</p>
+    return <p className="footer-panel">You&apos;re subscribed. Watch your inbox.</p>
   }
 
   return (
@@ -187,7 +188,7 @@ export function FounderBioTab() {
       <h3>Abhishek Angad</h3>
       {/* Replace the paragraph below with the real bio before launch. */}
       <p>Founder and editor of ReportersDesk. Independent journalist covering accountability, power, and public institutions.</p>
-      <a href="/founder">Read the full bio →</a>
+      <Link href="/founder">Read the full bio →</Link>
     </div>
   )
 }
