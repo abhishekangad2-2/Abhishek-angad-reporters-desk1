@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import type { Poll } from '../../lib/types'
+import Link from 'next/link'
 
 const PLANS = [
   { id: 'reader', label: 'Reader', amount: 5000, blurb: 'Annual support for the newsroom' },
@@ -187,7 +188,7 @@ export function FounderBioTab() {
       <h3>Abhishek Angad</h3>
       {/* Replace the paragraph below with the real bio before launch. */}
       <p>Founder and editor of ReportersDesk. Independent journalist covering accountability, power, and public institutions.</p>
-      <a href="/founder">Read the full bio →</a>
+      <Link href="/founder">Read the full bio →</Link>
     </div>
   )
 }
