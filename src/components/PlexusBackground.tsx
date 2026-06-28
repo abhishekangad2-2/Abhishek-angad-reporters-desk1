@@ -103,7 +103,7 @@ function PlexusScene({
     <>
       <points ref={pointsRef}>
         <bufferGeometry>
-          {/* @ts-expect-error */}
+          {/* @ts-expect-error React Three Fiber bufferAttribute API */}
           <bufferAttribute attach="attributes-position" count={points.length} array={initialPositions} itemSize={3} args={[initialPositions, 3]} />
         </bufferGeometry>
         <pointsMaterial color={color} size={0.06} transparent opacity={intensity} sizeAttenuation />
