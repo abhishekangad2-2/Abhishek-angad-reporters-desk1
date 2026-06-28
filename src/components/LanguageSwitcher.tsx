@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LOCALES, LOCALE_COOKIE, localeByCode } from '@/lib/i18n'
 
 /** Small floating language switcher. Sets the rd_lang cookie (for persistence)
@@ -8,14 +8,21 @@ import { LOCALES, LOCALE_COOKIE, localeByCode } from '@/lib/i18n'
  *  render that reads the locale and translates. */
 export default function LanguageSwitcher({ current }: { current: string }) {
   const [open, setOpen] = useState(false)
+  const [selectedCode, setSelectedCode] = useState<string | null>(null)
   const cur = localeByCode(current)
 
+  useEffect(() => {
+    if (selectedCode) {
+      document.cookie = `${LOCALE_COOKIE}=${selectedCode}; path=/; max-age=31536000; samesite=lax`
+      const u = new URL(window.location.href)
+      if (selectedCode === 'en') u.searchParams.delete('lang')
+      else u.searchParams.set('lang', selectedCode)
+      window.location.href = u.toString()
+    }
+  }, [selectedCode])
+
   function pick(code: string) {
-    document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`
-    const u = new URL(window.location.href)
-    if (code === 'en') u.searchParams.delete('lang')
-    else u.searchParams.set('lang', code)
-    window.location.href = u.toString()
+    setSelectedCode(code)
   }
 
   return (
