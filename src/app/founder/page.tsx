@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Link from 'next/link'
 import './founder.css'
 
 const TIMELINE = [
-  { year: 'The beat', title: 'Ground reportage from Jharkhand & eastern India', body: 'Reporting where policy meets the people it is meant to serve — public health, the rural belt, and the distance between an entitlement on paper and a hand-pump that works.' },
+  { year: 'The beat', title: 'Ground reportage from Jharkhand & eastern India', body: 'Reporting where policy meets the people it is meant to serve — public health, the rural belt, and the distan[...]
   { year: 'Accountability', title: 'Following the money', body: 'Where public money was meant to go, and where it actually went — budgets, schemes, and the institutions answerable for them.' },
   { year: 'Elections', title: 'The integrity of the rolls', body: 'Booth-level scrutiny of electoral revisions and the trust deficit they expose, from the West Bengal SIR onward.' },
   { year: 'Form', title: 'Visual & audio investigations', body: 'Photo essays, field video and recorded testimony — telling the story in the medium the story demands.' },
@@ -55,7 +56,7 @@ export default function FounderPage() {
       </section>
 
       <footer className="fd-foot">
-        <a href="/">← Back to ReportersDesk</a>
+        <Link href="/">← Back to ReportersDesk</Link>
         <a href="mailto:desk@reportersdesk.abhishekangad.com">Get in touch</a>
       </footer>
     </main>
