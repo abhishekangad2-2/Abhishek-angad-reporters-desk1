@@ -26,7 +26,12 @@ export const Integrations: GlobalConfig = {
                 { label: 'Newspaper', value: 'newspaper' },
                 { label: 'Immersive (single feature)', value: 'immersive' },
               ],
-              admin: { description: 'Set by the Layout Co-Pilot. ?layout= still overrides for preview.' },
+              admin: {
+                description: 'Set by the Layout Co-Pilot. ?layout= still overrides for preview.',
+                components: {
+                  Field: '/components/admin/LandingLayoutPicker#LandingLayoutPicker',
+                },
+              },
             },
           ],
         },

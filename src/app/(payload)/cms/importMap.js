@@ -24,6 +24,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { GcsClientUploadHandler as GcsClientUploadHandler_rd } from '@payloadcms/storage-gcs/client'
 import { LayoutPicker as LayoutPicker_rd } from '@/components/admin/LayoutPicker'
+import { LandingLayoutPicker as LandingLayoutPicker_rd } from '@/components/admin/LandingLayoutPicker'
 import { AccentThemePicker as AccentThemePicker_rd } from '@/components/admin/AccentThemePicker'
 import { PublishGateChecklist as PublishGateChecklist_rd } from '@/components/admin/PublishGateChecklist'
 
@@ -55,6 +56,7 @@ export const importMap = {
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_rd,
   "/components/admin/LayoutPicker#LayoutPicker": LayoutPicker_rd,
+  "/components/admin/LandingLayoutPicker#LandingLayoutPicker": LandingLayoutPicker_rd,
   "/components/admin/AccentThemePicker#AccentThemePicker": AccentThemePicker_rd,
   "/components/admin/PublishGateChecklist#PublishGateChecklist": PublishGateChecklist_rd
 }
