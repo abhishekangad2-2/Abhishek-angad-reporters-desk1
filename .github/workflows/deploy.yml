@@ -54,6 +54,7 @@ jobs:
             DATABASE_URI=database-uri:latest
             PAYLOAD_SECRET=payload-secret:latest
             PENDING_2FA_SECRET=pending-2fa-secret:latest
+            GOOGLE_CLOUD_VISION_API_KEY=google-cloud-vision-api-key:latest
           # Preserve the Cloud SQL socket connection the DATABASE_URI relies on.
           # 2Gi memory: Payload + sharp image processing and large video uploads
           # (100MB+) need headroom beyond the 512Mi default.
