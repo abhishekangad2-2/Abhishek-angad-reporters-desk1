@@ -27,6 +27,8 @@ import { LayoutPicker as LayoutPicker_rd } from '@/components/admin/LayoutPicker
 import { LandingLayoutPicker as LandingLayoutPicker_rd } from '@/components/admin/LandingLayoutPicker'
 import { AccentThemePicker as AccentThemePicker_rd } from '@/components/admin/AccentThemePicker'
 import { PublishGateChecklist as PublishGateChecklist_rd } from '@/components/admin/PublishGateChecklist'
+import { TagSuggester as TagSuggester_rd } from '@/components/admin/TagSuggester'
+import { CaptionSuggester as CaptionSuggester_rd } from '@/components/admin/CaptionSuggester'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -58,5 +60,7 @@ export const importMap = {
   "/components/admin/LayoutPicker#LayoutPicker": LayoutPicker_rd,
   "/components/admin/LandingLayoutPicker#LandingLayoutPicker": LandingLayoutPicker_rd,
   "/components/admin/AccentThemePicker#AccentThemePicker": AccentThemePicker_rd,
-  "/components/admin/PublishGateChecklist#PublishGateChecklist": PublishGateChecklist_rd
+  "/components/admin/PublishGateChecklist#PublishGateChecklist": PublishGateChecklist_rd,
+  "/components/admin/TagSuggester#TagSuggester": TagSuggester_rd,
+  "/components/admin/CaptionSuggester#CaptionSuggester": CaptionSuggester_rd
 }

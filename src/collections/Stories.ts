@@ -14,6 +14,11 @@ const SinglePictureBlock: Block = {
     {
       name: 'caption',
       type: 'text',
+      admin: {
+        components: {
+          Field: '/components/admin/CaptionSuggester#CaptionSuggester',
+        },
+      },
     },
   ],
 }
@@ -35,6 +40,11 @@ const TextPhotoBlock: Block = {
     {
       name: 'caption',
       type: 'text',
+      admin: {
+        components: {
+          Field: '/components/admin/CaptionSuggester#CaptionSuggester',
+        },
+      },
     },
   ],
 }
@@ -412,6 +422,15 @@ export const Stories: CollectionConfig = {
                   label: 'Generate Tags on Save',
                   admin: {
                     description: 'Check this box and save the article to auto-generate suggested tags and reasoning.',
+                  },
+                },
+                {
+                  name: 'tagSuggester',
+                  type: 'ui',
+                  admin: {
+                    components: {
+                      Field: '/components/admin/TagSuggester#TagSuggester',
+                    },
                   },
                 },
                 {
