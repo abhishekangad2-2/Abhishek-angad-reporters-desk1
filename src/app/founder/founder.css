@@ -1,0 +1,100 @@
+/* Founder bio — interactive, scroll-revealed timeline. Uses globals :root vars. */
+.fd {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 6rem) 1.4rem 6rem;
+}
+.fd-hero {
+  text-align: center;
+  margin-bottom: clamp(3rem, 8vh, 6rem);
+}
+.fd-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(20, 23, 28, 0.15);
+  margin-bottom: 1.2rem;
+}
+.fd-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+.fd-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1;
+  margin: 0 0 1.1rem;
+}
+.fd-lede {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.6;
+  color: var(--ink-soft, #4a4f57);
+  max-width: 52ch;
+  margin: 0 auto;
+}
+.fd-timeline {
+  position: relative;
+  padding-left: 1.4rem;
+  border-left: 2px solid rgba(20, 23, 28, 0.14);
+}
+.fd-step {
+  position: relative;
+  margin-bottom: 2.4rem;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.fd-step.in {
+  opacity: 1;
+  transform: none;
+}
+.fd-step::before {
+  content: '';
+  position: absolute;
+  left: calc(-1.4rem - 6px);
+  top: 6px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.fd-year {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #4a4f57);
+  margin-bottom: 0.4rem;
+}
+.fd-card h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  line-height: 1.12;
+  margin: 0 0 0.5rem;
+}
+.fd-card p {
+  font-size: 0.96rem;
+  line-height: 1.65;
+  color: var(--ink-soft, #4a4f57);
+  margin: 0;
+}
+.fd-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3.5rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(20, 23, 28, 0.14);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+}
+.fd-foot a:hover {
+  color: var(--accent);
+}

@@ -1,12 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 // IDPB — Intelligent Dispatch & Patronage Beacon.
 // Floating, collapsible "Live Dispatches" panel anchored bottom-right on all
-// public pages. Polls /api/dispatches, renders the newsroom feed with a
-// Plexus-Pulse ripple on Significant/Breaking dispatches, per-dispatch share
-// links, and a contextual Patronage Beacon that opens a UPI payment modal.
+// public pages. Realtime via SSE (/api/dispatches/stream) with polling fallback
+// (/api/dispatches); Plexus-Pulse on Significant/Breaking; per-dispatch share;
+// a notification-frequency control; and a Patronage Beacon that triggers on
+// genuine engagement (dwell + scroll depth) with a per-story cooldown.
 
 type Dispatch = {
   id: string | number
@@ -17,16 +19,37 @@ type Dispatch = {
   time: string
 }
 
+type Freq = 'all' | 'breaking' | 'off'
+
 const SITE_URL = 'https://reportersdesk.abhishekangad.com'
 const POLL_MS = 20_000
-const BEACON_DELAY_MS = 6_000
+const COOLDOWN_MS = 36 * 60 * 60 * 1000 // 36h, within the spec's 24–48h
+const DWELL_MS = 45_000
+const SCROLL_TRIGGER = 0.55
 
 export default function LiveDispatches() {
-  // Start COLLAPSED so it never covers content on load.
+  const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(true)
   const [dispatches, setDispatches] = useState<Dispatch[]>([])
   const [showBeacon, setShowBeacon] = useState(false)
   const [payAmount, setPayAmount] = useState<number | null>(null)
+  const [freq, setFreq] = useState<Freq>('all')
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Restore the reader's notification preference.
+  useEffect(() => {
+    try {
+      const f = localStorage.getItem('rd-disp-freq') as Freq | null
+      if (f === 'all' || f === 'breaking' || f === 'off') setFreq(f)
+    } catch {}
+  }, [])
+  const setFrequency = (f: Freq) => {
+    setFreq(f)
+    setMenuOpen(false)
+    try {
+      localStorage.setItem('rd-disp-freq', f)
+    } catch {}
+  }
 
   const fetchDispatches = useCallback(async () => {
     try {
@@ -34,36 +57,81 @@ export default function LiveDispatches() {
       if (!res.ok) return
       const data = await res.json()
       if (Array.isArray(data?.dispatches)) setDispatches(data.dispatches)
-    } catch {
-      // Non-critical widget — fail quietly (e.g. DB unreachable).
-    }
+    } catch {}
   }, [])
 
+  // Realtime via SSE; fall back to polling if the stream is unavailable.
   useEffect(() => {
-    fetchDispatches()
-    const id = setInterval(fetchDispatches, POLL_MS)
-    return () => clearInterval(id)
+    let es: EventSource | null = null
+    let pollId: ReturnType<typeof setInterval> | null = null
+    const startPolling = () => {
+      fetchDispatches()
+      pollId = setInterval(fetchDispatches, POLL_MS)
+    }
+    try {
+      es = new EventSource('/api/dispatches/stream')
+      es.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data)
+          if (Array.isArray(data?.dispatches)) setDispatches(data.dispatches)
+        } catch {}
+      }
+      es.onerror = () => {
+        es?.close()
+        es = null
+        if (!pollId) startPolling()
+      }
+    } catch {
+      startPolling()
+    }
+    return () => {
+      es?.close()
+      if (pollId) clearInterval(pollId)
+    }
   }, [fetchDispatches])
 
-  // Patronage Beacon appears after a short delay (simulated "significant
-  // engagement"), once there's at least one dispatch to anchor it to.
+  // Patronage Beacon — triggers on real engagement (dwell ≥45s AND scroll
+  // depth ≥55%), once per story within the cooldown window.
   useEffect(() => {
-    if (dispatches.length === 0) return
-    const id = setTimeout(() => setShowBeacon(true), BEACON_DELAY_MS)
-    return () => clearTimeout(id)
-  }, [dispatches.length])
+    if (freq === 'off') return
+    const key = `rd-beacon-${pathname}`
+    try {
+      const last = Number(localStorage.getItem(key) || 0)
+      if (Date.now() - last < COOLDOWN_MS) return
+    } catch {}
+    const start = Date.now()
+    let maxScroll = 0
+    const onScroll = () => {
+      const h = document.documentElement.scrollHeight - innerHeight
+      if (h > 0) maxScroll = Math.max(maxScroll, scrollY / h)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    const id = setInterval(() => {
+      if (Date.now() - start >= DWELL_MS && maxScroll >= SCROLL_TRIGGER) {
+        setShowBeacon(true)
+        try {
+          localStorage.setItem(key, String(Date.now()))
+        } catch {}
+        clearInterval(id)
+        window.removeEventListener('scroll', onScroll)
+      }
+    }, 3000)
+    return () => {
+      clearInterval(id)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [pathname, freq])
 
-  // Esc closes the payment modal.
   useEffect(() => {
     if (payAmount == null) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPayAmount(null)
-    }
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setPayAmount(null)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [payAmount])
 
-  if (dispatches.length === 0) return null
+  if (freq === 'off') return null
+  const visible = freq === 'breaking' ? dispatches.filter((d) => d.flag) : dispatches
+  if (visible.length === 0) return null
 
   const upiLink =
     payAmount != null
@@ -78,19 +146,69 @@ export default function LiveDispatches() {
             <span className="rd-live-dot" aria-hidden />
             Live Dispatches
           </span>
-          <button
-            type="button"
-            className="rd-dispatch-toggle"
-            aria-expanded={!collapsed}
-            aria-label={collapsed ? 'Expand live dispatches' : 'Collapse live dispatches'}
-            onClick={() => setCollapsed((c) => !c)}
-          >
-            {collapsed ? '▴' : '▾'}
-          </button>
+          <span style={{ position: 'relative', display: 'inline-flex', gap: 6 }}>
+            <button
+              type="button"
+              className="rd-dispatch-toggle"
+              aria-label="Notification settings"
+              onClick={() => setMenuOpen((m) => !m)}
+            >
+              ⚙
+            </button>
+            <button
+              type="button"
+              className="rd-dispatch-toggle"
+              aria-expanded={!collapsed}
+              aria-label={collapsed ? 'Expand live dispatches' : 'Collapse live dispatches'}
+              onClick={() => setCollapsed((c) => !c)}
+            >
+              {collapsed ? '▴' : '▾'}
+            </button>
+            {menuOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 26,
+                  right: 0,
+                  background: '#14171c',
+                  border: '1px solid rgba(245,243,236,0.14)',
+                  borderRadius: 6,
+                  padding: 4,
+                  zIndex: 60,
+                  minWidth: 130,
+                  fontFamily: 'var(--font-mono, monospace)',
+                  fontSize: '0.62rem',
+                }}
+              >
+                {(['all', 'breaking', 'off'] as Freq[]).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setFrequency(f)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      background: freq === f ? 'rgba(180,61,42,0.18)' : 'none',
+                      color: freq === f ? '#e6b8ac' : '#cfcabd',
+                      border: 'none',
+                      padding: '0.45rem 0.6rem',
+                      borderRadius: 4,
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
+                    {f === 'all' ? 'All updates' : f === 'breaking' ? 'Only breaking' : 'Off'}
+                  </button>
+                ))}
+              </div>
+            )}
+          </span>
         </div>
 
         <div className="rd-dispatch-body">
-          {dispatches.map((d) => {
+          {visible.map((d) => {
             const isPulse = d.flag === 'Significant' || d.flag === 'Breaking'
             const share = encodeURIComponent(d.text)
             return (
@@ -102,27 +220,9 @@ export default function LiveDispatches() {
                 </div>
                 <div className="rd-disp-text">{d.text}</div>
                 <div className="rd-disp-share">
-                  <a
-                    href={`https://twitter.com/intent/tweet?text=${share}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Twitter
-                  </a>
-                  <a
-                    href={`https://wa.me/?text=${share}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    WhatsApp
-                  </a>
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Facebook
-                  </a>
+                  <a href={`https://twitter.com/intent/tweet?text=${share}`} target="_blank" rel="noopener noreferrer">Twitter</a>
+                  <a href={`https://wa.me/?text=${share}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`} target="_blank" rel="noopener noreferrer">Facebook</a>
                 </div>
               </div>
             )
@@ -132,12 +232,8 @@ export default function LiveDispatches() {
             <div className="rd-beacon">
               <p>This story is generating significant impact. Support our journalism.</p>
               <div className="rd-beacon-opts">
-                <button type="button" onClick={() => setPayAmount(5000)}>
-                  ₹5,000 / yr
-                </button>
-                <button type="button" onClick={() => setPayAmount(10000)}>
-                  ₹10,000 · FOI patron
-                </button>
+                <button type="button" onClick={() => setPayAmount(5000)}>₹5,000 / yr</button>
+                <button type="button" onClick={() => setPayAmount(10000)}>₹10,000 · FOI patron</button>
               </div>
             </div>
           )}
@@ -150,49 +246,26 @@ export default function LiveDispatches() {
           role="dialog"
           aria-modal="true"
           aria-label="Support ReportersDesk"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setPayAmount(null)
-          }}
+          onClick={(e) => e.target === e.currentTarget && setPayAmount(null)}
         >
           <div className="rd-modal">
-            <button
-              type="button"
-              className="rd-modal-close"
-              aria-label="Close"
-              onClick={() => setPayAmount(null)}
-            >
-              ×
-            </button>
+            <button type="button" className="rd-modal-close" aria-label="Close" onClick={() => setPayAmount(null)}>×</button>
             <h3>Become an FOI Patron</h3>
             <p className="sub">Direct, no-middleman support for independent reporting.</p>
-
             <div className="rd-tier">
-              <button
-                type="button"
-                className={payAmount === 5000 ? 'sel' : ''}
-                onClick={() => setPayAmount(5000)}
-              >
-                <span className="amt">₹5,000</span>
-                <span className="lbl">Annual</span>
+              <button type="button" className={payAmount === 5000 ? 'sel' : ''} onClick={() => setPayAmount(5000)}>
+                <span className="amt">₹5,000</span><span className="lbl">Annual</span>
               </button>
-              <button
-                type="button"
-                className={payAmount === 10000 ? 'sel' : ''}
-                onClick={() => setPayAmount(10000)}
-              >
-                <span className="amt">₹10,000</span>
-                <span className="lbl">FOI Patron</span>
+              <button type="button" className={payAmount === 10000 ? 'sel' : ''} onClick={() => setPayAmount(10000)}>
+                <span className="amt">₹10,000</span><span className="lbl">FOI Patron</span>
               </button>
             </div>
-
             <div className="rd-qr">
               <div className="rd-qr-box" aria-hidden />
               <div className="rd-qr-note">
                 Scan the QR with any UPI app, or tap below on mobile.
                 <br />
-                <a href={upiLink} className="rd-upi-link">
-                  reportersdesk@upi · ₹{payAmount.toLocaleString('en-IN')}
-                </a>
+                <a href={upiLink} className="rd-upi-link">reportersdesk@upi · ₹{payAmount.toLocaleString('en-IN')}</a>
               </div>
             </div>
           </div>

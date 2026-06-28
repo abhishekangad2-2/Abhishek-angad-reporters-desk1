@@ -187,8 +187,7 @@ export function FounderBioTab() {
       <h3>Abhishek Angad</h3>
       {/* Replace the paragraph below with the real bio before launch. */}
       <p>Founder and editor of ReportersDesk. Independent journalist covering accountability, power, and public institutions.</p>
-      {/* Link points to the contact/admin email until an About page is built */}
-      <a href="mailto:desk@reportersdesk.abhishekangad.com">Get in touch →</a>
+      <a href="/founder">Read the full bio →</a>
     </div>
   )
 }
