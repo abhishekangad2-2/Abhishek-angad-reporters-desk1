@@ -1,0 +1,415 @@
+/* story.css — NYT / New-Yorker-grade presentation for the public Story page.
+ *
+ * Scoped to the new `rd-*` classes used by the upgraded media blocks
+ * (StoryGallery, StoryVideo) and the NYT-style header. Does NOT touch the
+ * existing `.story-*` / `.vm-*` rules that live in globals.css. Palette vars
+ * (--ink, --accent, --data-accent, --font-display, --font-body, --font-mono)
+ * come from globals :root.
+ */
+
+/* ───────────────────────── NYT-style story header ───────────────────────── */
+
+.rd-header {
+  position: relative;
+  z-index: 2;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 5vh 1.5rem 2rem;
+}
+
+.rd-header__kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.85rem;
+}
+
+.rd-header__headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  color: var(--ink);
+}
+
+.rd-header__standfirst {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  line-height: 1.4;
+  max-width: 46ch;
+  margin: 0 0 1.5rem;
+  color: var(--ink-soft);
+}
+
+.rd-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  align-items: baseline;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.rd-header__byline {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+}
+
+.rd-header__date {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Full-bleed hero image under the header */
+.rd-hero-image {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto 2.5rem;
+  max-width: 1200px;
+  padding: 0 1.5rem;
+}
+
+.rd-hero-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius, 4px);
+}
+
+.rd-hero-image figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 0.5rem;
+}
+
+/* Immersive video-left / text-right hero (wide screens) */
+.rd-hero-split {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1280px;
+  margin: 0 auto 3rem;
+  padding: 4vh 1.5rem 0;
+  align-items: center;
+}
+
+@media (min-width: 1000px) {
+  .rd-hero-split {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 3rem;
+  }
+}
+
+.rd-hero-split__text .rd-header {
+  padding: 0;
+  max-width: none;
+}
+
+/* ───────────────────────── Masonry photo gallery ───────────────────────── */
+
+.rd-gallery {
+  margin: 2.5rem 0;
+}
+
+.rd-gallery__grid {
+  column-count: 1;
+  column-gap: 1rem;
+}
+
+@media (min-width: 560px) {
+  .rd-gallery__grid {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 980px) {
+  .rd-gallery__grid {
+    column-count: 3;
+  }
+}
+
+.rd-gallery__item {
+  break-inside: avoid;
+  margin: 0 0 1rem;
+  padding: 0;
+  position: relative;
+  cursor: zoom-in;
+  background: none;
+  border: 0;
+  width: 100%;
+  display: block;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.rd-gallery__item img {
+  display: block;
+  width: 100%;
+  height: auto; /* true aspect ratio — never cropped */
+  border-radius: var(--radius, 4px);
+  transition: filter 0.2s ease;
+}
+
+.rd-gallery__item:hover img,
+.rd-gallery__item:focus-visible img {
+  filter: brightness(1.05);
+}
+
+.rd-gallery__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.rd-gallery__cap {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+}
+
+/* Small per-item media badge (audio/video clip attached to gallery item) */
+.rd-gallery__badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(20, 23, 28, 0.82);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+}
+
+.rd-gallery__track {
+  margin-top: 1.25rem;
+}
+
+/* ───────────────────────────── Lightbox ───────────────────────────── */
+
+.rd-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 11, 13, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.rd-lightbox__stage {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rd-lightbox__img {
+  max-width: 100%;
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.rd-lightbox__cap {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
+  max-width: 60ch;
+}
+
+.rd-lightbox__count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.rd-lightbox__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(20, 23, 28, 0.6);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.rd-lightbox__btn:hover {
+  background: var(--accent);
+}
+
+.rd-lightbox__btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.rd-lightbox__btn--prev { left: clamp(0.5rem, 2vw, 1.5rem); }
+.rd-lightbox__btn--next { right: clamp(0.5rem, 2vw, 1.5rem); }
+
+.rd-lightbox__close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(20, 23, 28, 0.6);
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rd-lightbox__close:hover { background: var(--accent); }
+.rd-lightbox__close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* ──────────────────────── Aspect-safe video player ──────────────────────── */
+
+.rd-video {
+  margin: 2.5rem 0;
+}
+
+.rd-video__frame {
+  position: relative;
+  background: #0a0b0d;
+  border-radius: var(--radius, 4px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Landscape: fill the column width at 16:9 */
+.rd-video__frame--landscape {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.rd-video__frame--landscape video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Portrait: stay portrait — contained, centered, capped height, never stretched */
+.rd-video__frame--portrait {
+  width: 100%;
+  max-height: 85vh;
+  padding: 0;
+}
+
+.rd-video__frame--portrait video {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 85vh;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+/* Unknown aspect (no dimensions yet) — safe contained default */
+.rd-video__frame--auto {
+  width: 100%;
+}
+
+.rd-video__frame--auto video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 85vh;
+}
+
+.rd-video__fs {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(20, 23, 28, 0.65);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rd-video__fs:hover { background: var(--accent); }
+.rd-video__fs:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.rd-video__cap {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 0.5rem;
+}
+
+/* ---- Embedded video (YouTube / Vimeo) ---- */
+.rd-embed {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0a0b0d;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.rd-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+/* YouTube Shorts / vertical clips stay portrait, centred, height-capped */
+.rd-embed--portrait {
+  aspect-ratio: 9 / 16;
+  max-width: 420px;
+  max-height: 85vh;
+  margin: 0 auto;
+}

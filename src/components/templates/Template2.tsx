@@ -2,16 +2,12 @@ import { Story } from '@/payload-types'
 import Masthead from '@/components/Masthead'
 import PlexusBackground from '@/components/PlexusBackground'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
-import { bylineOf, sectionNameOf, heroUrlOf } from './storyMeta'
+import StoryHeader from '@/components/StoryHeader'
 
-/** Z-Pattern design (x/y) at the story level: a hero row with image on one
- *  side and headline on the other, then the body on a translucent reading
- *  panel over a faint Plexus. */
+/** Z-Pattern design (x/y) at the story level: an NYT-style header (full-bleed
+ *  hero image, or video-left / text-right when the hero is a video), then the
+ *  body on a translucent reading panel over a faint Plexus. */
 export default function Template2({ story }: { story: Story }) {
-  const heroUrl = heroUrlOf(story)
-  const sectionName = sectionNameOf(story)
-  const byline = bylineOf(story)
-
   return (
     <div className="story landing landing--z-pattern">
       <PlexusBackground
@@ -23,18 +19,7 @@ export default function Template2({ story }: { story: Story }) {
       />
       <Masthead />
 
-      <section className="z-row">
-        <div
-          className="z-row-image"
-          style={heroUrl ? { backgroundImage: `url(${heroUrl})` } : undefined}
-        />
-        <div className="z-row-text">
-          <span className="three-col-section">{sectionName}</span>
-          <h2>{story.headline}</h2>
-          {story.strap && <p>{story.strap}</p>}
-          {byline && <div className="story-byline">{byline}</div>}
-        </div>
-      </section>
+      <StoryHeader story={story} />
 
       <article className="story-reading story-reading--panel">
         {story.caption && <p className="story-caption">{story.caption}</p>}

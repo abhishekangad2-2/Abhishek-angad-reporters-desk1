@@ -2,15 +2,12 @@ import { Story } from '@/payload-types'
 import Masthead from '@/components/Masthead'
 import PlexusBackground from '@/components/PlexusBackground'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
-import { bylineOf, sectionNameOf } from './storyMeta'
+import StoryHeader from '@/components/StoryHeader'
 
 /** Three-Column design (z-axis) at the story level: the full-bleed Plexus is
- *  the backdrop; the headline floats over it and the body sits on a translucent
- *  reading panel so it stays legible over the network. */
+ *  the backdrop; an NYT-style header (full-bleed hero image, or video-left /
+ *  text-right when the hero is a video) leads into a translucent reading panel. */
 export default function Template1({ story }: { story: Story }) {
-  const sectionName = sectionNameOf(story)
-  const byline = bylineOf(story)
-
   return (
     <div className="story landing landing--three-column">
       <PlexusBackground
@@ -22,12 +19,7 @@ export default function Template1({ story }: { story: Story }) {
       />
       <Masthead />
 
-      <header className="story-hero">
-        <div className="story-kicker">{sectionName}</div>
-        <h1 className="story-title">{story.headline}</h1>
-        {story.strap && <p className="story-strap">{story.strap}</p>}
-        {byline && <div className="story-byline">{byline}</div>}
-      </header>
+      <StoryHeader story={story} />
 
       <article className="story-reading story-reading--panel">
         {story.caption && <p className="story-caption">{story.caption}</p>}

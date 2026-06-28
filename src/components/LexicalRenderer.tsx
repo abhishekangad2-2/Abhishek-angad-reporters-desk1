@@ -17,8 +17,10 @@
  */
 import Image from 'next/image'
 import React from 'react'
-import HlsVideo from './HlsVideo'
 import { WavePlayer } from './WavePlayer'
+import StoryGallery, { type GalleryImage } from './StoryGallery'
+import StoryVideo from './StoryVideo'
+import './story.css'
 
 // ─────────────────────────── Lexical node renderer ───────────────────────────
 
@@ -121,14 +123,44 @@ function getUrl(media: any): string | null {
   return media.url ?? null
 }
 
+/** Pull display details (url + true dimensions + mime) off a populated upload. */
+function mediaDetail(media: any): {
+  url: string | null
+  width: number | null
+  height: number | null
+  mime: string
+  id: any
+} {
+  if (!media || typeof media !== 'object') {
+    return { url: typeof media === 'string' ? media : null, width: null, height: null, mime: '', id: undefined }
+  }
+  return {
+    url: media.url ?? null,
+    width: media.width ?? null,
+    height: media.height ?? null,
+    mime: media.mimeType ?? '',
+    id: media.id,
+  }
+}
+
+function isVideoMedia(mime: string, url: string | null): boolean {
+  return mime.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(url ?? '')
+}
+
 function SinglePictureBlock({ block }: { block: any }) {
-  const url = getUrl(block.image)
+  const { url, width, height } = mediaDetail(block.image)
   if (!url) return null
   return (
     <figure className="my-8">
-      <div className="relative w-full aspect-[16/9] overflow-hidden">
-        <Image src={url} alt={block.caption ?? ''} fill className="object-cover" />
-      </div>
+      {/* True aspect ratio — no crop. */}
+      <Image
+        src={url}
+        alt={block.caption ?? ''}
+        width={width ?? 1600}
+        height={height ?? 1000}
+        sizes="(min-width: 720px) 720px, 100vw"
+        className="w-full h-auto rounded"
+      />
       {block.caption && (
         <figcaption className="text-xs font-mono text-ink-soft mt-2">{block.caption}</figcaption>
       )}
@@ -137,15 +169,21 @@ function SinglePictureBlock({ block }: { block: any }) {
 }
 
 function TextPhotoBlock({ block }: { block: any }) {
-  const url = getUrl(block.image)
+  const { url, width, height } = mediaDetail(block.image)
   return (
     <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
       <div className="prose prose-lg font-serif">{block.text}</div>
       {url && (
         <figure>
-          <div className="relative w-full aspect-[4/3] overflow-hidden">
-            <Image src={url} alt={block.caption ?? ''} fill className="object-cover" />
-          </div>
+          {/* True aspect ratio — no crop. */}
+          <Image
+            src={url}
+            alt={block.caption ?? ''}
+            width={width ?? 1200}
+            height={height ?? 900}
+            sizes="(min-width: 768px) 360px, 100vw"
+            className="w-full h-auto rounded"
+          />
           {block.caption && (
             <figcaption className="text-xs font-mono text-ink-soft mt-2">{block.caption}</figcaption>
           )}
@@ -159,28 +197,39 @@ function GalleryBlock({ block }: { block: any }) {
   const track: any = block.track
   const trackUrl = getUrl(track)
   const trackId = track && typeof track === 'object' ? track.id : undefined
-  const mime: string = track && typeof track === 'object' ? (track.mimeType ?? '') : ''
-  const isVideo = mime.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(trackUrl ?? '')
+  const trackMime: string = track && typeof track === 'object' ? (track.mimeType ?? '') : ''
+  const trackIsVideo = isVideoMedia(trackMime, trackUrl)
+
+  const images: GalleryImage[] = (block.gallery ?? [])
+    .map((item: any) => {
+      const d = mediaDetail(item.image)
+      if (!d.url) return null
+      return {
+        url: d.url,
+        width: d.width,
+        height: d.height,
+        caption: item.caption ?? null,
+      } as GalleryImage
+    })
+    .filter(Boolean) as GalleryImage[]
+
+  // Surface an attached gallery-level clip on the first image so it gets a
+  // small badge + inline control in the lightbox.
+  if (trackUrl && images.length) {
+    images[0] = {
+      ...images[0],
+      clipUrl: trackUrl,
+      clipKind: trackIsVideo ? 'video' : 'audio',
+    }
+  }
+
   return (
     <div className="my-8">
-      {block.gallery?.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-          {block.gallery.map((item: any, i: number) => {
-            const url = getUrl(item.image)
-            if (!url) return null
-            return (
-              <div key={i} className="relative aspect-square overflow-hidden">
-                <Image src={url} alt="" fill className="object-cover" />
-              </div>
-            )
-          })}
-        </div>
-      )}
+      {images.length > 0 && <StoryGallery images={images} />}
       {trackUrl && (
-        <div className="mt-4">
-          {isVideo ? (
-            // Plays the Transcoder HLS rendition when ready, else the original.
-            <HlsVideo trackId={trackId} fallbackUrl={trackUrl} />
+        <div className="rd-gallery__track">
+          {trackIsVideo ? (
+            <StoryVideo trackId={trackId} fallbackUrl={trackUrl} />
           ) : (
             <WavePlayer
               src={trackUrl}
@@ -264,34 +313,44 @@ function DiptychBlk({ block }: { block: any }) {
   )
 }
 
-function toEmbed(url: string): string {
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
-  if (yt) return `https://www.youtube.com/embed/${yt[1]}`
+// Normalise a pasted YouTube/Vimeo link to a privacy-friendly embed URL.
+// Handles watch?v=, youtu.be/, /embed/, and /shorts/ (portrait). Returns a
+// portrait flag so Shorts/vertical clips render 9:16 instead of 16:9.
+function toEmbed(url: string): { src: string; portrait: boolean } {
+  const short = url.match(/youtube\.com\/shorts\/([\w-]+)/)
+  if (short) return { src: `https://www.youtube-nocookie.com/embed/${short[1]}`, portrait: true }
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([\w-]+)/)
+  if (yt) return { src: `https://www.youtube-nocookie.com/embed/${yt[1]}`, portrait: false }
   const vm = url.match(/vimeo\.com\/(\d+)/)
-  if (vm) return `https://player.vimeo.com/video/${vm[1]}`
-  return url
+  if (vm) return { src: `https://player.vimeo.com/video/${vm[1]}`, portrait: false }
+  return { src: url, portrait: false }
 }
 
 function VideoBlock({ block }: { block: any }) {
-  const file = block.videoFile
-  const fileUrl = getUrl(file)
-  const fileId = file && typeof file === 'object' ? file.id : undefined
+  const { url: fileUrl, width, height, id: fileId } = mediaDetail(block.videoFile)
   return (
-    <figure className="vm-video">
+    <figure className="rd-video">
       {fileUrl ? (
-        <HlsVideo trackId={fileId} fallbackUrl={fileUrl} />
+        // Portrait stays portrait (contained, ≤85vh, dark frame); landscape
+        // fills 16:9. Keeps the HLS/hls.js logic + adds fullscreen + auto-pause.
+        <StoryVideo trackId={fileId} fallbackUrl={fileUrl} width={width} height={height} />
       ) : block.embedUrl ? (
-        <div className="vm-video-frame">
-          <iframe
-            src={toEmbed(block.embedUrl)}
-            title={block.caption ?? 'Video'}
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            loading="lazy"
-          />
-        </div>
+        (() => {
+          const { src, portrait } = toEmbed(block.embedUrl)
+          return (
+            <div className={`rd-embed${portrait ? ' rd-embed--portrait' : ''}`}>
+              <iframe
+                src={src}
+                title={block.caption ?? 'Video'}
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          )
+        })()
       ) : null}
-      {block.caption && <figcaption className="vm-cap">{block.caption}</figcaption>}
+      {block.caption && <figcaption className="rd-video__cap">{block.caption}</figcaption>}
     </figure>
   )
 }
