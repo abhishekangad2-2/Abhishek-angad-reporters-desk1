@@ -19,6 +19,18 @@ function normalizeStory(story: any): LandingStory {
   }
 }
 
+/** The editor-chosen homepage layout, read from the Integrations global.
+ *  Falls back to null so the caller can apply its own default. */
+export async function getLandingLayout(): Promise<string | null> {
+  try {
+    const payload = await getPayload({ config })
+    const g: any = await payload.findGlobal({ slug: 'integrations', depth: 0 })
+    return g?.landingLayout ?? null
+  } catch {
+    return null
+  }
+}
+
 /** Single source of landing data shared by every template, so a story
  *  published in the CMS shows up identically in all four layouts. */
 export async function getLandingData(): Promise<LandingData> {

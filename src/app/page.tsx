@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { isLandingTemplate, DEFAULT_TEMPLATE, type LandingTemplate } from '@/lib/landing'
-import { getLandingData } from '@/lib/landing.server'
+import { getLandingData, getLandingLayout } from '@/lib/landing.server'
 import { translateLandingData } from '@/lib/translate.server'
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
 import ThreeColumnLanding from '@/components/ThreeColumnLanding'
@@ -16,8 +16,11 @@ export default async function Home({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const sp = await searchParams
+  // Priority: ?layout= preview override → editor's CMS choice → default.
   const requested = typeof sp.layout === 'string' ? sp.layout : undefined
-  const template: LandingTemplate = isLandingTemplate(requested) ? requested : DEFAULT_TEMPLATE
+  const editorChoice = requested ? undefined : await getLandingLayout()
+  const resolved = requested ?? editorChoice ?? undefined
+  const template: LandingTemplate = isLandingTemplate(resolved) ? resolved : DEFAULT_TEMPLATE
 
   const cookieStore = await cookies()
   // ?lang= wins (forces a fresh translated render); cookie persists the choice.
