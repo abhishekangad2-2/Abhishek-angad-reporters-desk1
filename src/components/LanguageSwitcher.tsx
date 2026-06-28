@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { LOCALES, LOCALE_COOKIE, localeByCode } from '@/lib/i18n'
 
 /** Small floating language switcher. Sets the rd_lang cookie (for persistence)
@@ -10,12 +11,22 @@ export default function LanguageSwitcher({ current }: { current: string }) {
   const [open, setOpen] = useState(false)
   const cur = localeByCode(current)
 
+  const router = useRouter()
+  const pathname = usePathname() ?? '/'
+  const searchParams = useSearchParams()
+
   function pick(code: string) {
+    // persist choice in a cookie for server-side reads
     document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`
-    const u = new URL(window.location.href)
-    if (code === 'en') u.searchParams.delete('lang')
-    else u.searchParams.set('lang', code)
-    window.location.href = u.toString()
+
+    // build a new query string without mutating external values
+    const params = new URLSearchParams(searchParams?.toString() ?? '')
+    if (code === 'en') params.delete('lang')
+    else params.set('lang', code)
+    const qs = params.toString()
+
+    // navigate using next/navigation to trigger a full page load on the app router
+    router.push(`${pathname}${qs ? `?${qs}` : ''}`)
   }
 
   return (
