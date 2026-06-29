@@ -297,6 +297,159 @@ export function PollTab() {
   )
 }
 
+const INVESTIGATE_SECTIONS = [
+  { value: '', label: 'Pick a desk (optional)' },
+  { value: 'accountability', label: 'Accountability' },
+  { value: 'politics', label: 'Politics & Power' },
+  { value: 'business', label: 'Business & Money' },
+  { value: 'environment', label: 'Environment' },
+  { value: 'local', label: 'Local / Civic' },
+  { value: 'other', label: 'Other / Unsure' },
+] as const
+
+export function InvestigateTab() {
+  const [topic, setTopic] = useState('')
+  const [details, setDetails] = useState('')
+  const [email, setEmail] = useState('')
+  const [section, setSection] = useState('')
+  const [optIn, setOptIn] = useState(false)
+  // Honeypot — must stay empty. Real users never see or fill this.
+  const [website, setWebsite] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setStatus('loading')
+    setErrorMsg(null)
+    try {
+      const res = await fetch('/api/investigate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic,
+          details,
+          email,
+          section,
+          newsletterOptIn: optIn,
+          website,
+          source: window.location.pathname,
+        }),
+      })
+      if (res.ok) {
+        setStatus('done')
+      } else {
+        const data = await res.json().catch(() => null)
+        setErrorMsg(data?.error ?? 'Something went wrong — try again.')
+        setStatus('error')
+      }
+    } catch {
+      setErrorMsg('Something went wrong — try again.')
+      setStatus('error')
+    }
+  }
+
+  if (status === 'done') {
+    return (
+      <div className="footer-panel" role="status">
+        <p className="investigate-pitch">Thank you — your tip is with the newsroom.</p>
+        <p className="pay-note">
+          We read every lead. If you left an email, we may reach out for more detail.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <form className="footer-panel investigate-form" onSubmit={handleSubmit}>
+      <p className="investigate-pitch">Got a lead? Tell us what to investigate.</p>
+      <p className="pay-note investigate-sub">
+        Tips are confidential. Email is optional — leave it blank to stay anonymous.
+      </p>
+
+      <div className="investigate-field">
+        <label htmlFor="investigate-topic">What should we look into?</label>
+        <input
+          id="investigate-topic"
+          type="text"
+          required
+          maxLength={200}
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="e.g. Misuse of the city road-repair fund"
+        />
+      </div>
+
+      <div className="investigate-field">
+        <label htmlFor="investigate-details">The lead</label>
+        <textarea
+          id="investigate-details"
+          required
+          rows={4}
+          maxLength={5000}
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          placeholder="What you know, who's involved, why it matters."
+        />
+      </div>
+
+      <div className="investigate-field">
+        <label htmlFor="investigate-section">Which desk?</label>
+        <select
+          id="investigate-section"
+          value={section}
+          onChange={(e) => setSection(e.target.value)}
+        >
+          {INVESTIGATE_SECTIONS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="investigate-field">
+        <label htmlFor="investigate-email">Email (optional, for follow-up)</label>
+        <input
+          id="investigate-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+      </div>
+
+      <label className="investigate-optin">
+        <input
+          type="checkbox"
+          checked={optIn}
+          onChange={(e) => setOptIn(e.target.checked)}
+        />
+        <span>Also send me the newsletter</span>
+      </label>
+
+      {/* Honeypot — visually hidden, off-screen, ignored by real users. */}
+      <div className="investigate-hp" aria-hidden="true">
+        <label htmlFor="investigate-website">Leave this field empty</label>
+        <input
+          id="investigate-website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      <button className="pay-button" type="submit" disabled={status === 'loading'}>
+        {status === 'loading' ? 'Sending…' : 'Send the tip'}
+      </button>
+
+      {status === 'error' && <p className="form-error">{errorMsg}</p>}
+    </form>
+  )
+}
+
 export function FounderBioTab() {
   return (
     <div className="footer-panel founder-bio">

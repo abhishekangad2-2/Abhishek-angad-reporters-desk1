@@ -306,6 +306,76 @@ a {
   font-size: 0.8rem;
 }
 
+/* Investigate-this tab */
+.investigate-pitch {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.investigate-sub {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.investigate-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.9rem;
+}
+
+.investigate-field label {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.investigate-field input,
+.investigate-field textarea,
+.investigate-field select {
+  padding: 0.6rem;
+  border: 1px solid var(--ink);
+  background: #fff;
+  font: inherit;
+  width: 100%;
+}
+
+.investigate-field textarea {
+  resize: vertical;
+}
+
+.investigate-optin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.investigate-optin input {
+  width: auto;
+}
+
+/* Honeypot — kept in the DOM for bots, hidden from people + assistive tech. */
+.investigate-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.investigate-form .pay-button {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
 /* Poll tab */
 .poll-question {
   font-weight: 600;

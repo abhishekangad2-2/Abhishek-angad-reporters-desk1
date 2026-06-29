@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { PaymentTab, NewsletterTab, PollTab, FounderBioTab } from './FooterPanels'
+import { PaymentTab, NewsletterTab, PollTab, InvestigateTab, FounderBioTab } from './FooterPanels'
 
 const TABS = [
+  { id: 'investigate', label: 'Investigate this', Component: InvestigateTab },
   { id: 'pay', label: 'Pay for our journalism', Component: PaymentTab },
   { id: 'newsletter', label: 'Subscribe to our newsletter', Component: NewsletterTab },
   { id: 'poll', label: 'Poll Section', Component: PollTab },
