@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Fallback: session-based confirmation (for future admin-panel UI)
     const user = await getSessionUser(req, { allowUnenrolled: true })
     if (!user) return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 })
-    userId = user.id
+    userId = String(user.id)
   }
 
   const payload = await getPayload({ config })
@@ -56,7 +56,11 @@ export async function POST(req: NextRequest) {
   })
   const usersConfig = payload.collections['users'].config
   const tokenExpiration = usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
-  const fieldsToSign = getFieldsToSign({ collectionConfig: usersConfig, email: user.email, user })
+  const fieldsToSign = getFieldsToSign({
+    collectionConfig: usersConfig,
+    email: user.email,
+    user: { ...user, collection: 'users' },
+  })
   const payloadJwtSecret = crypto
     .createHash('sha256')
     .update(process.env.PAYLOAD_SECRET!)
