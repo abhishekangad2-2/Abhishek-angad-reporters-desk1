@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 
 import { translateStory } from '@/lib/translate.server'
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
+import { SITE_URL, absoluteUrl, buildArticleJsonLd } from '@/lib/seo'
 import Template1 from '@/components/templates/Template1'
 import Template2 from '@/components/templates/Template2'
 import Template3 from '@/components/templates/Template3'
@@ -56,19 +57,37 @@ export async function generateMetadata({
     const seo = story.seoMeta || {}
     const title: string = seo.title || story.headline
     const description: string = seo.description || story.strap
-    const img =
-      story.heroMedia && typeof story.heroMedia === 'object' ? story.heroMedia.url : undefined
+    const img = absoluteUrl(
+      story.heroMedia && typeof story.heroMedia === 'object' ? story.heroMedia.url : undefined,
+    )
+    const canonical = `${SITE_URL}/${sectionSlug}/${slug}`
+    const authors = (Array.isArray(story.author) ? story.author : [])
+      .map((a: any) => [a?.firstName, a?.lastName].filter(Boolean).join(' ').trim() || a?.name)
+      .filter(Boolean)
     return {
+      metadataBase: new URL(SITE_URL),
       title,
       description,
       keywords: seo.keywords || undefined,
+      alternates: { canonical },
       openGraph: {
         title,
         description,
         type: 'article',
+        url: canonical,
+        siteName: 'ReportersDesk',
+        section: section.name || sectionSlug,
+        publishedTime: story.publishedAt ? new Date(story.publishedAt).toISOString() : undefined,
+        modifiedTime: story.updatedAt ? new Date(story.updatedAt).toISOString() : undefined,
+        authors: authors.length ? authors : undefined,
         images: img ? [{ url: img }] : undefined,
       },
-      twitter: { card: 'summary_large_image', title, description },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: img ? [img] : undefined,
+      },
     }
   } catch {
     return {}
@@ -125,15 +144,29 @@ export default async function StoryPage({
   const override = typeof sp.template === 'string' ? TEMPLATE_ALIASES[sp.template] : undefined
   const layout = override ?? (story as any).layout_type
 
-  switch (layout) {
-    case 'template_2':
-      return <Template2 story={story as any} />
-    case 'template_3':
-      return <Template3 story={story as any} />
-    case 'template_4':
-      return <Template4 story={story as any} />
-    case 'template_1':
-    default:
-      return <Template1 story={story as any} />
-  }
+  // NewsArticle structured data — built from the (untranslated-or-translated)
+  // story so the schema matches the rendered copy.
+  const jsonLd = buildArticleJsonLd(story, {
+    url: `${SITE_URL}/${sectionSlug}/${slug}`,
+    sectionName: (section as any).name || sectionSlug,
+  })
+
+  const Template =
+    layout === 'template_2'
+      ? Template2
+      : layout === 'template_3'
+        ? Template3
+        : layout === 'template_4'
+          ? Template4
+          : Template1
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Template story={story as any} />
+    </>
+  )
 }

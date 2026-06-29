@@ -1,10 +1,43 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import PlexusBackground from '@/components/PlexusBackground'
 import { notFound } from 'next/navigation'
+import { SITE_URL } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ section: string }>
+}): Promise<Metadata> {
+  try {
+    const { section: slug } = await params
+    const payload = await getPayload({ config })
+    const res = await payload.find({
+      collection: 'sections',
+      where: { slug: { equals: slug } },
+      limit: 1,
+    })
+    const section: any = res.docs[0]
+    if (!section) return {}
+    const title = `${section.name} · ReportersDesk`
+    const description = section.description || `Reporting from the ${section.name} desk at ReportersDesk.`
+    const canonical = `${SITE_URL}/${slug}`
+    return {
+      metadataBase: new URL(SITE_URL),
+      title,
+      description,
+      alternates: { canonical },
+      openGraph: { title, description, type: 'website', url: canonical, siteName: 'ReportersDesk' },
+      twitter: { card: 'summary', title, description },
+    }
+  } catch {
+    return {}
+  }
+}
 
 export default async function SectionArchive({ params }: { params: Promise<{ section: string }> }) {
   const resolvedParams = await params;
