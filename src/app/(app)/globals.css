@@ -1,6 +1,9 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
+/* Fonts are self-hosted via next/font/google in layout.tsx (--font-fraunces,
+   --font-ibm-plex-sans, --font-ibm-plex-mono). No external @import needed — a
+   url() @import here lands after Tailwind's expanded rules and is invalid CSS,
+   which fails the Turbopack build and is silently dropped by browsers in prod. */
 /* Map Tailwind's font utilities to the next/font families loaded in layout.tsx */
 @theme {
   --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
