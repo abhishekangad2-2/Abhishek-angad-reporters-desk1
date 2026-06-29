@@ -1,48 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 
+// Fresh admin middleware. Runs only for /cms (see matcher). Three jobs:
+//  1. Optional IP allowlist (env ADMIN_IP_ALLOWLIST, comma-separated; fail-open).
+//  2. Require a valid 2FA session cookie, else redirect to the custom login.
+//  3. Mark every admin response no-store so the browser never pins a stale
+//     build — this is what fixes the post-deploy "This page couldn't load"
+//     (Next router fetching a dead deployment's RSC payload).
 const SESSION_COOKIE = 'rd_session'
+const NO_STORE = 'no-store, no-cache, must-revalidate, proxy-revalidate'
 
-// This middleware only runs for the paths in `config.matcher` below (the
-// Payload admin, mounted at /cms). Every request that reaches here must
-// carry a valid 2FA session cookie or it is redirected to the custom login.
-// NOTE: the matcher deliberately does NOT include /admin-login or /api/auth,
-// so those stay reachable without a session.
-export async function middleware(request: NextRequest) {
-  // Optional IP allowlist for the admin. Configured via the ADMIN_IP_ALLOWLIST
-  // env var (comma-separated IPs/prefixes). Fail-open: if unset, no restriction.
-  const allow = (process.env.ADMIN_IP_ALLOWLIST || '').split(',').map((s) => s.trim()).filter(Boolean)
+function noStore(res: NextResponse): NextResponse {
+  res.headers.set('Cache-Control', NO_STORE)
+  res.headers.set('Pragma', 'no-cache')
+  res.headers.set('Expires', '0')
+  return res
+}
+
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  const allow = (process.env.ADMIN_IP_ALLOWLIST || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
   if (allow.length > 0) {
-    const fwd = request.headers.get('x-forwarded-for') || ''
-    const ip = fwd.split(',')[0].trim()
-    const ok = ip && allow.some((a) => ip === a || ip.startsWith(a))
-    if (!ok) return new NextResponse('Forbidden', { status: 403 })
+    const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim()
+    if (!ip || !allow.some((a) => ip === a || ip.startsWith(a))) {
+      return new NextResponse('Forbidden', { status: 403 })
+    }
   }
 
-  const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
-
-  if (!sessionToken) {
-    return NextResponse.redirect(new URL('/admin-login', request.url))
+  const token = request.cookies.get(SESSION_COOKIE)?.value
+  if (!token) {
+    return noStore(NextResponse.redirect(new URL('/admin-login', request.url)))
   }
 
-  // Verify the session token (signed with the raw PAYLOAD_SECRET in
-  // verify-2fa). Middleware runs in the Edge runtime, where `jsonwebtoken`
-  // cannot run (no Node crypto) — it would throw on every request and redirect
-  // even valid sessions. `jose` works in Edge and is interoperable with the
-  // HS256 token.
   try {
-    await jwtVerify(sessionToken, new TextEncoder().encode(process.env.PAYLOAD_SECRET))
-    return NextResponse.next()
+    await jwtVerify(token, new TextEncoder().encode(process.env.PAYLOAD_SECRET))
+    // Authenticated — pass through, but never cache the admin.
+    return noStore(NextResponse.next())
   } catch {
-    // Invalid/expired token — clear it and send the user back to login.
-    const response = NextResponse.redirect(new URL('/admin-login', request.url))
-    response.cookies.delete(SESSION_COOKIE)
-    return response
+    const res = noStore(NextResponse.redirect(new URL('/admin-login', request.url)))
+    res.cookies.delete(SESSION_COOKIE)
+    return res
   }
 }
 
 export const config = {
-  // Match the admin index (/cms) AND everything under it (/cms/...).
-  // '/cms/:path*' alone does not match the bare /cms path.
+  // Bare /cms and everything under it.
   matcher: ['/cms', '/cms/:path*'],
 }
