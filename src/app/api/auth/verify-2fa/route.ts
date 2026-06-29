@@ -77,7 +77,11 @@ export async function POST(req: NextRequest) {
   //    (auth.useSessions = false), so no server-side session record is needed.
   const usersConfig = payload.collections['users'].config
   const tokenExpiration = usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
-  const fieldsToSign = getFieldsToSign({ collectionConfig: usersConfig, email: user.email, user })
+  const fieldsToSign = getFieldsToSign({
+    collectionConfig: usersConfig,
+    email: user.email,
+    user: { ...user, collection: 'users' },
+  })
   // Payload does NOT sign its JWTs with the raw PAYLOAD_SECRET — at init it
   // derives the signing key as sha256(secret) hex, truncated to 32 chars
   // (see payload Payload.init). We must sign with the same derived key or the

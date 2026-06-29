@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     // Fallback: session-based enrollment (for future admin-panel UI)
     const user = await getSessionUser(req, { allowUnenrolled: true })
     if (!user) return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 })
-    userId = user.id
+    userId = String(user.id)
   }
 
   const payload = await getPayload({ config })

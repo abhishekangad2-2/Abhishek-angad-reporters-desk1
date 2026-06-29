@@ -202,7 +202,9 @@ export const Stories: CollectionConfig = {
   admin: {
     useAsTitle: 'headline',
     components: {
-      BeforeDocumentControls: ['/components/admin/PublishGateChecklist#PublishGateChecklist'],
+      edit: {
+        beforeDocumentControls: ['/components/admin/PublishGateChecklist#PublishGateChecklist'],
+      },
     },
   },
   access: {
