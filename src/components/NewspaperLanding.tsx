@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Masthead from './Masthead'
 import PlexusBackground from './PlexusBackground'
 import { buildCards, type LandingData } from '@/lib/landing'
@@ -19,18 +19,23 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
   const leadImgRef = useRef<HTMLImageElement>(null)
   const linksRef = useRef<HTMLCanvasElement>(null)
 
-  const dateline = (() => {
+  // Compute the dateline only after mount — rendering new Date() during SSR
+  // and again on the client produces different text and breaks hydration.
+  const [dateline, setDateline] = useState('')
+  useEffect(() => {
     try {
-      return new Date().toLocaleDateString('en-GB', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
+      setDateline(
+        new Date().toLocaleDateString('en-GB', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }),
+      )
     } catch {
-      return ''
+      /* leave empty */
     }
-  })()
+  }, [])
 
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
