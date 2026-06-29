@@ -19,6 +19,7 @@ import { NewsletterSubscribers } from './collections/NewsletterSubscribers'
 import { Payments } from './collections/Payments'
 import { AuditLogs } from './collections/AuditLogs'
 import { RTIRequests } from './collections/RTIRequests'
+import { InvestigateRequests } from './collections/InvestigateRequests'
 import { Integrations } from './globals/Integrations'
 
 const filename = fileURLToPath(import.meta.url)
@@ -36,7 +37,7 @@ export default buildConfig({
   collections: [
     Users, Sections, Issues, Stories, Media, LiveDispatches, Polls,
     Subscriptions, Transactions, Newsletters, NewsletterSubscribers,
-    Payments, AuditLogs, RTIRequests,
+    Payments, AuditLogs, RTIRequests, InvestigateRequests,
   ],
   globals: [Integrations],
   plugins: [
