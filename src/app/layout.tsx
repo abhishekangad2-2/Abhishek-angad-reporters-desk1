@@ -29,6 +29,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "ReportersDesk · Abhishek Angad Ink",
   description: "Independent Journalism",
+  // Discourage Chrome auto-translate, which rewrites text nodes before React
+  // hydrates and triggers React #418 text-mismatch crashes. i18n is handled
+  // server-side via the locale cookie, so browser translation isn't needed.
+  other: { google: "notranslate" },
 };
 
 export default async function RootLayout({
@@ -46,9 +50,11 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${fraunces.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
+      translate="no"
+      suppressHydrationWarning
+      className={`notranslate ${fraunces.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
+      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
         <main className="flex-1">
           {children}
         </main>

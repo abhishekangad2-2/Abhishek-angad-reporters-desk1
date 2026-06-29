@@ -10,6 +10,10 @@ const PLANS = [
   { id: 'foi-patron', label: 'FOI Patron', amount: 10000, blurb: 'Funds RTI filings and document access' },
 ] as const
 
+// Deterministic thousands grouping — Intl/toLocaleString can format differently
+// on the server vs the browser and break hydration (React #418).
+const inr = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
 export function PaymentTab() {
   const [planId, setPlanId] = useState<(typeof PLANS)[number]['id']>('reader')
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
@@ -50,7 +54,7 @@ export function PaymentTab() {
             onClick={() => { setPlanId(p.id); setPaymentUrl(null) }}
           >
             <span className="plan-card-label">{p.label}</span>
-            <span className="plan-card-amount">₹{p.amount.toLocaleString('en-IN')}/yr</span>
+            <span className="plan-card-amount">₹{inr(p.amount)}/yr</span>
             <span className="plan-card-blurb">{p.blurb}</span>
           </button>
         ))}
@@ -72,7 +76,7 @@ export function PaymentTab() {
           onClick={handleSubscribe}
           disabled={status === 'loading'}
         >
-          {status === 'loading' ? 'Preparing payment…' : `Subscribe — ₹${plan.amount.toLocaleString('en-IN')}/yr`}
+          {status === 'loading' ? 'Preparing payment…' : `Subscribe — ₹${inr(plan.amount)}/yr`}
         </button>
       )}
 
