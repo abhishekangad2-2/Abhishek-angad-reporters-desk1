@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useField } from '@payloadcms/ui'
 
 type AccentTheme = 'inherit' | 'house-red' | 'field-teal' | 'ink' | 'archive-sepia' | 'forest' | 'slate'
@@ -23,6 +23,9 @@ const ACCENTS: AccentOption[] = [
 
 export const AccentThemePicker: React.FC<{ path: string }> = ({ path }) => {
   const { value, setValue } = useField<AccentTheme>({ path })
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
 
   return (
     <div style={{ padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '6px' }}>

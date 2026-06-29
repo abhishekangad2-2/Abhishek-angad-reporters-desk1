@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDocumentInfo } from '@payloadcms/ui'
 
 interface PublishGateChecklistProps {
@@ -16,6 +16,10 @@ export const PublishGateChecklist: React.FC<PublishGateChecklistProps> = ({ sect
   const requiresGate = useMemo(() => {
     return section === 'accountability' || section === 'investigative'
   }, [section])
+
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
 
   if (!requiresGate) {
     return (
