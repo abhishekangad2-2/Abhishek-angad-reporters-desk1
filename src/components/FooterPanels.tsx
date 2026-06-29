@@ -14,11 +14,61 @@ const PLANS = [
 // on the server vs the browser and break hydration (React #418).
 const inr = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
+const RAZORPAY_CHECKOUT_SRC = 'https://checkout.razorpay.com/v1/checkout.js'
+
+// Lazily inject Razorpay's checkout.js once and resolve when window.Razorpay is
+// available. Returns null if it can't load (offline / blocked) so callers fall
+// back to the hosted short_url.
+function loadRazorpayCheckout(): Promise<any | null> {
+  return new Promise((resolve) => {
+    const w = window as any
+    if (w.Razorpay) return resolve(w.Razorpay)
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${RAZORPAY_CHECKOUT_SRC}"]`)
+    if (existing) {
+      existing.addEventListener('load', () => resolve((window as any).Razorpay ?? null))
+      existing.addEventListener('error', () => resolve(null))
+      return
+    }
+    const s = document.createElement('script')
+    s.src = RAZORPAY_CHECKOUT_SRC
+    s.async = true
+    s.onload = () => resolve((window as any).Razorpay ?? null)
+    s.onerror = () => resolve(null)
+    document.body.appendChild(s)
+  })
+}
+
+type PayStatus = 'idle' | 'checking' | 'unconfigured' | 'loading' | 'success' | 'error'
+
 export function PaymentTab() {
   const [planId, setPlanId] = useState<(typeof PLANS)[number]['id']>('reader')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [status, setStatus] = useState<PayStatus>('checking')
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
+  const [keyId, setKeyId] = useState<string | null>(null)
   const plan = PLANS.find((p) => p.id === planId)!
+
+  // Probe config on mount so the UI can show the right state before the user
+  // clicks. Graceful degradation: configured:false → "payments not configured".
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/payments/create-subscription')
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return
+        if (data?.configured) {
+          setKeyId(data.keyId ?? null)
+          setStatus('idle')
+        } else {
+          setStatus('unconfigured')
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setStatus('unconfigured')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function handleSubscribe() {
     setStatus('loading')
@@ -30,16 +80,73 @@ export function PaymentTab() {
         body: JSON.stringify({ plan: planId }),
       })
       const data = await res.json()
-      if (res.ok && data.paymentUrl) {
+
+      if (data?.configured === false) {
+        setStatus('unconfigured')
+        return
+      }
+      if (!res.ok || !data?.subscriptionId) {
+        setStatus('error')
+        return
+      }
+
+      // Preferred path: open Razorpay Checkout in subscription mode.
+      const Razorpay = await loadRazorpayCheckout()
+      const checkoutKey = data.keyId ?? keyId
+      if (Razorpay && checkoutKey) {
+        const rzp = new Razorpay({
+          key: checkoutKey,
+          subscription_id: data.subscriptionId,
+          name: 'ReportersDesk',
+          description: `${plan.label} — ₹${inr(plan.amount)}/yr`,
+          handler: () => {
+            // Payment authorised in the browser. The webhook is the source of
+            // truth for activation; this just updates the UI.
+            setStatus('success')
+          },
+          modal: {
+            ondismiss: () => {
+              // User closed the sheet without paying — return to idle, no error.
+              setStatus('idle')
+            },
+          },
+          theme: { color: '#111111' },
+        })
+        rzp.on('payment.failed', () => setStatus('error'))
+        rzp.open()
+        setStatus('idle')
+        return
+      }
+
+      // Fallback: no checkout.js (blocked/offline) → show the hosted QR + link.
+      if (data.paymentUrl) {
         setPaymentUrl(data.paymentUrl)
+        setStatus('idle')
       } else {
         setStatus('error')
       }
     } catch {
       setStatus('error')
-    } finally {
-      if (status !== 'error') setStatus('idle')
     }
+  }
+
+  if (status === 'unconfigured') {
+    return (
+      <div className="footer-panel">
+        <p className="pay-note">
+          Online payments aren&apos;t set up yet. Please check back soon — we&apos;re finalising our
+          payment gateway.
+        </p>
+      </div>
+    )
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="footer-panel">
+        <p>Thank you for supporting independent journalism. Your subscription is being activated — watch your inbox for a receipt.</p>
+      </div>
+    )
   }
 
   return (
@@ -74,9 +181,13 @@ export function PaymentTab() {
         <button
           className="pay-button"
           onClick={handleSubscribe}
-          disabled={status === 'loading'}
+          disabled={status === 'loading' || status === 'checking'}
         >
-          {status === 'loading' ? 'Preparing payment…' : `Subscribe — ₹${inr(plan.amount)}/yr`}
+          {status === 'loading'
+            ? 'Preparing payment…'
+            : status === 'checking'
+              ? 'Loading…'
+              : `Subscribe — ₹${inr(plan.amount)}/yr`}
         </button>
       )}
 

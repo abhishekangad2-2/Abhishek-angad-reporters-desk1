@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
+export const dynamic = 'force-dynamic'
+
 // Plan configuration — single source of truth for pricing.
 // The actual Razorpay plan IDs must be created in the Razorpay dashboard
 // and stored as environment variables. Never hard-code amounts here for
@@ -16,23 +18,59 @@ const PLAN_MAP: Record<string, { razorpayPlanId: string; amountPaise: number }> 
   },
 }
 
+function isConfigured(): boolean {
+  const keyId = process.env.RAZORPAY_KEY_ID
+  const keySecret = process.env.RAZORPAY_KEY_SECRET
+  return Boolean(keyId && keyId !== 'none' && keySecret && keySecret !== 'none')
+}
+
+// GET is a cheap config probe for the client — lets the UI render a
+// "payments not configured" state without attempting a checkout.
+export async function GET() {
+  if (!isConfigured()) {
+    return NextResponse.json({
+      configured: false,
+      note: 'Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to enable payments.',
+    })
+  }
+  return NextResponse.json({
+    configured: true,
+    keyId: process.env.RAZORPAY_KEY_ID, // publishable key id, safe for the client
+    plans: {
+      reader: Boolean(process.env.RAZORPAY_PLAN_ID_READER && process.env.RAZORPAY_PLAN_ID_READER !== 'none'),
+      'foi-patron': Boolean(
+        process.env.RAZORPAY_PLAN_ID_FOI_PATRON && process.env.RAZORPAY_PLAN_ID_FOI_PATRON !== 'none',
+      ),
+    },
+  })
+}
+
 export async function POST(req: NextRequest) {
   // 5 subscription creation attempts per IP per 10 minutes
   if (!checkRateLimit(`payment:${getClientIp(req)}`, 5, 10 * 60 * 1000)) {
     return NextResponse.json({ error: 'Too many requests. Try again later.' }, { status: 429 })
   }
 
-  const keyId = process.env.RAZORPAY_KEY_ID
-  const keySecret = process.env.RAZORPAY_KEY_SECRET
-
-  if (!keyId || keyId === 'none' || !keySecret || keySecret === 'none') {
-    return NextResponse.json(
-      { error: 'Payment gateway not configured.' },
-      { status: 503 },
-    )
+  // Graceful degradation: no Razorpay env → tell the client we're not configured
+  // (200 with configured:false) instead of a 500/503 that looks like an outage.
+  if (!isConfigured()) {
+    return NextResponse.json({
+      configured: false,
+      note: 'Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to enable payments.',
+    })
   }
 
-  const { plan: planId, email } = await req.json()
+  const keyId = process.env.RAZORPAY_KEY_ID as string
+  const keySecret = process.env.RAZORPAY_KEY_SECRET as string
+
+  let body: any
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
+  }
+
+  const { plan: planId, email } = body ?? {}
   const plan = PLAN_MAP[planId]
 
   if (!plan) {
@@ -40,10 +78,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!plan.razorpayPlanId || plan.razorpayPlanId === 'none') {
-    return NextResponse.json(
-      { error: 'Razorpay plan ID not configured for this plan.' },
-      { status: 503 },
-    )
+    return NextResponse.json({
+      configured: false,
+      note: `Razorpay plan ID not configured for the "${planId}" tier.`,
+    })
   }
 
   try {
@@ -60,11 +98,14 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         plan_id: plan.razorpayPlanId,
-        total_count: 12,         // 12 cycles before requiring re-authorisation
+        total_count: 12, // 12 cycles before requiring re-authorisation
         quantity: 1,
+        // Surface checkout details (email) and our internal tags. These notes
+        // come back on the subscription webhook so we can attribute the record.
+        customer_notify: 1,
         notes: {
           plan: planId,
-          email: email ?? '',
+          email: typeof email === 'string' ? email : '',
           source: 'footer-payment-tab',
         },
       }),
@@ -77,10 +118,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Could not create subscription.' }, { status: 502 })
     }
 
-    // Return the short_url — Razorpay hosted payment page, handles UPI Autopay
-    // mandate setup, QR generation, and everything else.
+    // Return everything the client needs: the subscription id (to open
+    // Razorpay Checkout in subscription mode), the publishable key id, and the
+    // hosted short_url (QR / fallback link for UPI Autopay mandate setup).
     return NextResponse.json({
+      configured: true,
       subscriptionId: subscription.id,
+      keyId,
       paymentUrl: subscription.short_url,
     })
   } catch (err) {
