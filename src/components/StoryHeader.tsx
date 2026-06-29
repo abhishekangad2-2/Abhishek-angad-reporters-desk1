@@ -49,7 +49,7 @@ function HeaderText({ story }: { story: Story }) {
       {(byline || date) && (
         <div className="rd-header__meta">
           {byline && <span className="rd-header__byline">{byline}</span>}
-          {date && <span className="rd-header__date">{date}</span>}
+          {date && <span className="rd-header__date" suppressHydrationWarning>{date}</span>}
         </div>
       )}
     </header>

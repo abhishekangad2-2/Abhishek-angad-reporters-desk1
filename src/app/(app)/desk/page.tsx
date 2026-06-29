@@ -101,7 +101,7 @@ export default async function Desk() {
                       <div className="me">{(s.section?.name ?? '—')} · {s.author?.[0]?.name ?? s.author?.[0]?.email ?? '—'}</div>
                     </div>
                     <span className={`aec-badge ${badge(s.status)}`}>{s.status ?? 'draft'}</span>
-                    <span className="me">{s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
+                    <span className="me" suppressHydrationWarning>{s.updatedAt ? new Date(s.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
                   </div>
                 ))}
               </div>
@@ -124,7 +124,7 @@ export default async function Desk() {
                 {payments.slice(0, 4).map((p) => (
                   <div className="aec-row" key={p.id}>
                     <div className="ti">{fmtINR(Number(p.amount) || 0)}</div>
-                    <span className="me">{p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
+                    <span className="me" suppressHydrationWarning>{p.paidAt ? new Date(p.paidAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
                   </div>
                 ))}
               </div>

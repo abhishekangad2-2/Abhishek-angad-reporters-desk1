@@ -29,7 +29,7 @@ export default function Template3({ story }: { story: Story }) {
         />
         <div className="news-masthead-inner">
           <div className="news-wordmark">ReportersDesk</div>
-          <div className="news-date">{longDate}</div>
+          <div className="news-date" suppressHydrationWarning>{longDate}</div>
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export default function Template3({ story }: { story: Story }) {
 
           <div className="news-byrule">
             <span>{byline || 'Staff report'}</span>
-            {pub && <span>{new Date(pub).toLocaleDateString('en-IN')}</span>}
+            {pub && <span suppressHydrationWarning>{new Date(pub).toLocaleDateString('en-IN')}</span>}
           </div>
 
           {heroUrl && (

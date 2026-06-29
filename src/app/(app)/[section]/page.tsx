@@ -88,7 +88,7 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
                   )}
                 </div>
                 <div className="flex items-center gap-4 mb-3">
-                  <span className="text-xs font-bold uppercase tracking-widest text-stone-500">
+                  <span className="text-xs font-bold uppercase tracking-widest text-stone-500" suppressHydrationWarning>
                     {new Date(story.publishedAt || story.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                   {story.issueTags && story.issueTags.length > 0 && (
