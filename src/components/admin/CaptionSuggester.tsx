@@ -14,7 +14,7 @@
  * and TextPhoto blocks in src/collections/Stories.ts.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useField, useAllFormFields } from '@payloadcms/ui'
 
 // Walk up from the caption path to the block row, then look for a sibling
@@ -44,6 +44,8 @@ export const CaptionSuggester: React.FC<{ path: string }> = ({ path }) => {
 
   const [loading, setLoading] = useState(false)
   const [note, setNote] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const suggest = async () => {
     setLoading(true)
@@ -80,6 +82,8 @@ export const CaptionSuggester: React.FC<{ path: string }> = ({ path }) => {
       setLoading(false)
     }
   }
+
+  if (!mounted) return null
 
   return (
     <div style={{ marginBottom: '0.5rem' }}>

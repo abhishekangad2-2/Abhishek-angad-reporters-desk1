@@ -9,7 +9,7 @@
  * reads this value directly, so it must not change.
  */
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useField } from '@payloadcms/ui'
 import { LayoutThumbGrid, type LayoutChoice } from './LayoutThumb'
 
@@ -22,6 +22,9 @@ const CHOICES: LayoutChoice[] = [
 
 export const LandingLayoutPicker: React.FC<{ path: string }> = ({ path }) => {
   const { value, setValue } = useField<string>({ path })
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
 
   return (
     <LayoutThumbGrid

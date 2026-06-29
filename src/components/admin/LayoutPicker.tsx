@@ -82,6 +82,11 @@ export const LayoutPicker: React.FC<{ path: string }> = ({ path }) => {
 
   const [recommended, setRecommended] = useState<string | null>(null)
   const [reason, setReason] = useState<string | null>(null)
+  // Render nothing until mounted so SSR and the first client render match —
+  // useField/useAllFormFields resolve differently on server vs client and
+  // would otherwise cause a button hydration mismatch (React #418).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   // Derive block counts from the `layout` (and `visualMedia`) blocks arrays in
   // form state. Block rows expose a `blockType` value at `<array>.<i>.blockType`.
@@ -135,6 +140,8 @@ export const LayoutPicker: React.FC<{ path: string }> = ({ path }) => {
     () => CHOICES.map((c) => ({ ...c, recommended: c.value === recommended })),
     [recommended],
   )
+
+  if (!mounted) return null
 
   return (
     <div>

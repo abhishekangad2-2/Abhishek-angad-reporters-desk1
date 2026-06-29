@@ -13,7 +13,7 @@
  * `suggestedTags` select in src/collections/Stories.ts.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useField, useAllFormFields } from '@payloadcms/ui'
 
 // The fixed option values supported by the `suggestedTags` select. Keep in sync
@@ -64,6 +64,8 @@ export const TagSuggester: React.FC<{ path: string }> = ({ path }) => {
   const [loading, setLoading] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [note, setNote] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const readText = (): string => {
     try {
@@ -112,6 +114,8 @@ export const TagSuggester: React.FC<{ path: string }> = ({ path }) => {
     if (current.includes(fv)) return
     setTags([...current, fv])
   }
+
+  if (!mounted) return null
 
   return (
     <div style={{ padding: '1rem', background: '#0e1115', borderRadius: '8px', marginBottom: '0.75rem' }}>
