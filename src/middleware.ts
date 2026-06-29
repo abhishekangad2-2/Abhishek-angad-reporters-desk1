@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
+import { clientIpFromXff } from './lib/clientIp'
 
 // Fresh admin middleware. Runs only for /cms (see matcher). Three jobs:
 //  1. Optional IP allowlist (env ADMIN_IP_ALLOWLIST, comma-separated; fail-open).
@@ -23,8 +24,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     .map((s) => s.trim())
     .filter(Boolean)
   if (allow.length > 0) {
-    const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim()
-    if (!ip || !allow.some((a) => ip === a || ip.startsWith(a))) {
+    const ip = clientIpFromXff(request.headers.get('x-forwarded-for'))
+    if (!ip || ip === 'unknown' || !allow.some((a) => ip === a || ip.startsWith(a))) {
       return new NextResponse('Forbidden', { status: 403 })
     }
   }

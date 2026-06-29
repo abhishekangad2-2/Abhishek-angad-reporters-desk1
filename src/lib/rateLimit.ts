@@ -33,7 +33,8 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   return true
 }
 
+import { clientIpFromXff } from './clientIp'
+
 export function getClientIp(req: Request): string {
-  const xff = (req as any).headers?.get?.('x-forwarded-for') ?? ''
-  return xff.split(',')[0].trim() || 'unknown'
+  return clientIpFromXff((req as any).headers?.get?.('x-forwarded-for'))
 }
