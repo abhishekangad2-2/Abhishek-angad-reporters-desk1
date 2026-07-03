@@ -143,7 +143,7 @@ export function PaymentTab() {
 
   if (status === 'success') {
     return (
-      <div className="footer-panel">
+      <div className="footer-panel" role="status">
         <p>Thank you for supporting independent journalism. Your subscription is being activated — watch your inbox for a receipt.</p>
       </div>
     )
@@ -192,7 +192,7 @@ export function PaymentTab() {
       )}
 
       {status === 'error' && (
-        <p className="form-error">Could not start the payment. Please try again.</p>
+        <p className="form-error" role="alert">Could not start the payment. Please try again.</p>
       )}
 
       <p className="pay-note">
@@ -222,7 +222,7 @@ export function NewsletterTab() {
   }
 
   if (status === 'done') {
-    return <p className="footer-panel">You&apos;re subscribed. Watch your inbox.</p>
+    return <p className="footer-panel" role="status">You&apos;re subscribed. Watch your inbox.</p>
   }
 
   return (
@@ -241,7 +241,7 @@ export function NewsletterTab() {
           {status === 'loading' ? 'Subscribing…' : 'Subscribe'}
         </button>
       </div>
-      {status === 'error' && <p className="form-error">Something went wrong — try again.</p>}
+      {status === 'error' && <p className="form-error" role="alert">Something went wrong — try again.</p>}
     </form>
   )
 }
@@ -283,6 +283,7 @@ export function PollTab() {
               {showResults && (
                 <span
                   className="poll-bar"
+                  aria-hidden="true"
                   style={{ width: `${total ? (o.voteCount / total) * 100 : 0}%` }}
                 />
               )}
@@ -445,7 +446,7 @@ export function InvestigateTab() {
         {status === 'loading' ? 'Sending…' : 'Send the tip'}
       </button>
 
-      {status === 'error' && <p className="form-error">{errorMsg}</p>}
+      {status === 'error' && <p className="form-error" role="alert">{errorMsg}</p>}
     </form>
   )
 }
@@ -453,7 +454,7 @@ export function InvestigateTab() {
 export function FounderBioTab() {
   return (
     <div className="footer-panel founder-bio">
-      <h3>Abhishek Angad</h3>
+      <h2 className="founder-bio-h">Abhishek Angad</h2>
       {/* Replace the paragraph below with the real bio before launch. */}
       <p>Founder and editor of ReportersDesk. Independent journalist covering accountability, power, and public institutions.</p>
       <Link href="/founder">Read the full bio →</Link>

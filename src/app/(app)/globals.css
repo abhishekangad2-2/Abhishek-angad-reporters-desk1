@@ -212,6 +212,14 @@ a {
   margin: 0 auto;
 }
 
+/* Founder bio heading — h2 for logical order, kept at its original size. */
+.founder-bio-h {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
 /* Payment tab */
 .plan-row {
   display: flex;
@@ -415,6 +423,37 @@ a {
   position: relative;
   float: right;
   font-family: var(--font-mono);
+}
+
+/* ---------- Narrow-screen hardening (~360px) ---------- */
+@media (max-width: 480px) {
+  /* Footer tabs: 160px min-width forces awkward overflow on tiny screens —
+     let each tab take the full row so labels never clip. */
+  .footer-tab {
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #d8d5cb;
+  }
+
+  .footer-panel-wrap {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Plan cards and the QR pay row stack vertically instead of squeezing. */
+  .plan-row {
+    flex-direction: column;
+  }
+
+  .pay-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  /* Newsletter input + button stack so neither is cut off. */
+  .newsletter-row {
+    flex-direction: column;
+  }
 }
 
 /* ---------- Landing page shells ---------- */
@@ -1347,6 +1386,18 @@ a {
   }
 }
 
+@media (max-width: 480px) {
+  .site-masthead {
+    padding: 1rem 1rem 0;
+  }
+  /* Let the top bar wrap rather than overflow if the eyebrow + editor pill
+     are wider than the viewport. */
+  .mh-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
 /* ---------- Per-story templates (echo the four landing designs) ---------- */
 .story {
   position: relative;
@@ -1515,6 +1566,17 @@ a {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+/* Sidebar headings (h2 for a logical h1→h2 order) sized like the small
+   sectional labels they replaced, so the visual design is unchanged. */
+.newspaper-aside-h {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .news-keylist {
@@ -2184,7 +2246,9 @@ a {
   font-size: 0.52rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #d24a32;
+  /* Lightened from #d24a32 (4.39:1) to meet AA 4.5:1 for this small label
+     on the dark dispatch panel. */
+  color: #e8654c;
   margin-left: auto;
 }
 .rd-disp-text {
