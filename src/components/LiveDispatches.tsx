@@ -140,7 +140,11 @@ export default function LiveDispatches() {
 
   return (
     <>
-      <div className={`rd-dispatch ${collapsed ? 'collapsed' : ''}`}>
+      <div
+        className={`rd-dispatch ${collapsed ? 'collapsed' : ''}`}
+        role="region"
+        aria-label="Live Dispatches"
+      >
         <div className="rd-dispatch-head">
           <span className="rd-dispatch-title">
             <span className="rd-live-dot" aria-hidden />
@@ -151,9 +155,11 @@ export default function LiveDispatches() {
               type="button"
               className="rd-dispatch-toggle"
               aria-label="Notification settings"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
               onClick={() => setMenuOpen((m) => !m)}
             >
-              ⚙
+              <span aria-hidden="true">⚙</span>
             </button>
             <button
               type="button"
@@ -162,10 +168,12 @@ export default function LiveDispatches() {
               aria-label={collapsed ? 'Expand live dispatches' : 'Collapse live dispatches'}
               onClick={() => setCollapsed((c) => !c)}
             >
-              {collapsed ? '▴' : '▾'}
+              <span aria-hidden="true">{collapsed ? '▴' : '▾'}</span>
             </button>
             {menuOpen && (
               <div
+                role="menu"
+                aria-label="Notification frequency"
                 style={{
                   position: 'absolute',
                   top: 26,
@@ -184,6 +192,8 @@ export default function LiveDispatches() {
                   <button
                     key={f}
                     type="button"
+                    role="menuitemradio"
+                    aria-checked={freq === f}
                     onClick={() => setFrequency(f)}
                     style={{
                       display: 'block',
@@ -207,7 +217,7 @@ export default function LiveDispatches() {
           </span>
         </div>
 
-        <div className="rd-dispatch-body">
+        <div className="rd-dispatch-body" aria-live="polite">
           {visible.map((d) => {
             const isPulse = d.flag === 'Significant' || d.flag === 'Breaking'
             const share = encodeURIComponent(d.text)

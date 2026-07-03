@@ -55,8 +55,8 @@ export default function Template3({ story }: { story: Story }) {
           </div>
         </article>
 
-        <aside className="newspaper-secondary">
-          <h3>Key details</h3>
+        <aside className="newspaper-secondary" aria-labelledby="np-key-details">
+          <h2 id="np-key-details" className="newspaper-aside-h">Key details</h2>
           <ul className="news-keylist">
             <li>Section — {sectionName}</li>
             {Array.isArray((story as any).issueTags) &&
@@ -69,8 +69,8 @@ export default function Template3({ story }: { story: Story }) {
           </ul>
         </aside>
 
-        <aside className="newspaper-briefs">
-          <h4>Have a tip?</h4>
+        <aside className="newspaper-briefs" aria-labelledby="np-have-tip">
+          <h2 id="np-have-tip" className="newspaper-aside-h">Have a tip?</h2>
           <a className="news-tip" href="mailto:tips@reportersdesk.abhishekangad.com">
             Contact us securely →
           </a>
