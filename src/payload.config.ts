@@ -21,6 +21,7 @@ import { AuditLogs } from './collections/AuditLogs'
 import { RTIRequests } from './collections/RTIRequests'
 import { InvestigateRequests } from './collections/InvestigateRequests'
 import { Integrations } from './globals/Integrations'
+import { DesignStudio } from './globals/DesignStudio'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -39,7 +40,7 @@ export default buildConfig({
     Subscriptions, Transactions, Newsletters, NewsletterSubscribers,
     Payments, AuditLogs, RTIRequests, InvestigateRequests,
   ],
-  globals: [Integrations],
+  globals: [Integrations, DesignStudio],
   plugins: [
     gcsStorage({
       collections: {

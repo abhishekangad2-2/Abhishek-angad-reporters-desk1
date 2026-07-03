@@ -8,33 +8,24 @@ export const Integrations: GlobalConfig = {
     update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
   },
   fields: [
+    // Appearance moved to the Design Studio global (layout + palette +
+    // simulation live together now). This hidden field keeps the legacy
+    // `landing_layout` column in the schema so getLandingLayout()'s fallback
+    // read keeps working and schema-push never tries to drop prod data.
+    {
+      name: 'landingLayout',
+      type: 'select',
+      options: [
+        { label: 'Z-Axis · three-column', value: 'three-column' },
+        { label: 'X/Y · z-pattern rows', value: 'z-pattern' },
+        { label: 'Newspaper', value: 'newspaper' },
+        { label: 'Immersive (single feature)', value: 'immersive' },
+      ],
+      admin: { hidden: true },
+    },
     {
       type: 'tabs',
       tabs: [
-        {
-          label: 'Appearance',
-          description: 'Choose the HRIE layout the public homepage renders.',
-          fields: [
-            {
-              name: 'landingLayout',
-              type: 'select',
-              label: 'Homepage layout',
-              defaultValue: 'three-column',
-              options: [
-                { label: 'Z-Axis · three-column', value: 'three-column' },
-                { label: 'X/Y · z-pattern rows', value: 'z-pattern' },
-                { label: 'Newspaper', value: 'newspaper' },
-                { label: 'Immersive (single feature)', value: 'immersive' },
-              ],
-              admin: {
-                description: 'Set by the Layout Co-Pilot. ?layout= still overrides for preview.',
-                components: {
-                  Field: '/components/admin/LandingLayoutPicker#LandingLayoutPicker',
-                },
-              },
-            },
-          ],
-        },
         {
           label: 'Analytics (GA4)',
           description: 'GA4 dashboard pull and tracking configuration.',

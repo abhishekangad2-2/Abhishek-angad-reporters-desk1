@@ -1,27 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import Masthead from './Masthead'
-import PlexusBackground from './PlexusBackground'
+import SimulationBackground from './sims/SimulationBackground'
 import { buildCards, type LandingData } from '@/lib/landing'
+import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
 
-/** Phase 6 — full-bleed three-column grid. The Plexus IS the background; three
- *  minimal-text columns float over it (real stories, backfilled with editorial
- *  desks so it's never half-empty), and hovering a column lifts it on the
- *  z-axis while the network leans toward it. */
+/** Phase 6 — full-bleed three-column grid. The simulation IS the background;
+ *  three minimal-text columns float over it (real stories, backfilled with
+ *  editorial desks so it's never half-empty), and hovering a column lifts it
+ *  on the z-axis while the network leans toward it. Palette + simulation come
+ *  from the Design Studio global. */
 export default function ThreeColumnLanding({ data }: { data: LandingData }) {
   const [hovered, setHovered] = useState<number | null>(null)
   const target = data.stories.length <= 3 ? 3 : 6
   const cards = buildCards(data, target).slice(0, target)
+  const design = data.design ?? DEFAULT_DESIGN
 
   return (
-    <div className="landing landing--three-column">
-      <PlexusBackground
+    <div className="landing landing--three-column" style={designCssVars(design) as CSSProperties}>
+      <SimulationBackground
+        design={design}
         className="landing-canvas landing-canvas--fixed"
-        nodeCount={95}
-        color="#b43d2a"
-        lineColor="#3e6b66"
-        intensity={0.75}
         focusIndex={hovered}
       />
       <Masthead sections={data.sections} labels={data.labels} />

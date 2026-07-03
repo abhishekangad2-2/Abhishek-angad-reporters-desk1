@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, type CSSProperties } from 'react'
 import Masthead from './Masthead'
-import PlexusBackground from './PlexusBackground'
+import SimulationBackground from './sims/SimulationBackground'
 import { buildCards, type LandingCard, type LandingData } from '@/lib/landing'
+import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
 
 /** X/Y rows — three horizontal, sideways-scrolling rows of story cards. The
  *  card nearest each row's centre "blooms" (scales up, brightens) while the
@@ -177,13 +178,15 @@ export default function ZPatternLanding({ data }: { data: LandingData }) {
   }
 
   return (
-    <div className="landing landing--z-pattern">
-      <PlexusBackground
+    <div
+      className="landing landing--z-pattern"
+      style={designCssVars(data.design ?? DEFAULT_DESIGN) as CSSProperties}
+    >
+      <SimulationBackground
+        design={data.design}
         className="landing-canvas landing-canvas--fixed"
-        nodeCount={70}
-        color="#b43d2a"
-        lineColor="#3e6b66"
-        intensity={0.3}
+        densityScale={0.78}
+        intensityScale={0.4}
       />
       <canvas ref={linksRef} className="xy-links" aria-hidden />
       <Masthead sections={data.sections} labels={data.labels} />

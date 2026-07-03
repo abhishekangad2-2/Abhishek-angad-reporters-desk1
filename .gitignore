@@ -48,3 +48,4 @@ next-env.d.ts
 # local logs
 dev.log
 *.log
+.claude/launch.json

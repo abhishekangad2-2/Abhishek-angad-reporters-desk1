@@ -49,6 +49,9 @@ export type LandingData = {
   stories: LandingStory[]
   sections: LandingSection[]
   labels?: LandingLabels
+  /** Editor's Design Studio choices (palette + simulation). Optional so
+   *  existing callers/tests without a design still render with defaults. */
+  design?: import('./design').DesignConfig
 }
 
 export function isLandingTemplate(value: unknown): value is LandingTemplate {

@@ -29,6 +29,8 @@ import { AccentThemePicker as AccentThemePicker_rd } from '@/components/admin/Ac
 import { PublishGateChecklist as PublishGateChecklist_rd } from '@/components/admin/PublishGateChecklist'
 import { TagSuggester as TagSuggester_rd } from '@/components/admin/TagSuggester'
 import { CaptionSuggester as CaptionSuggester_rd } from '@/components/admin/CaptionSuggester'
+import { PalettePicker as PalettePicker_rd } from '@/components/admin/PalettePicker'
+import { SimulationPicker as SimulationPicker_rd } from '@/components/admin/SimulationPicker'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -62,5 +64,7 @@ export const importMap = {
   "/components/admin/AccentThemePicker#AccentThemePicker": AccentThemePicker_rd,
   "/components/admin/PublishGateChecklist#PublishGateChecklist": PublishGateChecklist_rd,
   "/components/admin/TagSuggester#TagSuggester": TagSuggester_rd,
-  "/components/admin/CaptionSuggester#CaptionSuggester": CaptionSuggester_rd
+  "/components/admin/CaptionSuggester#CaptionSuggester": CaptionSuggester_rd,
+  "/components/admin/PalettePicker#PalettePicker": PalettePicker_rd,
+  "/components/admin/SimulationPicker#SimulationPicker": SimulationPicker_rd
 }

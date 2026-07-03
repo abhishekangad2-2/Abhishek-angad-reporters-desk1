@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Masthead from './Masthead'
-import PlexusBackground from './PlexusBackground'
+import SimulationBackground from './sims/SimulationBackground'
 import { buildCards, type LandingData } from '@/lib/landing'
+import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
 
 /** Modern broadsheet — double-rule dateline, a large lead story (hero image +
  *  kicker + big serif headline + standfirst + byline), a right rail of two
@@ -131,15 +132,21 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
   }, [])
 
   return (
-    <div className="landing landing--newspaper">
+    <div
+      className="landing landing--newspaper"
+      style={designCssVars(data.design ?? DEFAULT_DESIGN) as CSSProperties}
+    >
       <canvas ref={linksRef} className="np-links" aria-hidden />
       <div className="newspaper-masthead-band">
-        <PlexusBackground
+        <SimulationBackground
+          design={data.design}
           className="landing-canvas landing-canvas--thin"
-          nodeCount={28}
-          color="#14171c"
-          lineColor="#b43d2a"
-          intensity={0.16}
+          densityScale={0.31}
+          intensityScale={0.22}
+          overrides={{
+            primary: (data.design ?? DEFAULT_DESIGN).palette.ink,
+            secondary: (data.design ?? DEFAULT_DESIGN).palette.accent,
+          }}
         />
         <Masthead sections={data.sections} labels={data.labels} />
       </div>

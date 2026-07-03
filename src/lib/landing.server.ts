@@ -1,6 +1,7 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import type { LandingData, LandingStory } from './landing'
+import { resolveDesign, DEFAULT_DESIGN, type DesignConfig } from './design'
 
 // Server-only: imports Payload (and its @google-cloud/storage/grpc deps), so it
 // must never be imported by a 'use client' component. Pure helpers/types live
@@ -19,15 +20,31 @@ function normalizeStory(story: any): LandingStory {
   }
 }
 
-/** The editor-chosen homepage layout, read from the Integrations global.
+/** The editor-chosen homepage layout. Design Studio is the source of truth;
+ *  the legacy Integrations field is a fallback so the choice made before the
+ *  Studio existed keeps working until the editor saves the Studio once.
  *  Falls back to null so the caller can apply its own default. */
 export async function getLandingLayout(): Promise<string | null> {
   try {
     const payload = await getPayload({ config })
+    const studio: any = await payload.findGlobal({ slug: 'design-studio', depth: 0 }).catch(() => null)
+    if (studio?.layout) return studio.layout
     const g: any = await payload.findGlobal({ slug: 'integrations', depth: 0 })
     return g?.landingLayout ?? null
   } catch {
     return null
+  }
+}
+
+/** The editor's Design Studio choices (palette + simulation), normalized so a
+ *  half-filled or missing global can never break the homepage. */
+export async function getLandingDesign(): Promise<DesignConfig> {
+  try {
+    const payload = await getPayload({ config })
+    const g = await payload.findGlobal({ slug: 'design-studio', depth: 0 })
+    return resolveDesign(g)
+  } catch {
+    return DEFAULT_DESIGN
   }
 }
 
@@ -36,7 +53,7 @@ export async function getLandingLayout(): Promise<string | null> {
 export async function getLandingData(): Promise<LandingData> {
   try {
     const payload = await getPayload({ config })
-    const [stories, sections] = await Promise.all([
+    const [stories, sections, design] = await Promise.all([
       payload.find({
         collection: 'stories',
         where: { status: { equals: 'published' } },
@@ -45,6 +62,7 @@ export async function getLandingData(): Promise<LandingData> {
         limit: 9,
       }),
       payload.find({ collection: 'sections', sort: 'name', limit: 50 }),
+      getLandingDesign(),
     ])
     return {
       stories: stories.docs.map(normalizeStory),
@@ -53,8 +71,9 @@ export async function getLandingData(): Promise<LandingData> {
         slug: s.slug,
         description: s.description,
       })),
+      design,
     }
   } catch {
-    return { stories: [], sections: [] }
+    return { stories: [], sections: [], design: DEFAULT_DESIGN }
   }
 }

@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import Masthead from './Masthead'
-import PlexusBackground from './PlexusBackground'
+import SimulationBackground from './sims/SimulationBackground'
 import { buildCards, type LandingData } from '@/lib/landing'
+import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
 
 /** Single full-bleed feature — a hero title over an evolving dark background,
  *  scroll-revealed text blocks and large figures (IntersectionObserver fade-in),
@@ -220,14 +221,17 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
   }, [playing])
 
   return (
-    <div className="landing landing--immersive" ref={containerRef}>
+    <div
+      className="landing landing--immersive"
+      ref={containerRef}
+      style={designCssVars(data.design ?? DEFAULT_DESIGN) as CSSProperties}
+    >
       <div className="im-bg" ref={bgRef} />
-      <PlexusBackground
+      <SimulationBackground
+        design={data.design}
         className="landing-canvas landing-canvas--fixed"
-        nodeCount={110}
-        color="#b43d2a"
-        lineColor="#3e6b66"
-        intensity={intensity}
+        densityScale={1.22}
+        overrides={{ intensity }}
       />
       <canvas ref={linksRef} className="im-links" aria-hidden />
       <div className="im-progress" ref={progRef} />
