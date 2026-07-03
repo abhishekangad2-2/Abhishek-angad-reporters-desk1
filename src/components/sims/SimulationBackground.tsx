@@ -9,7 +9,10 @@ import React from 'react'
 import type { DesignConfig } from '../../lib/design'
 import { DEFAULT_DESIGN, simColors } from '../../lib/design'
 import PlexusBackground from '../PlexusBackground'
+import Constellation from './Constellation'
+import ParticleField from './ParticleField'
 import type { SimulationProps } from './types'
+import WaveField from './WaveField'
 
 // Plexus predates the SimulationProps contract — adapt at the boundary.
 function PlexusAdapter(props: SimulationProps) {
@@ -25,14 +28,11 @@ function PlexusAdapter(props: SimulationProps) {
   )
 }
 
-// particles / waves / constellation alias to Plexus (tuned differently) until
-// their dedicated implementations land — the editor's choice always renders
-// SOMETHING coherent rather than a blank page.
 const REGISTRY: Record<string, React.ComponentType<SimulationProps>> = {
   plexus: PlexusAdapter,
-  particles: PlexusAdapter,
-  waves: PlexusAdapter,
-  constellation: PlexusAdapter,
+  particles: ParticleField,
+  waves: WaveField,
+  constellation: Constellation,
 }
 
 export default function SimulationBackground({
