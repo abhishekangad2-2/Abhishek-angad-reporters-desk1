@@ -1,9 +1,29 @@
 import type { CollectionConfig } from 'payload'
 
+const isAdmin: NonNullable<CollectionConfig['access']>['read'] = ({ req: { user } }) =>
+  Boolean(user && (user as { role?: string }).role === 'admin')
+
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
+  },
+  access: {
+    // A user may read/update their own record; admins manage everyone. Without
+    // this, Payload's default (any authenticated user) let any logged-in
+    // account read every other user's row via /api/users.
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if ((user as { role?: string }).role === 'admin') return true
+      return { id: { equals: user.id } }
+    },
+    create: isAdmin,
+    update: ({ req: { user } }) => {
+      if (!user) return false
+      if ((user as { role?: string }).role === 'admin') return true
+      return { id: { equals: user.id } }
+    },
+    delete: isAdmin,
   },
   auth: {
     // Payload uses Argon2id out of the box for password hashing.
@@ -41,6 +61,14 @@ export const Users: CollectionConfig = {
     {
       name: 'totpSecret',
       type: 'text',
+      // Never exposed over any API surface — the 2FA flow reads it via the
+      // Local API, which bypasses access control. hidden:true only hid it in
+      // the admin UI, not the REST/GraphQL response.
+      access: {
+        read: () => false,
+        create: () => false,
+        update: () => false,
+      },
       admin: {
         hidden: true,
       },
@@ -48,6 +76,11 @@ export const Users: CollectionConfig = {
     {
       name: 'backupCodes',
       type: 'array',
+      access: {
+        read: () => false,
+        create: () => false,
+        update: () => false,
+      },
       admin: {
         hidden: true,
       },

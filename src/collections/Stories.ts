@@ -208,7 +208,14 @@ export const Stories: CollectionConfig = {
     },
   },
   access: {
-    read: () => true, // Public can read
+    // Public (unauthenticated) callers — including the raw Payload REST API —
+    // may ONLY read published stories. Authenticated staff see everything
+    // (drafts, in-review, scheduled, archived). Without the where-constraint
+    // form, `/api/stories?where[status][equals]=draft` leaks every draft.
+    read: ({ req: { user } }) => {
+      if (user) return true
+      return { status: { equals: 'published' } }
+    },
     create: isReporterOrAbove,
     update: ({ req }) => Boolean(req.user), // Field/beforeChange enforces what they can change
     delete: isEditorOrAbove,

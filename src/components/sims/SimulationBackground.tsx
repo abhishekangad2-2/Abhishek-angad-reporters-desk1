@@ -8,6 +8,7 @@
 import React from 'react'
 import type { DesignConfig } from '../../lib/design'
 import { DEFAULT_DESIGN, simColors } from '../../lib/design'
+import { useReaderPrefs } from '../../lib/readerPrefs'
 import PlexusBackground from '../PlexusBackground'
 import Constellation from './Constellation'
 import ParticleField from './ParticleField'
@@ -54,19 +55,29 @@ export default function SimulationBackground({
   overrides?: Partial<SimulationProps>
 }) {
   const d = design ?? DEFAULT_DESIGN
-  if (d.simulation.kind === 'off') return null
+  // Reader accessibility gear (spec): explicit disable-3D / motion-off kill the
+  // WebGL layer entirely; "subtle" and Low-Power damp it. The page is designed
+  // HTML-first, so returning null degrades cleanly.
+  const reader = useReaderPrefs()
+  if (d.simulation.kind === 'off' || reader.disable3d || reader.motion === 'off') return null
 
   const Sim = REGISTRY[d.simulation.kind] ?? PlexusAdapter
   const colors = simColors(d)
 
+  const subtle = reader.motion === 'subtle'
+  const lowPower = reader.lowPower
+  const readerDensity = lowPower ? 0.4 : 1
+  const readerIntensity = (subtle ? 0.55 : 1) * (lowPower ? 0.8 : 1)
+  const readerSpeed = (subtle ? 0.6 : 1) * (lowPower ? 0.7 : 1)
+
   const props: SimulationProps = {
     className,
-    density: Math.max(12, Math.round(d.simulation.density * densityScale)),
-    speed: d.simulation.speed,
-    intensity: Math.min(1, d.simulation.intensity * intensityScale),
+    density: Math.max(12, Math.round(d.simulation.density * densityScale * readerDensity)),
+    speed: d.simulation.speed * readerSpeed,
+    intensity: Math.min(1, d.simulation.intensity * intensityScale * readerIntensity),
     primary: colors.primary,
     secondary: colors.secondary,
-    interactive: d.simulation.interactive,
+    interactive: d.simulation.interactive && !lowPower && !subtle,
     focusIndex: focusIndex ?? null,
     ...overrides,
   }

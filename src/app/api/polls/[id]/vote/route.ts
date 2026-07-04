@@ -15,11 +15,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Already voted in this poll.' }, { status: 409 })
   }
 
-  const { option } = await req.json()
-  const payload = await getPayload({ config })
-  const poll = await payload.findByID({ collection: 'polls', id })
+  let option: unknown
+  try {
+    ;({ option } = await req.json())
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
+  }
+  if (typeof option !== 'string' || !option) {
+    return NextResponse.json({ error: 'A poll option is required.' }, { status: 400 })
+  }
 
-  // Match by `label` and increment `voteCount` — both now aligned with the Polls collection schema
+  const payload = await getPayload({ config })
+  const poll = await payload.findByID({ collection: 'polls', id }).catch(() => null)
+  if (!poll) {
+    return NextResponse.json({ error: 'Poll not found.' }, { status: 404 })
+  }
+
+  // Match by `label` and increment `voteCount`. Reject an option that isn't in
+  // the poll rather than silently no-op'ing (and setting the voted cookie).
+  if (!poll.options.some((o: any) => o.label === option)) {
+    return NextResponse.json({ error: 'Unknown poll option.' }, { status: 400 })
+  }
   const options = poll.options.map((o: any) =>
     o.label === option ? { ...o, voteCount: (o.voteCount ?? 0) + 1 } : o,
   )

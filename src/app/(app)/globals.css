@@ -1606,6 +1606,109 @@ a {
 }
 
 /* ---------- Language switcher widget ---------- */
+/* ---------- Reader accessibility gear (motion / low-power / 3D) ---------- */
+/* Explicit reader choice: when motion is Off, damp every CSS animation and
+   transition — mirrors the prefers-reduced-motion block above. */
+[data-rd-motion='off'] *,
+[data-rd-motion='off'] *::before,
+[data-rd-motion='off'] *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+[data-rd-motion='off'] .dispatch-pulse,
+[data-rd-motion='off'] .rd-live-dot {
+  animation: none;
+}
+
+.a11y-widget {
+  position: fixed;
+  bottom: 4.4rem;
+  right: 1.25rem;
+  z-index: 50;
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.a11y-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--ink);
+  color: var(--paper-cool);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.45rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.a11y-toggle-label {
+  text-transform: uppercase;
+}
+
+.a11y-panel {
+  width: 240px;
+  background: var(--paper-cool);
+  border: 1px solid var(--ink);
+  padding: 0.8rem;
+  font-family: var(--font-body);
+}
+
+.a11y-panel-title {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+
+.a11y-group-label {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  margin-bottom: 0.3rem;
+}
+
+.a11y-group {
+  margin-bottom: 0.7rem;
+}
+
+.a11y-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.a11y-option input {
+  margin-top: 0.15rem;
+}
+
+.a11y-option span {
+  display: flex;
+  flex-direction: column;
+}
+
+.a11y-option em {
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+}
+
+.a11y-option--switch {
+  border-top: 1px solid #d8d5cb;
+}
+
 .lang-widget {
   position: fixed;
   bottom: 1.25rem;
