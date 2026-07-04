@@ -12,15 +12,11 @@ export default function Masthead({
   labels?: { est?: string; editor?: string }
 }) {
   const est = labels?.est || 'Est. 2026'
-  const editor = labels?.editor || 'Editor login'
 
   return (
     <header className="site-masthead">
       <div className="mh-bar">
         <span className="mh-eyebrow">{est}</span>
-        <Link href="/cms" className="mh-editor">
-          {editor}
-        </Link>
       </div>
 
       <div className="mh-brand">
