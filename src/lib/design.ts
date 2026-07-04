@@ -143,9 +143,22 @@ export function designCssVars(design: DesignConfig): Record<string, string> {
     '--ink': p.ink,
     '--ink-soft': p.ink + 'cc', // 80% alpha of ink for soft text
     '--paper-cool': p.paper,
+    // Newspaper layout paints on --paper-newsprint; without setting it here that
+    // background stayed light while --ink went light under a dark preset →
+    // unreadable. Track the palette paper (slightly warmed).
+    '--paper-newsprint': p.paper,
     '--accent': p.accent,
     '--data-accent': p.dataAccent,
   }
+}
+
+/** Same vars as a `prop:value;` string, for injecting onto <body> so the shared
+ *  site chrome (footer tabs, dispatches, language + reader gear) picks up the
+ *  homepage palette too — those widgets render outside the `.landing` root. */
+export function designCssVarString(design: DesignConfig): string {
+  return Object.entries(designCssVars(design))
+    .map(([k, v]) => `${k}:${v}`)
+    .join(';')
 }
 
 /** Colors the simulation should actually draw with. */

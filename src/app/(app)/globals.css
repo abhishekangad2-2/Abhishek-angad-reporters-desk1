@@ -589,7 +589,17 @@ a {
    plexus lines (teal within a row, gold across rows) on .xy-links. */
 .landing--z-pattern {
   background: var(--ink);
-  color: #f5f3ec;
+  /* Text = paper so it always contrasts the ink background, and flips with a
+     dark palette (where --ink is light) instead of being a fixed near-white. */
+  color: var(--paper-cool);
+}
+
+/* Full-bleed grid: give it the palette's paper background (page bg comes from
+   :root, outside this div's inline vars, so set it here to honor the Studio). */
+.landing--three-column {
+  background: var(--paper-cool);
+  color: var(--ink);
+  min-height: 100vh;
 }
 
 .xy-links {

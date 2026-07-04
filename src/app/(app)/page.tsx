@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { isLandingTemplate, DEFAULT_TEMPLATE, type LandingTemplate } from '@/lib/landing'
 import { getLandingData, getLandingLayout } from '@/lib/landing.server'
+import { designCssVarString, DEFAULT_DESIGN } from '@/lib/design'
 import { translateLandingData } from '@/lib/translate.server'
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
 import ThreeColumnLanding from '@/components/ThreeColumnLanding'
@@ -31,15 +32,27 @@ export default async function Home({
   let data = await getLandingData()
   if (locale !== DEFAULT_LOCALE) data = await translateLandingData(data, locale)
 
-  switch (template) {
-    case 'z-pattern':
-      return <ZPatternLanding data={data} />
-    case 'newspaper':
-      return <NewspaperLanding data={data} />
-    case 'immersive':
-      return <ImmersiveLanding data={data} />
-    case 'three-column':
-    default:
-      return <ThreeColumnLanding data={data} />
-  }
+  const landing =
+    template === 'z-pattern' ? (
+      <ZPatternLanding data={data} />
+    ) : template === 'newspaper' ? (
+      <NewspaperLanding data={data} />
+    ) : template === 'immersive' ? (
+      <ImmersiveLanding data={data} />
+    ) : (
+      <ThreeColumnLanding data={data} />
+    )
+
+  // Push the Design Studio palette onto <body> so the shared site chrome
+  // (footer tabs, dispatches, language + reader gear — rendered in layout.tsx,
+  // outside the .landing root) matches the homepage palette. Scoped to this
+  // page only, so story/section pages keep the static newsroom palette.
+  const bodyVars = designCssVarString(data.design ?? DEFAULT_DESIGN)
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: `body{${bodyVars}}` }} />
+      {landing}
+    </>
+  )
 }
