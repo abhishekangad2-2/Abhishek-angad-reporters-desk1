@@ -126,13 +126,14 @@
    (fixed aspect ratio + object-fit: cover) instead of masonry's ragged sizes. */
 
 .rd-gallery {
-  /* Break out to the full viewport width regardless of the reading column. */
-  width: 100vw;
-  max-width: 100vw;
+  /* Break out well beyond the ~720px reading column so the tiles are large,
+     centred on the viewport. Capped under 100vw and centred with a transform
+     (not 100vw margins) so it never triggers a horizontal scrollbar. */
+  width: min(94vw, 1400px);
   margin: 3rem 0;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  padding: 0 clamp(0.75rem, 3vw, 2.5rem);
+  margin-left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
 }
 
 .rd-gallery__grid {
