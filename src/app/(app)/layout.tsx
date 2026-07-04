@@ -1,26 +1,31 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Playfair_Display, Libre_Franklin, IBM_Plex_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE, localeByCode } from "@/lib/i18n";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Newspaper pairing: Playfair Display (high-contrast masthead/display serif)
+// + Libre Franklin (Franklin Gothic-heritage body sans) + IBM Plex Mono for
+// the small editorial labels. Semantic variable names so globals.css maps
+// them without caring which faces are loaded.
+const displayFace = Playfair_Display({
+  variable: "--font-display-src",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const bodyFace = Libre_Franklin({
+  variable: "--font-body-src",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-ibm-plex-sans",
-  weight: ["400", "500", "600"],
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
+const monoFace = IBM_Plex_Mono({
+  variable: "--font-mono-src",
   weight: ["400", "500"],
   subsets: ["latin"],
   display: "swap",
@@ -52,7 +57,7 @@ export default async function RootLayout({
       dir={dir}
       translate="no"
       suppressHydrationWarning
-      className={`notranslate ${fraunces.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
+      className={`notranslate ${displayFace.variable} ${bodyFace.variable} ${monoFace.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
         <main className="flex-1">

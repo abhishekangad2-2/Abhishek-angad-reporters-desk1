@@ -6,9 +6,9 @@
    which fails the Turbopack build and is silently dropped by browsers in prod. */
 /* Map Tailwind's font utilities to the next/font families loaded in layout.tsx */
 @theme {
-  --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), Georgia, serif;
-  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  --font-sans: var(--font-body-src), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display-src), Georgia, serif;
+  --font-mono: var(--font-mono-src), ui-monospace, monospace;
 }
 
 :root {
@@ -22,10 +22,11 @@
   --accent: #b43d2a;     /* leads, alerts, Live Dispatches pulse, the Plexus node color */
   --data-accent: #3e6b66; /* Data Journalism desk, chart contexts, Plexus line color */
 
-  /* Type */
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  /* Type — reference the next/font variables (a bare family name here would
+     silently fall back to Georgia/system, since next/font hashes families). */
+  --font-display: var(--font-display-src), Georgia, serif;
+  --font-body: var(--font-body-src), system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), monospace;
 
   --radius: 2px; /* near-zero — this is a newsroom, not a SaaS dashboard */
 }
@@ -1328,21 +1329,22 @@ a {
   margin: 1.5rem 0 1rem;
 }
 
-.mh-sub {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1rem;
-  opacity: 0.7;
-  margin-bottom: 0.25rem;
-}
-
 .mh-wordmark {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.2rem, 5vw, 3.8rem);
-  letter-spacing: -0.02em;
+  font-weight: 900; /* big bold masthead */
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  letter-spacing: -0.015em;
   line-height: 0.95;
   text-decoration: none;
+}
+
+.mh-sub {
+  /* Byline under the masthead: italic, house red. */
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  color: var(--accent);
+  margin-top: 0.35rem;
 }
 
 .mh-nav {

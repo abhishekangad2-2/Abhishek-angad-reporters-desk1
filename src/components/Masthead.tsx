@@ -20,10 +20,10 @@ export default function Masthead({
       </div>
 
       <div className="mh-brand">
-        <span className="mh-sub">Abhishek Angad Ink.</span>
         <Link href="/" className="mh-wordmark">
-          ReportersDesk
+          Reporters Desk
         </Link>
+        <span className="mh-sub">Abhishek Angad (Ink)</span>
       </div>
 
       {sections.length > 0 && (
