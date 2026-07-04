@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Story } from '@/payload-types'
 import Masthead from '@/components/Masthead'
 import PlexusBackground from '@/components/PlexusBackground'
-import { RichTextRenderer } from '@/components/LexicalRenderer'
+import { RichTextRenderer, LayoutRenderer } from '@/components/LexicalRenderer'
 import { sectionNameOf } from './storyMeta'
 
 function mediaUrl(m: any): string | null {
@@ -19,6 +19,7 @@ function mediaUrl(m: any): string | null {
  *  Reporters author the whole piece from the CMS, no developer required. */
 export default function Template4({ story }: { story: Story }) {
   const chapters: any[] = (story as any).scrollytellingChapters || []
+  const layout: any[] = (story as any).layout || []
   const sectionName = sectionNameOf(story)
   const hasAudio = chapters.some((c) => mediaUrl(c.ambientAudio))
 
@@ -138,6 +139,14 @@ export default function Template4({ story }: { story: Story }) {
           <div className="chapter-text">
             {story.caption && <p>{story.caption}</p>}
             <p>This story has no scrollytelling chapters yet.</p>
+          </div>
+        </section>
+      )}
+
+      {layout.length > 0 && (
+        <section className="immersive-layout">
+          <div className="immersive-layout-inner">
+            <LayoutRenderer layout={layout} />
           </div>
         </section>
       )}
