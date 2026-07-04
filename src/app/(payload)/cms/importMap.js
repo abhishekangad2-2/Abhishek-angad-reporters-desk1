@@ -31,6 +31,7 @@ import { TagSuggester as TagSuggester_rd } from '@/components/admin/TagSuggester
 import { CaptionSuggester as CaptionSuggester_rd } from '@/components/admin/CaptionSuggester'
 import { PalettePicker as PalettePicker_rd } from '@/components/admin/PalettePicker'
 import { SimulationPicker as SimulationPicker_rd } from '@/components/admin/SimulationPicker'
+import { SpecGaps as SpecGaps_rd } from '@/components/admin/SpecGaps'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -66,5 +67,6 @@ export const importMap = {
   "/components/admin/TagSuggester#TagSuggester": TagSuggester_rd,
   "/components/admin/CaptionSuggester#CaptionSuggester": CaptionSuggester_rd,
   "/components/admin/PalettePicker#PalettePicker": PalettePicker_rd,
-  "/components/admin/SimulationPicker#SimulationPicker": SimulationPicker_rd
+  "/components/admin/SimulationPicker#SimulationPicker": SimulationPicker_rd,
+  "/components/admin/SpecGaps#SpecGaps": SpecGaps_rd
 }

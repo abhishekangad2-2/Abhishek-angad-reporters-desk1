@@ -34,6 +34,9 @@ export default buildConfig({
   },
   admin: {
     user: Users.slug,
+    components: {
+      beforeDashboard: ['/components/admin/SpecGaps#SpecGaps'],
+    },
   },
   collections: [
     Users, Sections, Issues, Stories, Media, LiveDispatches, Polls,
