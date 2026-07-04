@@ -12,7 +12,7 @@ import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
  *  parallaxes gently on scroll, and hovering any headline materialises a small,
  *  transient plexus "cloud" around it. */
 export default function NewspaperLanding({ data }: { data: LandingData }) {
-  const cards = buildCards(data, 8)
+  const cards = buildCards(data, 3).slice(0, 3)
   const lead = cards[0]
   const secondary = cards.slice(1, 3)
   const briefs = cards.slice(3, 7)

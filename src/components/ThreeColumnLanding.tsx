@@ -13,8 +13,8 @@ import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
  *  from the Design Studio global. */
 export default function ThreeColumnLanding({ data }: { data: LandingData }) {
   const [hovered, setHovered] = useState<number | null>(null)
-  const target = data.stories.length <= 3 ? 3 : 6
-  const cards = buildCards(data, target).slice(0, target)
+  // Exactly three stories — one per full-bleed column, each running deep.
+  const cards = buildCards(data, 3).slice(0, 3)
   const design = data.design ?? DEFAULT_DESIGN
 
   return (

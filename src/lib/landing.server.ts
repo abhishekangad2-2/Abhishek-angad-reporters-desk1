@@ -59,7 +59,9 @@ export async function getLandingData(): Promise<LandingData> {
         where: { status: { equals: 'published' } },
         sort: '-publishedAt',
         depth: 1,
-        limit: 9,
+        // Editorial rule: every landing layout presents exactly the three
+        // latest stories (desk promos backfill only when fewer exist).
+        limit: 3,
       }),
       payload.find({ collection: 'sections', sort: 'name', limit: 50 }),
       getLandingDesign(),

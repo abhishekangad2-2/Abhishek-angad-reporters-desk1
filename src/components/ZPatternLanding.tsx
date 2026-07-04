@@ -15,7 +15,7 @@ import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
 type Row = { title: string; sub: string; cards: LandingCard[] }
 
 export default function ZPatternLanding({ data }: { data: LandingData }) {
-  const cards = buildCards(data, 12)
+  const cards = buildCards(data, 3).slice(0, 3)
 
   // Split the cards into three themed rows.
   const rows = useMemo<Row[]>(() => {

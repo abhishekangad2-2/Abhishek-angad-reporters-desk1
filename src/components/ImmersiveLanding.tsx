@@ -21,7 +21,7 @@ const THEMES = [
 const LINE_COLORS = ['#3e6b66', '#9c7b3e', '#7a3f3f']
 
 export default function ImmersiveLanding({ data }: { data: LandingData }) {
-  const cards = buildCards(data, 6)
+  const cards = buildCards(data, 3).slice(0, 3)
   const hero = cards[0]
   const body = cards.slice(1)
 

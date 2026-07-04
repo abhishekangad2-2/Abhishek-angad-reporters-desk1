@@ -484,8 +484,10 @@ a {
   position: relative;
   z-index: 2;
   display: grid;
+  /* Exactly three stories: one full-bleed column each, running DEEP — each
+     column is ~1.6 viewports tall so the page scrolls long, gallery-style. */
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: minmax(220px, 42vh);
+  grid-auto-rows: minmax(160vh, auto);
   gap: clamp(10px, 1.1vw, 18px);
   padding: clamp(0.75rem, 1.6vw, 1.6rem);
 }
@@ -579,7 +581,8 @@ a {
 @media (max-width: 800px) {
   .three-col-grid {
     grid-template-columns: 1fr;
-    grid-auto-rows: minmax(200px, 34vh);
+    /* Stacked on mobile: each story still a deep full-viewport panel. */
+    grid-auto-rows: minmax(100vh, auto);
   }
 }
 
