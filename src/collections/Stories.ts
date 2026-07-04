@@ -342,7 +342,10 @@ export const Stories: CollectionConfig = {
             {
               name: 'layout',
               type: 'blocks',
-              required: true,
+              // Not unconditionally required: template_4 (immersive) stories are
+              // authored via `scrollytellingChapters` and may legitimately carry
+              // no layout blocks. Template_1/2/3 still render layout when present.
+              required: false,
               blocks: [
                 {
                   slug: 'Prose',

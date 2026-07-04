@@ -665,9 +665,9 @@ a {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(245, 243, 236, 0.18);
-  background: rgba(245, 243, 236, 0.04);
-  color: #f5f3ec;
+  border: 1px solid color-mix(in srgb, var(--paper-cool) 18%, transparent);
+  background: color-mix(in srgb, var(--paper-cool) 4%, transparent);
+  color: var(--paper-cool);
   font-size: 0.85rem;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
@@ -700,7 +700,7 @@ a {
   overflow: hidden;
   background: #14171c;
   text-decoration: none;
-  color: #f5f3ec;
+  color: var(--paper-cool);
   transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.45s ease,
     filter 0.45s ease;
   will-change: transform;
@@ -999,8 +999,10 @@ a {
    progress bar, and a corner connections graph that grows on scroll. */
 .landing--immersive {
   position: relative;
+  /* Intentional near-black page bg (kept fixed); text = paper so it flips
+     with a dark Studio palette instead of being a hardcoded near-white. */
   background: #07080a;
-  color: #f5f3ec;
+  color: var(--paper-cool);
 }
 
 .im-bg {
@@ -1056,7 +1058,7 @@ a {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(1rem, 1.6vw, 1.4rem);
-  color: rgba(245, 243, 236, 0.8);
+  color: color-mix(in srgb, var(--paper-cool) 80%, transparent);
   margin-top: 1.2rem;
   max-width: 50ch;
 }
@@ -1106,7 +1108,7 @@ a {
   font-weight: 400;
   font-size: clamp(1.15rem, 1.5vw, 1.4rem);
   line-height: 1.7;
-  color: rgba(245, 243, 236, 0.9);
+  color: color-mix(in srgb, var(--paper-cool) 90%, transparent);
   margin: 0;
 }
 
@@ -1143,7 +1145,7 @@ a {
   font-weight: 500;
   font-size: clamp(1.6rem, 3vw, 2.6rem);
   line-height: 1.25;
-  color: #f5f3ec;
+  color: var(--paper-cool);
   border-left: 3px solid var(--accent);
   padding-left: 1.4rem;
   opacity: 0;
@@ -1168,7 +1170,7 @@ a {
   align-items: center;
   gap: 1rem;
   background: rgba(18, 21, 26, 0.7);
-  border: 1px solid rgba(245, 243, 236, 0.12);
+  border: 1px solid color-mix(in srgb, var(--paper-cool) 12%, transparent);
   border-radius: 8px;
   padding: 1rem 1.2rem;
   margin: 12vh 0;
@@ -1613,6 +1615,257 @@ a {
   text-transform: uppercase;
   padding: 0.6rem 1rem;
   text-decoration: none;
+}
+
+/* ── Template 3 story — broadsheet grid ────────────────────────────
+   Lead column with drop-cap body + a right rail (key details, briefs).
+   Collapses to a single column at ~860px, tightens at ~480px. */
+.newspaper-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-areas:
+    'lead   secondary'
+    'lead   briefs';
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-content: start;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2.5rem clamp(1rem, 3vw, 2.5rem) 6rem;
+}
+
+.newspaper-lead {
+  grid-area: lead;
+  min-width: 0;
+  border-right: 1px solid #cfc8b6;
+  padding-right: clamp(0rem, 3vw, 3rem);
+}
+
+.newspaper-section {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.newspaper-lead h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 4.5vw, 3.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0.4rem 0 0.75rem;
+}
+
+.newspaper-lead-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 0 1.5rem;
+  border-radius: var(--radius);
+}
+
+/* Drop-cap on the first paragraph of the lead body. */
+.newspaper-dropcap > .prose:first-of-type p:first-of-type::first-letter,
+.newspaper-dropcap > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding: 0.05em 0.12em 0 0;
+  color: var(--accent);
+}
+
+.newspaper-secondary {
+  grid-area: secondary;
+  min-width: 0;
+}
+
+.newspaper-briefs {
+  grid-area: briefs;
+  min-width: 0;
+  border-top: 1px solid #cfc8b6;
+  padding-top: 1.25rem;
+}
+
+@media (max-width: 860px) {
+  .newspaper-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'lead'
+      'secondary'
+      'briefs';
+  }
+  .newspaper-lead {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid #cfc8b6;
+    padding-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .newspaper-grid {
+    padding: 1.5rem 1rem 4rem;
+    gap: 1.5rem;
+  }
+  .newspaper-dropcap > .prose:first-of-type p:first-of-type::first-letter,
+  .newspaper-dropcap > p:first-of-type::first-letter {
+    font-size: 2.8em;
+  }
+}
+
+/* ── Template 4 story — immersive scrollytelling ───────────────────
+   Full-viewport chapters over cover-fit background media, a fixed
+   reading-progress bar, and a hero. Sits on the dark .landing--immersive
+   background (color = --paper-cool so text flips with a dark palette). */
+.immersive-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 4px;
+  width: 100%;
+  transform-origin: 0 50%;
+  background: var(--accent);
+  z-index: 50;
+  will-change: transform;
+}
+
+.immersive-hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 2rem;
+  color: var(--paper-cool);
+}
+
+.immersive-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 6vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  max-width: 16ch;
+  margin: 0.4rem 0 0;
+}
+
+.immersive-strap {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
+  color: color-mix(in srgb, var(--paper-cool) 82%, transparent);
+  max-width: 50ch;
+  margin: 1rem 0 0;
+}
+
+.immersive-scrollcue {
+  margin-top: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper-cool) 70%, transparent);
+  animation: immersive-cue 1.8s ease-in-out infinite;
+}
+
+@keyframes immersive-cue {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50%      { transform: translateY(6px); opacity: 1; }
+}
+
+.chapter {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12vh clamp(1.25rem, 5vw, 4rem);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Scrim so body text stays legible over any background photo. */
+.chapter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 8, 10, 0.45) 0%, rgba(7, 8, 10, 0.7) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.chapter-text {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  color: var(--paper-cool);
+}
+
+.chapter-text--left {
+  margin-left: 0;
+  margin-right: auto;
+  text-align: left;
+}
+
+.chapter-text--right {
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+}
+
+.chapter-text h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.05;
+  margin: 0 0 1rem;
+}
+
+.chapter-text p {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--paper-cool) 92%, transparent);
+  margin: 0 0 1.25rem;
+}
+
+.chapter-text a {
+  color: var(--accent);
+}
+
+/* Layout blocks rendered below the scrolly section on a template_4 story. */
+.immersive-layout {
+  position: relative;
+  z-index: 2;
+  background: color-mix(in srgb, var(--paper-cool) 96%, var(--ink));
+  color: var(--ink);
+  padding: 6vh 0;
+}
+
+.immersive-layout-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .immersive-scrollcue {
+    animation: none;
+  }
 }
 
 /* ---------- Language switcher widget ---------- */
