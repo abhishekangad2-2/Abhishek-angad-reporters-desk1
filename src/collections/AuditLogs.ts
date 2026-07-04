@@ -5,7 +5,7 @@ export const AuditLogs: CollectionConfig = {
   admin: {
     useAsTitle: 'action',
     description: 'Audit log of all admin actions and workflow transitions.',
-    group: 'Admin Console',
+    group: 'System',
   },
   access: {
     create: () => false, // Typically created by hooks, not manually

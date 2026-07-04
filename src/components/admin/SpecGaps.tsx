@@ -1,18 +1,20 @@
 'use client'
 
-// Spec-gap board — shown at the top of the CMS dashboard (beforeDashboard).
-// Tracks the canonical ReportersDesk spec (HRIE + AEC + IDPB) against what is
-// actually built and live, so the state of the platform is visible inside the
-// CMS itself rather than in chat logs. Update statuses here when items ship.
+// Spec-gap board — shown at the top of the CMS dashboard (beforeDashboard),
+// ADMIN ONLY. Tracks the canonical ReportersDesk spec (HRIE + AEC + IDPB)
+// against what is actually built and live. Reporters/editors never see this —
+// it's ops/infra tracking, not editorial content — and it uses Payload's own
+// theme variables so it matches dark mode instead of a hardcoded light card.
 
 import React from 'react'
+import { useAuth } from '@payloadcms/ui'
 
 type Status = 'built' | 'pending' | 'deferred'
 
 const STATUS_STYLE: Record<Status, { bg: string; fg: string; label: string }> = {
-  built: { bg: '#f0fdf4', fg: '#166534', label: 'BUILT' },
-  pending: { bg: '#fffbeb', fg: '#92400e', label: 'PENDING' },
-  deferred: { bg: '#f3f4f6', fg: '#4b5563', label: 'DEFERRED' },
+  built: { bg: 'var(--theme-success-150)', fg: 'var(--theme-success-800)', label: 'BUILT' },
+  pending: { bg: 'var(--theme-warning-150)', fg: 'var(--theme-warning-800)', label: 'PENDING' },
+  deferred: { bg: 'var(--theme-elevation-100)', fg: 'var(--theme-elevation-600)', label: 'DEFERRED' },
 }
 
 const ITEMS: { pillar: string; entries: { name: string; status: Status; note?: string }[] }[] = [
@@ -52,19 +54,26 @@ const ITEMS: { pillar: string; entries: { name: string; status: Status; note?: s
 ]
 
 export const SpecGaps: React.FC = () => {
+  const { user } = useAuth()
+  // Ops/infra tracking, not editorial content — only admins need it.
+  if (!user || (user as { role?: string }).role !== 'admin') return null
+
   return (
     <div
       style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '8px',
+        border: '1px solid var(--theme-elevation-150)',
+        borderRadius: 'var(--style-radius-m, 8px)',
         padding: '1.25rem',
         marginBottom: '1.5rem',
-        background: '#fff',
+        background: 'var(--theme-elevation-50)',
+        color: 'var(--theme-text)',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.75rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.4rem' }}>
         <h2 style={{ margin: 0, fontSize: '1rem' }}>Spec status — HRIE · AEC · IDPB</h2>
-        <span style={{ fontSize: '0.72rem', color: '#6b7280' }}>vs the canonical spec · updated 2026-07-04</span>
+        <span style={{ fontSize: '0.72rem', color: 'var(--theme-elevation-500)' }}>
+          Admin only · vs the canonical spec · updated 2026-07-04
+        </span>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
@@ -76,7 +85,7 @@ export const SpecGaps: React.FC = () => {
                 fontWeight: 600,
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                color: '#6b7280',
+                color: 'var(--theme-elevation-500)',
                 marginBottom: '0.4rem',
               }}
             >
@@ -103,7 +112,11 @@ export const SpecGaps: React.FC = () => {
                   </span>
                   <span style={{ fontSize: '0.82rem', lineHeight: 1.35 }}>
                     {e.name}
-                    {e.note && <span style={{ display: 'block', fontSize: '0.7rem', color: '#6b7280' }}>{e.note}</span>}
+                    {e.note && (
+                      <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--theme-elevation-500)' }}>
+                        {e.note}
+                      </span>
+                    )}
                   </span>
                 </div>
               )

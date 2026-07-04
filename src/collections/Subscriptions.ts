@@ -9,7 +9,7 @@ export const Subscriptions: CollectionConfig = {
   slug: 'subscriptions',
   admin: {
     useAsTitle: 'subscriberEmail',
-    group: 'Admin Console',
+    group: 'Finance',
     defaultColumns: ['subscriberEmail', 'plan', 'status', 'currentPeriodEnd'],
     listSearchableFields: ['subscriberEmail', 'plan', 'status', 'razorpaySubscriptionId'],
     description: 'Active subscriptions. Filter by plan or status for a quick subscriber dashboard.',

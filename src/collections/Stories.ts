@@ -201,6 +201,8 @@ export const Stories: CollectionConfig = {
   slug: 'stories',
   admin: {
     useAsTitle: 'headline',
+    group: 'Newsroom',
+    description: 'Every article — drafts, in review, published, and archived.',
     components: {
       edit: {
         beforeDocumentControls: ['/components/admin/PublishGateChecklist#PublishGateChecklist'],

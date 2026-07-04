@@ -4,7 +4,7 @@ export const Transactions: CollectionConfig = {
   slug: 'transactions',
   admin: {
     useAsTitle: 'razorpayId',
-    group: 'Admin Console',
+    group: 'Finance',
     defaultColumns: ['user', 'amount', 'currency', 'status', 'razorpayId'],
     listSearchableFields: ['razorpayId', 'status'],
     description: 'Revenue ledger — every Razorpay transaction. Filter by status for reconciliation.',

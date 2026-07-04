@@ -11,6 +11,8 @@ export const Sections: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
+    group: 'Newsroom',
+    description: 'Editorial desks (e.g. Accountability, Ground Reportage) that stories belong to.',
   },
   fields: [
     {

@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  admin: {
+    group: 'Newsroom',
+    description: 'Photos, audio, and video — upload here, then attach to a story\'s layout blocks.',
+  },
   upload: {
     staticDir: 'media',
     imageSizes: [

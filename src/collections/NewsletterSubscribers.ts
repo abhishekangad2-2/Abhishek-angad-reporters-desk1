@@ -4,7 +4,7 @@ export const NewsletterSubscribers: CollectionConfig = {
   slug: 'newsletter-subscribers',
   admin: {
     useAsTitle: 'email',
-    group: 'Admin Console',
+    group: 'Engagement',
     defaultColumns: ['email', 'status', 'source', 'subscribedAt'],
     listSearchableFields: ['email', 'status'],
     description: 'Readers who have opted in to receive the newsletter.',

@@ -7,6 +7,8 @@ export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
+    group: 'System',
+    description: 'Newsroom staff accounts, roles, and 2FA status.',
   },
   access: {
     // A user may read/update their own record; admins manage everyone. Without

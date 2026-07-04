@@ -50,7 +50,7 @@ export const Newsletters: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'subject',
-    group: 'Admin Console',
+    group: 'Engagement',
     defaultColumns: ['subject', 'status', 'sendDate', 'openCount', 'clickCount'],
     listSearchableFields: ['subject', 'status'],
     description: 'Newsletter campaigns — compose, schedule, send, and watch opens/clicks.',

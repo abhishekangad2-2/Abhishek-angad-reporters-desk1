@@ -2,7 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 export const Integrations: GlobalConfig = {
   slug: 'integrations',
-  label: 'Integrations Tab',
+  label: 'Integrations',
   access: {
     read: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
     update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),

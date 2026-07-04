@@ -34,14 +34,34 @@ export default buildConfig({
   },
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: ' · ReportersDesk',
+    },
+    // Components use `/components/...` (leading slash = relative to baseDir).
+    // Our source lives under src/, so baseDir must be this config's dir (src),
+    // not the default process.cwd() (repo root) — otherwise generate:importmap
+    // emits paths one level too shallow and drops entries.
+    importMap: {
+      baseDir: dirname,
+    },
     components: {
+      graphics: {
+        Icon: '/components/admin/AdminBrand#AdminIcon',
+        Logo: '/components/admin/AdminBrand#AdminLogo',
+      },
       beforeDashboard: ['/components/admin/SpecGaps#SpecGaps'],
     },
   },
+  // Ordered so the nav groups read as a real newsroom taxonomy: the daily
+  // editorial tools first (Newsroom), then accounts/audit (System),
+  // reader-engagement tools (Engagement), money (Finance), and the reporter
+  // toolkit last. Order within a group follows this array order too.
   collections: [
-    Users, Sections, Issues, Stories, Media, LiveDispatches, Polls,
-    Subscriptions, Transactions, Newsletters, NewsletterSubscribers,
-    Payments, AuditLogs, RTIRequests, InvestigateRequests,
+    Stories, Sections, Issues, Media,
+    Users, AuditLogs,
+    LiveDispatches, Polls, Newsletters, NewsletterSubscribers,
+    Subscriptions, Transactions, Payments,
+    RTIRequests, InvestigateRequests,
   ],
   globals: [Integrations, DesignStudio],
   plugins: [
