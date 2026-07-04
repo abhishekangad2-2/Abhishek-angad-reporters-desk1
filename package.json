@@ -9,7 +9,8 @@
     "lint": "eslint",
     "generate:importmap": "payload generate:importmap",
     "payload": "payload",
-    "generate:types": "payload generate:types"
+    "generate:types": "payload generate:types",
+    "test": "vitest run"
   },
   "dependencies": {
     "@google-cloud/vertexai": "^1.12.0",
@@ -51,6 +52,7 @@
     "eslint-config-next": "16.2.9",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.9"
   }
 }
