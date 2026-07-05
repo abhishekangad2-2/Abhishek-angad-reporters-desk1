@@ -49,6 +49,7 @@ export default buildConfig({
         Icon: '/components/admin/AdminBrand#AdminIcon',
         Logo: '/components/admin/AdminBrand#AdminLogo',
       },
+      providers: ['/components/admin/AdminStyles#AdminStyles'],
       beforeDashboard: ['/components/admin/SpecGaps#SpecGaps'],
     },
   },

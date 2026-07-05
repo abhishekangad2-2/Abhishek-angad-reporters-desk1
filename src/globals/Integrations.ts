@@ -3,6 +3,11 @@ import type { GlobalConfig } from 'payload'
 export const Integrations: GlobalConfig = {
   slug: 'integrations',
   label: 'Integrations',
+  admin: {
+    group: 'Appearance',
+    description:
+      'Third-party keys and settings — analytics (GA4), video, translation, and payments. Connect external services the site uses.',
+  },
   access: {
     read: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
     update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
