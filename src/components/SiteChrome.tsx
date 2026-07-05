@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import LiveDispatches from '@/components/LiveDispatches'
 import FooterTabs from '@/components/FooterTabs'
-import ReaderSettings from '@/components/ReaderSettings'
 
 // Public-site chrome (language switcher, reader accessibility gear, live
 // dispatches, footer tabs). Suppressed on the admin/login surfaces so the
@@ -18,7 +17,6 @@ export default function SiteChrome({ current }: { current: string }) {
   return (
     <>
       <LanguageSwitcher current={current} />
-      <ReaderSettings />
       <LiveDispatches />
       <FooterTabs />
     </>

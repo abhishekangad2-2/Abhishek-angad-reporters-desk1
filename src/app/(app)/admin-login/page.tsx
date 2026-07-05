@@ -144,7 +144,7 @@ export default function AdminLoginPage() {
         <div className="rd-login__brand">
           <span className="rd-login__kicker">Editor access</span>
           <h1 className="rd-login__title">ReportersDesk</h1>
-          <p className="rd-login__sub">Abhishek Angad Ink</p>
+          <p className="rd-login__sub">Abhishek Angad INK</p>
         </div>
 
         {step === 'credentials' && (

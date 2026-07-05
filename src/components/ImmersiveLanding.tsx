@@ -226,13 +226,10 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
       ref={containerRef}
       style={designCssVars(data.design ?? DEFAULT_DESIGN) as CSSProperties}
     >
+      {/* The immersive backdrop is the evolving im-bg gradient. The floating
+          plexus cluster read as a purposeless web at the top of the hero, so
+          it's removed here (the simulation still drives the other 3 layouts). */}
       <div className="im-bg" ref={bgRef} />
-      <SimulationBackground
-        design={data.design}
-        className="landing-canvas landing-canvas--fixed"
-        densityScale={1.22}
-        overrides={{ intensity }}
-      />
       <canvas ref={linksRef} className="im-links" aria-hidden />
       <div className="im-progress" ref={progRef} />
       <canvas ref={graphRef} className="im-graph" aria-hidden />

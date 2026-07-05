@@ -24,19 +24,10 @@ export default function Masthead({
           Reporters Desk
         </Link>
         <span className="mh-sub">
-          Abhishek Angad <em className="mh-sub-ink">(Ink)</em>
+          Abhishek Angad <em className="mh-sub-ink">INK</em>
         </span>
       </div>
 
-      {sections.length > 0 && (
-        <nav className="mh-nav" aria-label="Editorial desks">
-          {sections.map((s) => (
-            <Link key={s.slug} href={`/${s.slug}`} className="mh-nav-link">
-              {s.name}
-            </Link>
-          ))}
-        </nav>
-      )}
     </header>
   )
 }

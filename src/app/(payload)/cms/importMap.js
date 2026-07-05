@@ -21,16 +21,17 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { CaptionSuggester as CaptionSuggester_45ad3ac3d91b7c811f7f1557a7ee0b82 } from '@/components/admin/CaptionSuggester'
-import { AccentThemePicker as AccentThemePicker_a366236f6240bdba1a458ba3dadd291d } from '@/components/admin/AccentThemePicker'
-import { TagSuggester as TagSuggester_cd6930c9b30898f89c445b02c4d3d5ac } from '@/components/admin/TagSuggester'
-import { LayoutPicker as LayoutPicker_bf28e511f21ac4851acc951bd2ddfceb } from '@/components/admin/LayoutPicker'
-import { PublishGateChecklist as PublishGateChecklist_69c5b1a9356d81c3caf6656700d432a8 } from '@/components/admin/PublishGateChecklist'
-import { LandingLayoutPicker as LandingLayoutPicker_4a12be5dff2e9acca9bce9a98ebcf2fe } from '@/components/admin/LandingLayoutPicker'
-import { PalettePicker as PalettePicker_4ab5dddca9cb3d1c16afb8f53fd019fe } from '@/components/admin/PalettePicker'
-import { SimulationPicker as SimulationPicker_0de382ef9c71c9b81b1be238fac575b5 } from '@/components/admin/SimulationPicker'
-import { SpecGaps as SpecGaps_46bd7b4c33d6ef9024cf12322c252c53 } from '@/components/admin/SpecGaps'
-import { AdminIcon as AdminIcon_rd, AdminLogo as AdminLogo_rd } from '@/components/admin/AdminBrand'
+import { CaptionSuggester as CaptionSuggester_45ad3ac3d91b7c811f7f1557a7ee0b82 } from '../../../components/admin/CaptionSuggester'
+import { AccentThemePicker as AccentThemePicker_a366236f6240bdba1a458ba3dadd291d } from '../../../components/admin/AccentThemePicker'
+import { TagSuggester as TagSuggester_cd6930c9b30898f89c445b02c4d3d5ac } from '../../../components/admin/TagSuggester'
+import { LayoutPicker as LayoutPicker_bf28e511f21ac4851acc951bd2ddfceb } from '../../../components/admin/LayoutPicker'
+import { PublishGateChecklist as PublishGateChecklist_69c5b1a9356d81c3caf6656700d432a8 } from '../../../components/admin/PublishGateChecklist'
+import { LandingLayoutPicker as LandingLayoutPicker_4a12be5dff2e9acca9bce9a98ebcf2fe } from '../../../components/admin/LandingLayoutPicker'
+import { PalettePicker as PalettePicker_4ab5dddca9cb3d1c16afb8f53fd019fe } from '../../../components/admin/PalettePicker'
+import { SimulationPicker as SimulationPicker_0de382ef9c71c9b81b1be238fac575b5 } from '../../../components/admin/SimulationPicker'
+import { AdminIcon as AdminIcon_db845eae23ef682757f9df5d4893ae70 } from '../../../components/admin/AdminBrand'
+import { AdminLogo as AdminLogo_db845eae23ef682757f9df5d4893ae70 } from '../../../components/admin/AdminBrand'
+import { SpecGaps as SpecGaps_46bd7b4c33d6ef9024cf12322c252c53 } from '../../../components/admin/SpecGaps'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -67,9 +68,9 @@ export const importMap = {
   "/components/admin/LandingLayoutPicker#LandingLayoutPicker": LandingLayoutPicker_4a12be5dff2e9acca9bce9a98ebcf2fe,
   "/components/admin/PalettePicker#PalettePicker": PalettePicker_4ab5dddca9cb3d1c16afb8f53fd019fe,
   "/components/admin/SimulationPicker#SimulationPicker": SimulationPicker_0de382ef9c71c9b81b1be238fac575b5,
+  "/components/admin/AdminBrand#AdminIcon": AdminIcon_db845eae23ef682757f9df5d4893ae70,
+  "/components/admin/AdminBrand#AdminLogo": AdminLogo_db845eae23ef682757f9df5d4893ae70,
   "/components/admin/SpecGaps#SpecGaps": SpecGaps_46bd7b4c33d6ef9024cf12322c252c53,
-  "/components/admin/AdminBrand#AdminIcon": AdminIcon_rd,
-  "/components/admin/AdminBrand#AdminLogo": AdminLogo_rd,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

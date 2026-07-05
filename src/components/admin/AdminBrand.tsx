@@ -28,13 +28,12 @@ export function AdminLogo() {
       <div
         style={{
           fontFamily: '"Playfair Display", Georgia, serif',
-          fontStyle: 'italic',
           fontSize: '0.95rem',
-          color: '#b43d2a',
           marginTop: '0.35rem',
         }}
       >
-        Abhishek Angad (Ink)
+        Abhishek Angad{' '}
+        <em style={{ fontStyle: 'italic', color: '#b43d2a' }}>INK</em>
       </div>
     </div>
   )
