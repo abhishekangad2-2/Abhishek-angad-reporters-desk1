@@ -1339,12 +1339,19 @@ a {
 }
 
 .mh-sub {
-  /* Byline under the masthead: italic, house red. */
+  /* Byline: "Abhishek Angad" inherits the masthead text colour (white on the
+     dark layouts, ink on the light ones — matching the wordmark). Only "(Ink)"
+     is italic + house red (see .mh-sub-ink). */
   font-family: var(--font-display);
-  font-style: italic;
+  font-style: normal;
   font-size: clamp(1rem, 1.6vw, 1.25rem);
-  color: var(--accent);
+  color: inherit;
   margin-top: 0.35rem;
+}
+
+.mh-sub-ink {
+  font-style: italic;
+  color: var(--accent);
 }
 
 .mh-nav {
@@ -1478,6 +1485,12 @@ a {
   max-width: 720px;
   margin: 0 auto 6rem;
   padding: 2.5rem 1.5rem;
+  /* The reading panel is ALWAYS a light frosted card, so it must fix its own
+     dark text colour. Story templates reuse the landing background classes
+     (three-column / z-pattern / newspaper / immersive); the dark ones set
+     color:light on the page, which otherwise cascades into the panel and makes
+     the body copy light-on-light (invisible) — e.g. template_2 (z-pattern). */
+  color: var(--ink);
 }
 
 .story-reading--panel {
@@ -1485,6 +1498,7 @@ a {
   backdrop-filter: blur(2px);
   border-radius: var(--radius);
   padding: 2.5rem clamp(1.25rem, 4vw, 3rem);
+  color: var(--ink);
 }
 
 /* Body typography — the Tailwind `prose` plugin isn't loaded, so style the

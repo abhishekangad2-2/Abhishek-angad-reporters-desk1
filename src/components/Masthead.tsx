@@ -23,7 +23,9 @@ export default function Masthead({
         <Link href="/" className="mh-wordmark">
           Reporters Desk
         </Link>
-        <span className="mh-sub">Abhishek Angad (Ink)</span>
+        <span className="mh-sub">
+          Abhishek Angad <em className="mh-sub-ink">(Ink)</em>
+        </span>
       </div>
 
       {sections.length > 0 && (
