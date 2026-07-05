@@ -2432,13 +2432,21 @@ a {
   flex-direction: column;
   border-left: 3px solid var(--accent);
   padding-left: 1rem;
+  /* Grid items default to min-width:auto, so a long unbroken value ("months",
+     "₹4.2 Cr") refused to shrink and overflowed into the next column, painting
+     on top of it. min-width:0 lets this cell — and the wrap rule below —
+     actually contain its content. */
+  min-width: 0;
 }
 
 .vm-stat-value {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1;
+  font-size: clamp(1.6rem, 3.2vw, 3rem);
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .vm-stat-label {
