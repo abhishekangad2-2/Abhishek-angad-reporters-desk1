@@ -51,6 +51,7 @@ export default buildConfig({
       },
       providers: ['/components/admin/AdminStyles#AdminStyles'],
       beforeDashboard: ['/components/admin/SpecGaps#SpecGaps'],
+      afterDashboard: ['/components/admin/DashboardCardHints#DashboardCardHints'],
     },
   },
   // Ordered so the nav groups read as a real newsroom taxonomy: the daily

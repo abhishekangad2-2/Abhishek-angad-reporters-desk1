@@ -1,5 +1,14 @@
 import type { GlobalConfig } from 'payload'
 
+// Reject non-hex values in the CMS (empty is allowed — resolveDesign falls back
+// to the preset). Prevents an editor silently getting Newsroom Classic because
+// they typed "red" instead of "#b43d2a".
+const hexValidate = (val: unknown): true | string => {
+  if (val == null || val === '') return true
+  if (typeof val === 'string' && /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(val.trim())) return true
+  return 'Enter a hex color like #b43d2a (3 or 6 digits), or leave blank.'
+}
+
 // Design Studio — the editor-facing "design your own landing page" panel.
 // Everything here is read by landing.server.ts (getLandingDesign) and applied
 // to whichever of the four landing layouts is active: palette recolors the
@@ -75,10 +84,10 @@ export const DesignStudio: GlobalConfig = {
                 description: 'Hex colors, e.g. #b43d2a. Invalid values fall back to Newsroom Classic.',
               },
               fields: [
-                { name: 'ink', type: 'text', label: 'Ink (text)', defaultValue: '#14171c' },
-                { name: 'paper', type: 'text', label: 'Paper (background)', defaultValue: '#efeee8' },
-                { name: 'accent', type: 'text', label: 'Accent', defaultValue: '#b43d2a' },
-                { name: 'dataAccent', type: 'text', label: 'Data accent', defaultValue: '#3e6b66' },
+                { name: 'ink', type: 'text', label: 'Ink (text)', defaultValue: '#14171c', validate: hexValidate },
+                { name: 'paper', type: 'text', label: 'Paper (background)', defaultValue: '#efeee8', validate: hexValidate },
+                { name: 'accent', type: 'text', label: 'Accent', defaultValue: '#b43d2a', validate: hexValidate },
+                { name: 'dataAccent', type: 'text', label: 'Data accent', defaultValue: '#3e6b66', validate: hexValidate },
               ],
             },
           ],
@@ -90,6 +99,10 @@ export const DesignStudio: GlobalConfig = {
               name: 'simulation',
               type: 'group',
               label: false as unknown as string,
+              admin: {
+                description:
+                  'The WebGL background for the Z-Axis, X/Y and Newspaper layouts. The Immersive layout uses its own evolving backdrop, so the simulation is not applied there.',
+              },
               fields: [
                 {
                   name: 'kind',

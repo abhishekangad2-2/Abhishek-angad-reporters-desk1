@@ -32,6 +32,8 @@ import { SimulationPicker as SimulationPicker_0de382ef9c71c9b81b1be238fac575b5 }
 import { AdminIcon as AdminIcon_db845eae23ef682757f9df5d4893ae70 } from '../../../components/admin/AdminBrand'
 import { AdminLogo as AdminLogo_db845eae23ef682757f9df5d4893ae70 } from '../../../components/admin/AdminBrand'
 import { SpecGaps as SpecGaps_46bd7b4c33d6ef9024cf12322c252c53 } from '../../../components/admin/SpecGaps'
+import { AdminStyles as AdminStyles_rd } from '../../../components/admin/AdminStyles'
+import { DashboardCardHints as DashboardCardHints_rd } from '../../../components/admin/DashboardCardHints'
 import { GcsClientUploadHandler as GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934 } from '@payloadcms/storage-gcs/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -72,6 +74,7 @@ export const importMap = {
   "/components/admin/AdminBrand#AdminLogo": AdminLogo_db845eae23ef682757f9df5d4893ae70,
   "/components/admin/SpecGaps#SpecGaps": SpecGaps_46bd7b4c33d6ef9024cf12322c252c53,
   "/components/admin/AdminStyles#AdminStyles": AdminStyles_rd,
+  "/components/admin/DashboardCardHints#DashboardCardHints": DashboardCardHints_rd,
   "@payloadcms/storage-gcs/client#GcsClientUploadHandler": GcsClientUploadHandler_06e62ca02c7c441053a9b643e5545934,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
