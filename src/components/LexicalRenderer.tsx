@@ -151,8 +151,8 @@ function SinglePictureBlock({ block }: { block: any }) {
   const { url, width, height } = mediaDetail(block.image)
   if (!url) return null
   return (
-    <figure className="my-8">
-      {/* True aspect ratio — no crop. */}
+    <figure className="vm-photo my-8">
+      {/* Height-capped (see .vm-photo img) so portrait & landscape sit uniformly. */}
       <Image
         src={url}
         alt={block.caption ?? ''}
@@ -174,8 +174,8 @@ function TextPhotoBlock({ block }: { block: any }) {
     <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
       <div className="prose prose-lg font-serif">{block.text}</div>
       {url && (
-        <figure>
-          {/* True aspect ratio — no crop. */}
+        <figure className="vm-photo">
+          {/* Height-capped (see .vm-photo img) so portrait & landscape sit uniformly. */}
           <Image
             src={url}
             alt={block.caption ?? ''}

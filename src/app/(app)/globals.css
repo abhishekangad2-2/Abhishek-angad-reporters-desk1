@@ -1540,6 +1540,21 @@ a {
   height: auto;
 }
 
+/* Inline editorial photo (SinglePicture / TextPhoto): cap height so a portrait
+   phone photo can't balloon to ~1200px tall while a landscape stays short —
+   every inline picture sits within a consistent band, centred, regardless of
+   source aspect ratio. Scoped to .vm-photo so full-bleed / comparison /
+   diptych / gallery blocks keep their own sizing. */
+.vm-photo img {
+  max-width: 100%;
+  max-height: 74vh;
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+  display: block;
+  border-radius: var(--radius, 4px);
+}
+
 .story-reading figure,
 .news-body figure {
   margin: 2rem 0;
@@ -2125,14 +2140,20 @@ a {
   gap: 0.5rem;
 }
 
-.vm-compare-cell {
+.vm-compare-cell,
+.vm-diptych-cell {
   position: relative;
 }
 
+/* Uniform pair: each image is the same fixed-aspect tile so a landscape +
+   portrait before/after (or diptych) render at identical size instead of two
+   mismatched heights. Applied to the img (not the cell) so the diptych caption
+   below it isn't clipped. */
 .vm-compare-cell img,
 .vm-diptych-cell img {
   width: 100%;
-  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   display: block;
 }
 
@@ -2447,9 +2468,10 @@ a {
   font-weight: 900;
   font-size: clamp(1.5rem, 2.6vw, 2.4rem);
   line-height: 1.1;
-  /* Wrap only BETWEEN words ("11" / "months"), never mid-word. word-break /
-     hyphens are removed because they chopped values into "mont"+"hs". */
-  overflow-wrap: normal;
+  /* Wrap only BETWEEN words ("11" / "months"), never mid-word. break-word only
+     kicks in for a single token too long for the column (rare), so normal
+     values like "months"/"₹4.2" are never chopped into "mont"+"hs". */
+  overflow-wrap: break-word;
   word-break: normal;
   hyphens: none;
 }
