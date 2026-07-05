@@ -2423,8 +2423,11 @@ a {
 
 .vm-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1.5rem;
+  /* Wider min so a value like "11 months" fits on its own line inside the
+     narrow newspaper-lead column; auto-fit reflows to 2 rows when cramped
+     instead of squeezing 4 columns that force mid-word breaks. */
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 1.5rem 1.75rem;
 }
 
 .vm-stat {
@@ -2442,11 +2445,13 @@ a {
 .vm-stat-value {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(1.6rem, 3.2vw, 3rem);
-  line-height: 1.05;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto;
+  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+  line-height: 1.1;
+  /* Wrap only BETWEEN words ("11" / "months"), never mid-word. word-break /
+     hyphens are removed because they chopped values into "mont"+"hs". */
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 .vm-stat-label {

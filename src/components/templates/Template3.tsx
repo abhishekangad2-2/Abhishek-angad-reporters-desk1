@@ -28,7 +28,7 @@ export default function Template3({ story }: { story: Story }) {
           intensity={0.14}
         />
         <div className="news-masthead-inner">
-          <div className="news-wordmark">ReportersDesk</div>
+          <div className="news-wordmark">Reporters Desk</div>
           <div className="news-date" suppressHydrationWarning>{longDate}</div>
         </div>
       </div>
