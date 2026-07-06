@@ -10,6 +10,10 @@ export const Transactions: CollectionConfig = {
     description: 'Revenue ledger — every Razorpay transaction. Filter by status for reconciliation.',
   },
   access: {
+    // Revenue PII — restrict read to admin/editor (parity with payments &
+    // subscriptions). Without this, Payload's default lets ANY authenticated
+    // user, including contributors, GET /api/transactions.
+    read: ({ req: { user } }) => Boolean(user && (user.role === 'admin' || user.role === 'editor')),
     create: () => false,
     update: () => false,
     delete: ({ req: { user } }) => user?.role === 'admin',

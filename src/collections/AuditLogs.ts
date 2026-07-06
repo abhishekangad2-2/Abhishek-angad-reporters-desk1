@@ -8,6 +8,9 @@ export const AuditLogs: CollectionConfig = {
     group: 'System',
   },
   access: {
+    // Admin-only read — the trail holds login-failure IPs and every workflow
+    // transition; lower roles shouldn't see it. (Default read was any-auth.)
+    read: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
     create: () => false, // Typically created by hooks, not manually
     update: () => false, // Immutable log
     delete: () => false,

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import PlexusBackground from '@/components/PlexusBackground'
+import PlexusBackground from '@/components/LazyPlexus'
 import { notFound } from 'next/navigation'
 import { SITE_URL } from '@/lib/seo'
 

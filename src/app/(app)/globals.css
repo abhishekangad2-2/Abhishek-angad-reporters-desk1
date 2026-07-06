@@ -942,10 +942,13 @@ a {
    progress bar, and a corner connections graph that grows on scroll. */
 .landing--immersive {
   position: relative;
-  /* Intentional near-black page bg (kept fixed); text = paper so it flips
-     with a dark Studio palette instead of being a hardcoded near-white. */
+  /* Intentional near-black page bg (kept fixed). Text must be a fixed light
+     token — NOT var(--im-ink), which the Design Studio drives dark under a
+     dark preset (Midnight Wire), making the whole hero unreadable. --im-ink is
+     local to immersive and is never palette-injected. */
+  --im-ink: #f5f3ec;
   background: #07080a;
-  color: var(--paper-cool);
+  color: var(--im-ink);
 }
 
 .im-bg {
@@ -1001,7 +1004,7 @@ a {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(1rem, 1.6vw, 1.4rem);
-  color: color-mix(in srgb, var(--paper-cool) 80%, transparent);
+  color: color-mix(in srgb, var(--im-ink) 80%, transparent);
   margin-top: 1.2rem;
   max-width: 50ch;
 }
@@ -1051,7 +1054,7 @@ a {
   font-weight: 400;
   font-size: clamp(1.15rem, 1.5vw, 1.4rem);
   line-height: 1.7;
-  color: color-mix(in srgb, var(--paper-cool) 90%, transparent);
+  color: color-mix(in srgb, var(--im-ink) 90%, transparent);
   margin: 0;
 }
 
@@ -1088,7 +1091,7 @@ a {
   font-weight: 500;
   font-size: clamp(1.6rem, 3vw, 2.6rem);
   line-height: 1.25;
-  color: var(--paper-cool);
+  color: var(--im-ink);
   border-left: 3px solid var(--accent);
   padding-left: 1.4rem;
   opacity: 0;
@@ -1113,7 +1116,7 @@ a {
   align-items: center;
   gap: 1rem;
   background: rgba(18, 21, 26, 0.7);
-  border: 1px solid color-mix(in srgb, var(--paper-cool) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--im-ink) 12%, transparent);
   border-radius: 8px;
   padding: 1rem 1.2rem;
   margin: 12vh 0;
@@ -1717,7 +1720,7 @@ a {
   text-align: center;
   gap: 0.6rem;
   padding: 2rem;
-  color: var(--paper-cool);
+  color: var(--im-ink);
 }
 
 .immersive-hero h1 {
@@ -1735,7 +1738,7 @@ a {
   font-weight: 400;
   font-style: italic;
   font-size: clamp(1rem, 1.8vw, 1.5rem);
-  color: color-mix(in srgb, var(--paper-cool) 82%, transparent);
+  color: color-mix(in srgb, var(--im-ink) 82%, transparent);
   max-width: 50ch;
   margin: 1rem 0 0;
 }
@@ -1746,7 +1749,7 @@ a {
   font-size: 0.66rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--paper-cool) 70%, transparent);
+  color: color-mix(in srgb, var(--im-ink) 70%, transparent);
   animation: immersive-cue 1.8s ease-in-out infinite;
 }
 
@@ -1824,7 +1827,7 @@ a {
 .immersive-layout {
   position: relative;
   z-index: 2;
-  background: color-mix(in srgb, var(--paper-cool) 96%, var(--ink));
+  background: color-mix(in srgb, var(--im-ink) 96%, var(--ink));
   color: var(--ink);
   padding: 6vh 0;
 }

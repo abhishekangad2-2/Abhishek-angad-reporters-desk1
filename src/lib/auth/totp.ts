@@ -1,6 +1,7 @@
 import { generateSecret, generateURI, verifySync } from 'otplib'
 import QRCode from 'qrcode'
 import bcrypt from 'bcryptjs'
+import { randomInt } from 'crypto'
 
 export function generateTotpSecret() {
   return generateSecret()
@@ -27,7 +28,12 @@ export function verifyTotpCode(secret: string, code: string) {
 }
 
 export function generateBackupCodes(count = 8) {
-  return Array.from({ length: count }, () => Math.random().toString(36).slice(2, 10).toUpperCase())
+  // Crypto-secure, unambiguous alphabet (no 0/O/1/I/L). Math.random is
+  // predictable and unfit for a security credential.
+  const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
+  return Array.from({ length: count }, () =>
+    Array.from({ length: 8 }, () => ALPHABET[randomInt(ALPHABET.length)]).join(''),
+  )
 }
 
 export async function hashBackupCode(code: string) {

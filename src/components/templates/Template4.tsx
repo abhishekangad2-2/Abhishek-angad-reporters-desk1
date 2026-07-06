@@ -5,7 +5,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Story } from '@/payload-types'
 import Masthead from '@/components/Masthead'
-import PlexusBackground from '@/components/PlexusBackground'
+import PlexusBackground from '@/components/LazyPlexus'
 import { RichTextRenderer, LayoutRenderer } from '@/components/LexicalRenderer'
 import { sectionNameOf } from './storyMeta'
 

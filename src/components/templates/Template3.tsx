@@ -1,5 +1,5 @@
 import { Story } from '@/payload-types'
-import PlexusBackground from '@/components/PlexusBackground'
+import PlexusBackground from '@/components/LazyPlexus'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
 import { bylineOf, sectionNameOf, heroUrlOf } from './storyMeta'
 

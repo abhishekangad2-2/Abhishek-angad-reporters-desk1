@@ -1,6 +1,6 @@
 import { Story } from '@/payload-types'
 import Masthead from '@/components/Masthead'
-import PlexusBackground from '@/components/PlexusBackground'
+import PlexusBackground from '@/components/LazyPlexus'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
 import StoryHeader from '@/components/StoryHeader'
 

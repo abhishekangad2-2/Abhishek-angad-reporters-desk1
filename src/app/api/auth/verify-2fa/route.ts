@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
   const payload = await getPayload({ config })
   const user = await payload.findByID({ collection: 'users', id: decoded.userId })
 
+  // Only for accounts that completed 2FA enrollment. A mid-enrollment account
+  // (totpSecret written but twoFactorEnabled still false) must finish via
+  // confirm-enrollment, not slip through here.
+  if (!user.twoFactorEnabled || !user.totpSecret) {
+    return NextResponse.json({ error: 'Two-factor is not set up for this account.' }, { status: 400 })
+  }
+
   let verified = verifyTotpCode(user.totpSecret, code)
 
   // Fall back to a one-time backup code if the live TOTP check fails —
