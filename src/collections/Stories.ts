@@ -581,6 +581,10 @@ export const Stories: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
+      // Hot filter on every public "published stories" query — index it so it
+      // doesn't seq-scan under real content volume (tracked in code, so the
+      // schema push keeps it rather than dropping an orphaned manual index).
+      index: true,
       options: [
         { label: 'Draft', value: 'draft' },
         { label: 'In Review', value: 'in-review' },

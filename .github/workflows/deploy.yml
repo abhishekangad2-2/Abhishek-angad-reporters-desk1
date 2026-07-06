@@ -6,7 +6,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Gate: a red lint must not ship. deploy `needs:` this, so a failing lint
+  # blocks the deploy (previously CI ran independently and never gated deploy).
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
   deploy:
+    needs: verify
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -26,15 +40,19 @@ jobs:
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push Docker Image
+        # Tag by commit SHA (immutable, auditable, rollback-able by tag) AND
+        # latest (Cloud Run deploys the pinned SHA below).
         run: |
-          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest .
-          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest
+          IMG=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms
+          docker build -t "$IMG:${{ github.sha }}" -t "$IMG:latest" .
+          docker push "$IMG:${{ github.sha }}"
+          docker push "$IMG:latest"
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: reportersdesk-cms
-          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:latest
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms:${{ github.sha }}
           region: us-central1
           # Non-sensitive config only. Razorpay/Resend are intentionally "none".
           env_vars: |
