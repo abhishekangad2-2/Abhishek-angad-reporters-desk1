@@ -82,7 +82,7 @@ export const Newsletters: CollectionConfig = {
             req.payload.logger.info('[Newsletter] no active subscribers')
             return
           }
-          const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:640px;margin:auto;padding:24px"><h1 style="font-family:Georgia,serif">${doc.subject}</h1>${lexicalToHtml((doc as any).content?.root)}<hr style="margin:32px 0;border:0;border-top:1px solid #ddd"/><p style="font-size:12px;color:#666">ReportersDesk · Abhishek Angad INK</p></div>`
+          const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:640px;margin:auto;padding:24px"><h1 style="font-family:Georgia,serif">${doc.subject}</h1>${lexicalToHtml((doc as any).content?.root)}<hr style="margin:32px 0;border:0;border-top:1px solid #ddd"/><p style="font-size:12px;color:#666">ReportersDesk · Abhishek Angad Ink</p></div>`
           const batches: string[][] = []
           for (let i = 0; i < recipients.length; i += 100) batches.push(recipients.slice(i, i + 100))
           let ok = 0, fail = 0

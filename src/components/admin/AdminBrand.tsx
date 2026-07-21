@@ -33,7 +33,7 @@ export function AdminLogo() {
         }}
       >
         Abhishek Angad{' '}
-        <em style={{ fontStyle: 'italic', color: '#b43d2a' }}>INK</em>
+        <em style={{ fontStyle: 'italic', color: '#b43d2a' }}>Ink</em>
       </div>
     </div>
   )

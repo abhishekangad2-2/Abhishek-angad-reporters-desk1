@@ -32,7 +32,7 @@ const monoFace = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ReportersDesk · Abhishek Angad INK",
+  title: "ReportersDesk · Abhishek Angad Ink",
   description: "Independent Journalism",
   // Discourage Chrome auto-translate, which rewrites text nodes before React
   // hydrates and triggers React #418 text-mismatch crashes. i18n is handled
