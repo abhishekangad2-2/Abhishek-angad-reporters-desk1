@@ -1342,10 +1342,10 @@ a {
 .mh-wordmark {
   font-family: var(--font-display);
   font-weight: 900; /* big bold newspaper nameplate */
-  /* "Large" scale — commanding but leaves margin air either side. */
-  font-size: clamp(3rem, 8.5vw, 6.6rem);
-  letter-spacing: -0.03em;
-  line-height: 0.9;
+  /* "Broadsheet Grand" — monumental scale, filling the measure edge to edge. */
+  font-size: clamp(3.6rem, 10vw, 8rem);
+  letter-spacing: -0.035em;
+  line-height: 0.86;
   text-decoration: none;
   text-transform: uppercase;
   /* Subtle ink weight — a hairline shadow gives the type presence without
@@ -1356,9 +1356,9 @@ a {
 /* Double hairline rule under the nameplate — the classic broadsheet cue. */
 .mh-rule {
   display: block;
-  width: min(600px, 80%);
+  width: min(620px, 80%);
   height: 4px;
-  margin: clamp(0.9rem, 2vw, 1.25rem) 0 0.85rem;
+  margin: 1.15rem 0 0.85rem;
   border-top: 1px solid currentColor;
   border-bottom: 1px solid currentColor;
   opacity: 0.55;
