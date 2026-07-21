@@ -109,7 +109,7 @@ export default async function Desk() {
 
             <div>
               <div className="aec-panel">
-                <h2>Dispatches</h2>
+                <h2>Dispatches <a href="/desk/dispatch">+ File from phone →</a></h2>
                 {dispatches.length === 0 && <p className="aec-empty">No dispatches.</p>}
                 {dispatches.map((d) => (
                   <div className="aec-task" key={d.id}>

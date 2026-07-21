@@ -1,11 +1,88 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
+import { getSessionUser } from '@/lib/auth/session'
 
-// Public, read-only feed of the most recent live dispatches for the floating
-// "Live Dispatches" widget (IDPB). Dynamic so it never tries to hit the DB at
-// build time and degrades gracefully if Payload/DB is unreachable.
+// GET: public, read-only feed of the most recent live dispatches for the
+// floating "Live Dispatches" widget (IDPB). POST: authenticated reporters file
+// a new dispatch from the mobile composer (/desk/dispatch). Dynamic so it never
+// hits the DB at build time and degrades gracefully if Payload is unreachable.
 export const dynamic = 'force-dynamic'
+
+const ROLES_ALLOWED = ['admin', 'editor', 'reporter']
+
+/** A dispatch body is one short message. Build the minimal Lexical editorState
+ *  the richText field expects, splitting on blank lines into paragraphs. */
+function lexicalFromText(text: string) {
+  const paras = text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+  const children = (paras.length ? paras : [text]).map((p) => ({
+    type: 'paragraph',
+    version: 1,
+    format: '',
+    indent: 0,
+    direction: 'ltr' as const,
+    children: [
+      { type: 'text', text: p, version: 1, format: 0, style: '', mode: 'normal' as const, detail: 0 },
+    ],
+  }))
+  return { root: { type: 'root', version: 1, format: '', indent: 0, direction: 'ltr' as const, children } }
+}
+
+export async function POST(req: NextRequest) {
+  const user = await getSessionUser(req)
+  const role = (user as { role?: string } | null)?.role
+  if (!user || !role || !ROLES_ALLOWED.includes(role)) {
+    return NextResponse.json({ error: 'Sign in as newsroom staff to file dispatches.' }, { status: 401 })
+  }
+
+  let data: Record<string, unknown>
+  try {
+    data = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Malformed request.' }, { status: 400 })
+  }
+
+  const message = String(data.message ?? '').trim()
+  if (message.length < 3) return NextResponse.json({ error: 'Dispatch is too short.' }, { status: 400 })
+  if (message.length > 280) return NextResponse.json({ error: 'Keep it under 280 characters.' }, { status: 400 })
+
+  const significance = ['normal', 'significant', 'breaking'].includes(String(data.significance))
+    ? String(data.significance)
+    : 'normal'
+  const initials = String(data.initials ?? '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4) || undefined
+  const expiresHours = Number(data.expiresHours)
+  const now = new Date()
+  const expiresAt =
+    Number.isFinite(expiresHours) && expiresHours > 0
+      ? new Date(now.getTime() + expiresHours * 3600 * 1000).toISOString()
+      : undefined
+
+  try {
+    const payload = await getPayload({ config })
+    const doc = await payload.create({
+      collection: 'live-dispatches',
+      // Run as the filing user so access control (isReporterOrAbove) is enforced
+      // and the dispatch is attributed to them.
+      overrideAccess: false,
+      user: { ...user, collection: 'users' },
+      data: {
+        headline: message,
+        body: lexicalFromText(message),
+        author: [user.id],
+        initials,
+        significance,
+        publishedAt: now.toISOString(),
+        expiresAt,
+      },
+    })
+    return NextResponse.json({ ok: true, id: doc.id })
+  } catch {
+    return NextResponse.json({ error: 'Could not file the dispatch. Try again.' }, { status: 500 })
+  }
+}
 
 function relativeTime(input?: string | null): string {
   if (!input) return ''
