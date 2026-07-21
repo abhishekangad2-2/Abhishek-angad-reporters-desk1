@@ -26,7 +26,7 @@ const ITEMS: { pillar: string; entries: { name: string; status: Status; note?: s
       { name: 'Four WebGL simulations (Plexus / Particles / Waves / Constellation)', status: 'built' },
       { name: 'Reader accessibility gear (motion / Low-Power / disable 3D)', status: 'built' },
       { name: 'Live Dispatches + Plexus Pulse', status: 'built', note: 'SSE with poll fallback (spec said WebSocket)' },
-      { name: 'True Z-axis camera-dolly scroll', status: 'deferred', note: 'CSS-3D + plexus hybrid chosen (CDN CORS constraint)' },
+      { name: 'True Z-axis camera-dolly scroll', status: 'deferred', note: 'CSS-3D + plexus hybrid shipped instead (CDN CORS constraint)' },
     ],
   },
   {

@@ -50,7 +50,10 @@ export default buildConfig({
         Logo: '/components/admin/AdminBrand#AdminLogo',
       },
       providers: ['/components/admin/AdminStyles#AdminStyles'],
-      beforeDashboard: ['/components/admin/SpecGaps#SpecGaps'],
+      beforeDashboard: [
+        '/components/admin/DashboardWelcome#DashboardWelcome',
+        '/components/admin/SpecGaps#SpecGaps',
+      ],
       afterDashboard: ['/components/admin/DashboardCardHints#DashboardCardHints'],
     },
   },

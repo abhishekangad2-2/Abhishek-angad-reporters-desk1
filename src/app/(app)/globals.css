@@ -615,10 +615,17 @@ a {
   z-index: 2;
   max-width: 1180px;
   margin: 0 auto;
-  padding: clamp(1.25rem, 3vw, 3rem) clamp(1rem, 3vw, 2.5rem) 5rem;
+  padding: clamp(1.25rem, 3vw, 3rem) clamp(1rem, 3vw, 2.5rem) 8rem;
+  /* The camera. Rows live inside .zig-scene and dolly along Z toward it. */
+  perspective: 1500px;
+  perspective-origin: 50% 42%;
+}
+
+.zig-scene {
   display: flex;
   flex-direction: column;
-  gap: clamp(2.5rem, 7vh, 6rem);
+  gap: clamp(3rem, 9vh, 7rem);
+  transform-style: preserve-3d;
 }
 
 .zig-row {
@@ -629,6 +636,13 @@ a {
   text-decoration: none;
   color: inherit;
   min-height: 58vh;
+  /* CSS-3D dolly — ZPatternLanding sets --z / --rx / --op from scroll position
+     so each row rises from depth, fills the frame at centre, then recedes. */
+  transform: translateZ(var(--z, 0px)) rotateX(var(--rx, 0deg));
+  opacity: var(--op, 1);
+  transform-style: preserve-3d;
+  transition: transform 0.12s linear, opacity 0.12s linear;
+  will-change: transform, opacity;
 }
 
 /* Every other story flips: the media moves to the right, text to the left. */
@@ -637,8 +651,27 @@ a {
 }
 
 .zig-media {
+  position: relative;
   overflow: hidden;
   border-radius: var(--radius, 4px);
+  /* Sits nearer the camera than its text — the two parallax against each other
+     as the row tilts, which sells the depth. */
+  transform: translateZ(60px);
+  box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.55);
+}
+
+/* Depth counter overlaid on the media (01 / 03 …). */
+.zig-depth-tag {
+  position: absolute;
+  left: 0.7rem;
+  bottom: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
 }
 
 .zig-img {
@@ -665,6 +698,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transform: translateZ(24px);
 }
 
 .zig-index {
@@ -709,15 +743,42 @@ a {
 }
 
 @media (max-width: 820px) {
+  /* Depth reads poorly on a narrow, thumb-scrolled screen — flatten to the
+     plain stacked zig-zag. */
+  .zig-stage {
+    perspective: none;
+  }
+  .zig-scene {
+    gap: 2.5rem;
+  }
   .zig-row,
   .zig-row--flip {
     grid-template-columns: 1fr;
     min-height: 0;
     gap: 1rem;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .zig-media,
+  .zig-text {
+    transform: none;
   }
   /* On mobile every story reads image-then-text, regardless of the zig flip. */
   .zig-row--flip .zig-media {
     order: 0;
+  }
+}
+
+/* Reduced motion: no dolly, no depth — the flat, static zig-zag. */
+@media (prefers-reduced-motion: reduce) {
+  .zig-stage {
+    perspective: none;
+  }
+  .zig-row,
+  .zig-media,
+  .zig-text {
+    transform: none;
+    opacity: 1;
   }
 }
 
@@ -1248,6 +1309,11 @@ a {
   opacity: 0.6;
 }
 
+.mh-eyebrow--right {
+  color: var(--accent);
+  opacity: 0.85;
+}
+
 .mh-editor {
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -1270,31 +1336,48 @@ a {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: 1.5rem 0 1rem;
+  margin: clamp(1.6rem, 4vw, 2.8rem) 0 1.2rem;
 }
 
 .mh-wordmark {
   font-family: var(--font-display);
-  font-weight: 900; /* big bold masthead */
-  font-size: clamp(2.6rem, 6vw, 4.6rem);
-  letter-spacing: -0.015em;
-  line-height: 0.95;
+  font-weight: 900; /* big bold newspaper nameplate */
+  /* Bigger, more commanding masthead. */
+  font-size: clamp(3.4rem, 9.5vw, 7.5rem);
+  letter-spacing: -0.03em;
+  line-height: 0.9;
   text-decoration: none;
+  text-transform: uppercase;
+  /* Subtle ink weight — a hairline shadow gives the type presence without
+     tipping into decoration. */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Double hairline rule under the nameplate — the classic broadsheet cue. */
+.mh-rule {
+  display: block;
+  width: min(560px, 78%);
+  height: 4px;
+  margin: clamp(0.8rem, 2vw, 1.35rem) 0 0.9rem;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.55;
 }
 
 .mh-sub {
   /* Byline: "Abhishek Angad" inherits the masthead text colour (white on the
-     dark layouts, ink on the light ones — matching the wordmark). Only "(Ink)"
+     dark layouts, ink on the light ones — matching the wordmark). Only "Ink"
      is italic + house red (see .mh-sub-ink). */
   font-family: var(--font-display);
   font-style: normal;
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-size: clamp(1.05rem, 1.9vw, 1.5rem);
+  letter-spacing: 0.06em;
   color: inherit;
-  margin-top: 0.35rem;
 }
 
 .mh-sub-ink {
   font-style: italic;
+  font-weight: 600;
   color: var(--accent);
 }
 

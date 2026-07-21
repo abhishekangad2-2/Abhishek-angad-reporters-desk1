@@ -1,0 +1,281 @@
+#!/usr/bin/env bash
+#
+# rd — ReportersDesk ops CLI
+# ---------------------------------------------------------------------------
+# One command to see the whole stack's health + cost and flip the two configs
+# that actually cost money (Cloud Run min-instances, Cloud SQL tier). Reads
+# live state via your existing `gcloud` / `gh` auth — nothing is stored here.
+#
+#   rd status     health of site/cms/cdn, Cloud Run, DB, last deploy  (default)
+#   rd cost       itemised monthly fixed-cost estimate from live state
+#   rd launch     flip to launch config  (Run min=1, DB → launch tier)
+#   rd idle       flip to cheap config   (Run min=0, DB → idle tier)
+#   rd deploy     trigger the GitHub Actions Deploy workflow + watch it
+#   rd logs [N]   tail the last N (default 50) Cloud Run log lines
+#   rd open [x]   open site | cms | run | db | deploy in the browser
+#   rd checklist  pending launch-time items (2FA, webhook, 2nd admin, rotation)
+#
+# Requires: gcloud (authed), curl. `deploy`/status-deploy also need gh (authed).
+# ---------------------------------------------------------------------------
+set -uo pipefail
+
+# ── config ────────────────────────────────────────────────────────────────
+AA_PROJECT="abhishek-angad-reporters-desk1"     # Cloud Run + Cloud SQL live here
+SW_PROJECT="secret-walker-497804-d5"            # media CDN + GCS + Vertex live here
+REGION="us-central1"
+RUN_SERVICE="reportersdesk-cms"
+DB_INSTANCE="reportersdesk-db"
+REPO_DIR="/Users/abhishekangad/reportersdesk-payload"
+
+SITE_URL="https://reportersdesk.abhishekangad.com"
+CMS_URL="$SITE_URL/cms"
+CDN_PROBE="https://cdn.reportersdesk.abhishekangad.com/seed-city-square.jpg"
+
+LAUNCH_TIER="db-custom-1-3840"                  # 1 vCPU / 3.75 GB — launch floor
+IDLE_TIER="db-g1-small"                         # 1.7 GB shared-core — pre-launch floor
+LAUNCH_MIN=1                                    # kill cold starts at launch
+
+# rough us-central1 monthly $ (estimates, labelled as such in `rd cost`)
+# NB: macOS ships bash 3.2 (no associative arrays) — use a case lookup.
+COST_RUN_PER_MIN_INSTANCE=26     # 1 always-on instance @ 2vCPU/2Gi, idle-rate
+COST_DISK_SSD_10GB=1.70
+COST_CDN_FWD_RULE=18             # media-CDN global forwarding rule
+db_cost() {                      # $1 = tier → approx $/mo (compute only)
+  case "$1" in
+    db-f1-micro)       echo 8   ;;
+    db-g1-small)       echo 25  ;;
+    db-custom-1-3840)  echo 49  ;;
+    db-custom-2-7680)  echo 98  ;;
+    db-custom-4-15360) echo 196 ;;
+    *)                 echo 50  ;;
+  esac
+}
+
+# ── styling ───────────────────────────────────────────────────────────────
+if [ -t 1 ]; then
+  B=$'\e[1m'; DIM=$'\e[2m'; R=$'\e[0m'
+  RED=$'\e[31m'; GRN=$'\e[32m'; YEL=$'\e[33m'; CYA=$'\e[36m'
+else
+  B=''; DIM=''; R=''; RED=''; GRN=''; YEL=''; CYA=''
+fi
+rule() { printf '%s\n' "${DIM}────────────────────────────────────────────────────────────${R}"; }
+head() { printf '\n%s%s%s\n' "$B" "$1" "$R"; }
+kv()   { printf '  %-11s %s\n' "$1" "$2"; }
+
+# colour an HTTP code green (2xx/3xx) or red (else / empty)
+httpc() {
+  local c="$1"
+  case "$c" in
+    2??|3??) printf '%s%s%s' "$GRN" "$c" "$R" ;;
+    "")      printf '%s%s%s' "$RED" "---" "$R" ;;
+    *)       printf '%s%s%s' "$RED" "$c" "$R" ;;
+  esac
+}
+probe() { curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$1" 2>/dev/null; }
+
+need_gcloud() {
+  command -v gcloud >/dev/null 2>&1 || { echo "${RED}gcloud not found${R}"; exit 1; }
+}
+
+# read one Cloud Run autoscaling annotation (minScale/maxScale) on its own,
+# so an unset value doesn't shift a packed value() row.
+_run_ann() {
+  gcloud run services describe "$RUN_SERVICE" --project "$AA_PROJECT" --region "$REGION" \
+    --format="value(spec.template.metadata.annotations['autoscaling.knative.dev/$1'])" 2>/dev/null
+}
+
+# ── status ────────────────────────────────────────────────────────────────
+cmd_status() {
+  need_gcloud
+  printf '%sReportersDesk — stack status%s   %s%s%s\n' \
+    "$B" "$R" "$DIM" "$(date '+%Y-%m-%d %H:%M')" "$R"
+  rule
+
+  head "ENDPOINTS"
+  kv "site"  "$(httpc "$(probe "$SITE_URL")")   $DIM$SITE_URL$R"
+  kv "cms"   "$(httpc "$(probe "$CMS_URL")")   $DIM(307 = auth redirect, healthy)$R"
+  kv "cdn"   "$(httpc "$(probe "$CDN_PROBE")")   $DIM media CDN asset$R"
+
+  head "CLOUD RUN  $DIM$RUN_SERVICE ($REGION)$R"
+  # NB: gcloud value() DROPS unset fields (an absent minScale shifts the row),
+  # so query the empty-able annotations on their own.
+  local run rev rimg rready rmin rmax
+  run=$(gcloud run services describe "$RUN_SERVICE" --project "$AA_PROJECT" --region "$REGION" \
+        --format="value(status.latestReadyRevisionName,
+                        spec.template.spec.containers[0].image,
+                        status.conditions[0].status)" 2>/dev/null)
+  if [ -n "$run" ]; then
+    IFS=$'\t' read -r rev rimg rready <<<"$run"
+    rmin=$(_run_ann minScale); [ -z "$rmin" ] && rmin=0
+    rmax=$(_run_ann maxScale); [ -z "$rmax" ] && rmax='∞'
+    local mode; [ "$rmin" -eq 0 ] 2>/dev/null \
+      && mode="${YEL}idle — pay-per-request${R}" || mode="${GRN}warm — ${rmin} always-on${R}"
+    kv "revision" "$rev   $([ "$rready" = True ] && echo "${GRN}READY${R}" || echo "${RED}$rready${R}")"
+    kv "scaling"  "min $rmin  max $rmax    $mode"
+    local rname="${rimg##*/}" rrepo rtag        # rname = repo:sha
+    rrepo="${rname%%:*}"; rtag="${rname##*:}"
+    kv "image"    "${rrepo}:${rtag:0:12}…"
+  else
+    kv "revision" "${RED}unreachable (gcloud auth?)${R}"
+  fi
+
+  head "DATABASE  $DIM$DB_INSTANCE$R"
+  local db
+  db=$(gcloud sql instances describe "$DB_INSTANCE" --project "$AA_PROJECT" \
+       --format="value(settings.tier,state,settings.availabilityType,settings.dataDiskSizeGb,databaseVersion)" 2>/dev/null)
+  if [ -n "$db" ]; then
+    IFS=$'\t' read -r dtier dstate dha ddisk dver <<<"$db"
+    local halbl; [ "$dha" = REGIONAL ] && halbl="${GRN}REGIONAL HA${R}" || halbl="zonal (no HA)"
+    kv "tier"  "$dtier   $([ "$dstate" = RUNNABLE ] && echo "${GRN}$dstate${R}" || echo "${RED}$dstate${R}")   $halbl"
+    kv "disk"  "${ddisk} GB SSD   $DIM$dver$R"
+  else
+    kv "tier" "${RED}unreachable${R}"
+  fi
+
+  head "DEPLOY  $DIM GitHub Actions$R"
+  if command -v gh >/dev/null 2>&1; then
+    local last
+    last=$(cd "$REPO_DIR" && gh run list --workflow Deploy --limit 1 \
+           --json displayTitle,conclusion,status,createdAt,headSha \
+           --template '{{range .}}{{.status}}|{{.conclusion}}|{{.createdAt}}|{{slice .headSha 0 7}}|{{.displayTitle}}{{end}}' 2>/dev/null)
+    if [ -n "$last" ]; then
+      IFS='|' read -r st concl created sha title <<<"$last"
+      local badge
+      case "$concl" in
+        success) badge="${GRN}success${R}" ;;
+        failure) badge="${RED}FAILURE${R}" ;;
+        "")      badge="${YEL}${st}${R}" ;;
+        *)       badge="${YEL}$concl${R}" ;;
+      esac
+      kv "last run" "$badge  $DIM$sha  ${created%T*}$R  ${title:0:38}"
+    else
+      kv "last run" "${DIM}none / gh not authed for this repo${R}"
+    fi
+  else
+    kv "last run" "${DIM}gh not installed${R}"
+  fi
+
+  echo
+  rule
+  printf '  %sEST. FIXED COST  ~$%s/mo%s   %srun `rd cost` for the breakdown%s\n' \
+    "$B" "$(_fixed_total)" "$R" "$DIM" "$R"
+}
+
+# ── cost ──────────────────────────────────────────────────────────────────
+# reads live tier + minScale + HA and totals the always-on monthly baseline
+_read_state() {
+  RMIN=$(gcloud run services describe "$RUN_SERVICE" --project "$AA_PROJECT" --region "$REGION" \
+         --format="value(spec.template.metadata.annotations['autoscaling.knative.dev/minScale'])" 2>/dev/null)
+  [ -z "$RMIN" ] && RMIN=0
+  read -r DTIER DHA DDISK <<<"$(gcloud sql instances describe "$DB_INSTANCE" --project "$AA_PROJECT" \
+         --format="value(settings.tier,settings.availabilityType,settings.dataDiskSizeGb)" 2>/dev/null)"
+}
+_fixed_total() {
+  need_gcloud; _read_state
+  local db=$(db_cost "$DTIER")
+  [ "$DHA" = REGIONAL ] && db=$((db * 2))
+  local run=$((RMIN * COST_RUN_PER_MIN_INSTANCE))
+  # bash can't do float; add the ~$20 disk+cdn as an int
+  echo $(( run + db + 20 ))
+}
+cmd_cost() {
+  need_gcloud; _read_state
+  local db=$(db_cost "$DTIER") dbnote=""
+  if [ "$DHA" = REGIONAL ]; then db=$((db * 2)); dbnote=" (×2 regional HA)"; fi
+  local run=$((RMIN * COST_RUN_PER_MIN_INSTANCE))
+  local runnote; [ "$RMIN" -eq 0 ] && runnote="idle — ~\$0 baseline, pay per request" || runnote="$RMIN always-on instance(s)"
+
+  printf '%sReportersDesk — monthly fixed cost%s   %s(estimate, us-central1)%s\n' "$B" "$R" "$DIM" "$R"
+  rule
+  printf '  %-34s %s\n' "Cloud Run min-instances ($RMIN)" "\$$run    $DIM$runnote$R"
+  printf '  %-34s %s\n' "Cloud SQL $DTIER$dbnote"          "\$$db"
+  printf '  %-34s %s\n' "  + 10 GB SSD disk"               "\$$COST_DISK_SSD_10GB"
+  printf '  %-34s %s\n' "Media CDN forwarding rule"        "\$$COST_CDN_FWD_RULE"
+  rule
+  printf '  %-34s %s%s~\$%s / mo%s\n' "FIXED BASELINE" "$B" "$GRN" "$(_fixed_total)" "$R"
+  echo
+  printf '%sUsage-based, on top (near \$0 while idle/empty):%s\n' "$DIM" "$R"
+  printf '%s  • Cloud Run requests/CPU beyond idle   • CDN + GCS egress\n' "$DIM"
+  printf '  • GCS + Artifact Registry storage       • Vertex AI translation calls%s\n' "$R"
+}
+
+# ── launch / idle toggles ─────────────────────────────────────────────────
+_confirm() { read -r -p "$1 [y/N] " a; [[ "$a" =~ ^[Yy]$ ]]; }
+
+cmd_launch() {
+  need_gcloud
+  printf '%sFlip to LAUNCH config%s\n' "$B" "$R"
+  echo "  Cloud Run min-instances → $LAUNCH_MIN   (no cold starts)"
+  echo "  Cloud SQL tier          → $LAUNCH_TIER"
+  echo "  ${DIM}Raises fixed cost. Regional HA is a separate manual step.${R}"
+  _confirm "Apply launch config?" || { echo "aborted."; return 1; }
+  echo "→ Cloud Run min-instances=$LAUNCH_MIN"
+  gcloud run services update "$RUN_SERVICE" --project "$AA_PROJECT" --region "$REGION" \
+    --min-instances="$LAUNCH_MIN" --quiet
+  echo "→ Cloud SQL tier=$LAUNCH_TIER (restarts the instance)"
+  gcloud sql instances patch "$DB_INSTANCE" --project "$AA_PROJECT" --tier="$LAUNCH_TIER" --quiet
+  echo "${GRN}done.${R} run 'rd status' to verify."
+}
+
+cmd_idle() {
+  need_gcloud
+  printf '%sFlip to IDLE (cheap) config%s\n' "$B" "$R"
+  echo "  Cloud Run min-instances → 0          (cold starts return)"
+  echo "  Cloud SQL tier          → $IDLE_TIER   (shared-core, no SLA)"
+  _confirm "Apply idle config?" || { echo "aborted."; return 1; }
+  echo "→ Cloud Run min-instances=0"
+  gcloud run services update "$RUN_SERVICE" --project "$AA_PROJECT" --region "$REGION" \
+    --min-instances=0 --quiet
+  echo "→ Cloud SQL tier=$IDLE_TIER (restarts the instance)"
+  gcloud sql instances patch "$DB_INSTANCE" --project "$AA_PROJECT" --tier="$IDLE_TIER" --quiet
+  echo "${GRN}done.${R} run 'rd status' to verify."
+}
+
+# ── deploy / logs / open / checklist ──────────────────────────────────────
+cmd_deploy() {
+  command -v gh >/dev/null 2>&1 || { echo "${RED}gh not installed${R}"; exit 1; }
+  ( cd "$REPO_DIR" && gh workflow run Deploy && sleep 4 && gh run watch "$(gh run list --workflow Deploy --limit 1 --json databaseId --jq '.[0].databaseId')" )
+}
+cmd_logs() {
+  need_gcloud
+  local n="${1:-50}"
+  gcloud run services logs read "$RUN_SERVICE" --project "$AA_PROJECT" --region "$REGION" --limit "$n"
+}
+cmd_open() {
+  local what="${1:-site}" url
+  case "$what" in
+    site) url="$SITE_URL" ;;
+    cms)  url="$CMS_URL" ;;
+    run)  url="https://console.cloud.google.com/run/detail/$REGION/$RUN_SERVICE/metrics?project=$AA_PROJECT" ;;
+    db)   url="https://console.cloud.google.com/sql/instances/$DB_INSTANCE/overview?project=$AA_PROJECT" ;;
+    deploy) url="https://github.com/$(cd "$REPO_DIR" && gh repo view --json nameWithOwner --jq .nameWithOwner)/actions" ;;
+    *)    echo "open: site|cms|run|db|deploy"; return 1 ;;
+  esac
+  open "$url" 2>/dev/null || echo "$url"
+}
+cmd_checklist() {
+  printf '%sReportersDesk — pending launch-time items%s\n' "$B" "$R"; rule
+  cat <<EOF
+  [ ] Rotate exposed credentials  ── PAYLOAD_SECRET, admin temp password,
+        PENDING_2FA_SECRET were seen in a transcript; rotate before public launch.
+  [ ] Create a second admin account (you — I don't create accounts).
+  [ ] Razorpay: add live keys + webhook secret to Secret Manager, flip env off 'none'.
+  [ ] Regional DB HA  ── separate manual flip; doubles DB cost, gives failover SLA.
+  [ ] 'rd launch'     ── min-instances=1 + DB up, once content is loaded.
+EOF
+}
+
+# ── dispatch ──────────────────────────────────────────────────────────────
+case "${1:-status}" in
+  status)    cmd_status ;;
+  cost)      cmd_cost ;;
+  launch)    cmd_launch ;;
+  idle)      cmd_idle ;;
+  deploy)    cmd_deploy ;;
+  logs)      shift; cmd_logs "$@" ;;
+  open)      shift; cmd_open "$@" ;;
+  checklist) cmd_checklist ;;
+  -h|--help|help)
+    sed -n '3,30p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) echo "unknown: $1  (try: rd help)"; exit 1 ;;
+esac

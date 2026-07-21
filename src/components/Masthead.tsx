@@ -5,9 +5,10 @@ import type { LandingSection } from '@/lib/landing'
  *  strings are passed in as props by the (server) caller so this file never
  *  pulls server-only Vertex deps into the client bundle. */
 export default function Masthead({
-  sections = [],
   labels,
 }: {
+  // `sections` is still accepted (callers pass it) but the nav that used it was
+  // removed; kept in the type so call sites don't need to change.
   sections?: LandingSection[]
   labels?: { est?: string; editor?: string }
 }) {
@@ -17,17 +18,18 @@ export default function Masthead({
     <header className="site-masthead">
       <div className="mh-bar">
         <span className="mh-eyebrow">{est}</span>
+        <span className="mh-eyebrow mh-eyebrow--right">Long-form · Investigative</span>
       </div>
 
       <div className="mh-brand">
         <Link href="/" className="mh-wordmark">
           Reporters Desk
         </Link>
+        <span className="mh-rule" aria-hidden />
         <span className="mh-sub">
-          Abhishek Angad <em className="mh-sub-ink">INK</em>
+          Abhishek Angad <em className="mh-sub-ink">Ink</em>
         </span>
       </div>
-
     </header>
   )
 }

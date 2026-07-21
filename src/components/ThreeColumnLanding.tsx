@@ -2,15 +2,14 @@
 
 import { useState, type CSSProperties } from 'react'
 import Masthead from './Masthead'
-import SimulationBackground from './sims/SimulationBackground'
 import { buildCards, type LandingData } from '@/lib/landing'
 import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
 
-/** Phase 6 — full-bleed three-column grid. The simulation IS the background;
- *  three minimal-text columns float over it (real stories, backfilled with
- *  editorial desks so it's never half-empty), and hovering a column lifts it
- *  on the z-axis while the network leans toward it. Palette + simulation come
- *  from the Design Studio global. */
+/** Phase 6 — full-bleed three-column grid. Three minimal-text columns over a
+ *  clean palette background (real stories, backfilled with editorial desks so
+ *  it's never half-empty); hovering a column lifts it on the z-axis and dims
+ *  the others. The floating plexus background was removed by request — it read
+ *  as a stray "web" with no purpose. Palette comes from the Design Studio. */
 export default function ThreeColumnLanding({ data }: { data: LandingData }) {
   const [hovered, setHovered] = useState<number | null>(null)
   // Exactly three stories — one per full-bleed column, each running deep.
@@ -19,11 +18,6 @@ export default function ThreeColumnLanding({ data }: { data: LandingData }) {
 
   return (
     <div className="landing landing--three-column" style={designCssVars(design) as CSSProperties}>
-      <SimulationBackground
-        design={design}
-        className="landing-canvas landing-canvas--fixed"
-        focusIndex={hovered}
-      />
       <Masthead sections={data.sections} labels={data.labels} />
 
       {cards.length > 0 ? (
