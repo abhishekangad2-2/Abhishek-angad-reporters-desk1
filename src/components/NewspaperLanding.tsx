@@ -15,7 +15,6 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
   const cards = buildCards(data, 3).slice(0, 3)
   const lead = cards[0]
   const secondary = cards.slice(1, 3)
-  const briefs = cards.slice(3, 7)
 
   const leadImgRef = useRef<HTMLImageElement>(null)
   const linksRef = useRef<HTMLCanvasElement>(null)
@@ -192,17 +191,6 @@ export default function NewspaperLanding({ data }: { data: LandingData }) {
               ))}
             </aside>
           </div>
-
-          {briefs.length > 0 && (
-            <div className="np-briefs">
-              {briefs.map((c, i) => (
-                <a key={i} href={c.href} className="np-brief">
-                  <span className="np-kicker">{c.kicker}</span>
-                  <h4 data-headline>{c.headline}</h4>
-                </a>
-              ))}
-            </div>
-          )}
         </main>
       ) : (
         <p className="landing-empty">No published stories yet.</p>

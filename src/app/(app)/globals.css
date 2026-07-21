@@ -592,10 +592,12 @@ a {
    nearest each row's centre blooms forward; the others dim. Hover draws
    plexus lines (teal within a row, gold across rows) on .xy-links. */
 .landing--z-pattern {
-  background: var(--ink);
-  /* Text = paper so it always contrasts the ink background, and flips with a
-     dark palette (where --ink is light) instead of being a fixed near-white. */
-  color: var(--paper-cool);
+  /* Track the palette's PAGE background (paper) + ink text, exactly like the
+     three-column and newspaper layouts, so all four stay visually consistent
+     under any Design Studio preset (dark presets → dark page, not an inverted
+     light one). */
+  background: var(--paper-cool);
+  color: var(--ink);
 }
 
 /* Full-bleed grid: give it the palette's paper background (page bg comes from

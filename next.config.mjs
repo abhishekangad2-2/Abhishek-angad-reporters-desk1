@@ -10,7 +10,10 @@ const nextConfig = {
     ],
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Build fails loud on type errors (tsc is clean). A failed build is
+    // fail-safe: the deploy job's docker build stops, no new revision ships,
+    // and prod keeps serving the last good image.
+    ignoreBuildErrors: false,
   },
   eslint: {
     ignoreDuringBuilds: true,
