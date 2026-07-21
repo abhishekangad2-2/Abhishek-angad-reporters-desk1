@@ -76,4 +76,4 @@ jobs:
           # Preserve the Cloud SQL socket connection the DATABASE_URI relies on.
           # 2Gi memory: Payload + sharp image processing and large video uploads
           # (100MB+) need headroom beyond the 512Mi default.
-          flags: '--add-cloudsql-instances=abhishek-angad-reporters-desk1:us-central1:reportersdesk-db --memory=2Gi --cpu=2 --min-instances=1'
+          flags: '--add-cloudsql-instances=abhishek-angad-reporters-desk1:us-central1:reportersdesk-db --memory=2Gi --cpu=2'
