@@ -1539,6 +1539,13 @@ a {
   max-width: 720px;
   margin: 0 auto 2rem;
 }
+/* The lead column's divider rule + right padding belonged to the old two-column
+   grid; with the grid collapsed they leave an orphan vertical line down the
+   right of the page. */
+.story .newspaper-lead {
+  border-right: 0;
+  padding-right: 0;
+}
 
 .story-reading,
 .story .news-body {
