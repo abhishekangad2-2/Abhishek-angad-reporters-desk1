@@ -83,7 +83,12 @@
 .rd-hero-image img {
   display: block;
   width: 100%;
-  height: auto;
+  /* Fixed band regardless of source aspect ratio, so every article's lead
+     picture is the same size (a portrait hero used to run ~2x taller than a
+     landscape one). Matches .newspaper-lead-img. */
+  height: 58vh;
+  max-height: 58vh;
+  object-fit: cover;
   border-radius: var(--radius, 4px);
 }
 

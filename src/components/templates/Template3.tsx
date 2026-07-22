@@ -1,10 +1,11 @@
 import { Story } from '@/payload-types'
-import PlexusBackground from '@/components/LazyPlexus'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
 import { bylineOf, sectionNameOf, heroUrlOf } from './storyMeta'
 
-/** Newspaper design (broadsheet) at the story level: print masthead band with a
- *  faint Plexus watermark, lead column with drop-cap body, and a details rail. */
+/** Newspaper design (broadsheet) at the story level: print masthead band, then
+ *  the drop-cap body in the shared reading column with the details rail stacked
+ *  below. The Plexus watermark was removed and the grid collapsed to one column
+ *  so this article flows identically to the other templates. */
 export default function Template3({ story }: { story: Story }) {
   const heroUrl = heroUrlOf(story)
   const sectionName = sectionNameOf(story)
@@ -20,13 +21,6 @@ export default function Template3({ story }: { story: Story }) {
   return (
     <div className="story landing landing--newspaper">
       <div className="newspaper-masthead-band">
-        <PlexusBackground
-          className="landing-canvas landing-canvas--thin"
-          nodeCount={26}
-          color="#14171c"
-          lineColor="#b43d2a"
-          intensity={0.14}
-        />
         <div className="news-masthead-inner">
           <div className="news-wordmark">Reporters Desk</div>
           <div className="news-date" suppressHydrationWarning>{longDate}</div>

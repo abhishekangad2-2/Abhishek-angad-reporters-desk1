@@ -1514,7 +1514,34 @@ a {
   opacity: 0.85;
 }
 
-.story-reading {
+/* ── Article shell ──────────────────────────────────────────────────────
+   Every story reads on the same paper, in the same measure, at the same type
+   size — whichever of the four templates it uses. Only the hero/masthead
+   differs. Without this, the newspaper template read on sepia in a grid
+   column while the others read on cool paper in a centred panel. */
+.story.landing--three-column,
+.story.landing--z-pattern,
+.story.landing--newspaper {
+  background: var(--paper-cool);
+  color: var(--ink);
+}
+
+/* The newspaper story collapses its three-column grid to the single centred
+   column the other templates use, so the asides stack below instead of
+   leaving a half-empty rail of blank space beside the article. */
+.story .newspaper-grid {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.story .newspaper-secondary,
+.story .newspaper-briefs {
+  max-width: 720px;
+  margin: 0 auto 2rem;
+}
+
+.story-reading,
+.story .news-body {
   position: relative;
   z-index: 2;
   max-width: 720px;
@@ -1532,7 +1559,9 @@ a {
   background: rgba(239, 238, 232, 0.88);
   backdrop-filter: blur(2px);
   border-radius: var(--radius);
-  padding: 2.5rem clamp(1.25rem, 4vw, 3rem);
+  /* Same padding as the base measure — a wider clamp here made the line length
+     in templates 1/2 ~48px shorter than the newspaper template's. */
+  padding: 2.5rem 1.5rem;
   color: var(--ink);
 }
 
@@ -1730,7 +1759,11 @@ a {
 .newspaper-lead-img {
   display: block;
   width: 100%;
-  height: auto;
+  /* Matches .rd-hero-image img — a portrait source must not balloon the lead
+     to a full screen while a landscape one stays short. */
+  height: 58vh;
+  max-height: 58vh;
+  object-fit: cover;
   margin: 0 0 1.5rem;
   border-radius: var(--radius);
 }
