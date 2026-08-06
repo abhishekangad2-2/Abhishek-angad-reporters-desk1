@@ -11,6 +11,7 @@ import { Sections } from './collections/Sections'
 import { Issues } from './collections/Issues'
 import { Media } from './collections/Media'
 import { LiveDispatches } from './collections/LiveDispatches'
+import { Archive } from './collections/Archive'
 import { Polls } from './collections/Polls'
 import { Subscriptions } from './collections/Subscriptions'
 import { Transactions } from './collections/Transactions'
@@ -67,6 +68,7 @@ export default buildConfig({
     LiveDispatches, Polls, Newsletters, NewsletterSubscribers,
     Subscriptions, Transactions, Payments,
     RTIRequests, InvestigateRequests,
+    Archive,
   ],
   globals: [Integrations, DesignStudio],
   plugins: [

@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { allEntries, entryBySlug, displayDate, bodyParagraphs } from '@/lib/archive'
+import { getEntries, entryBySlug, displayDate, bodyParagraphs } from '@/lib/archive'
 import '../archive.css'
 
-export function generateStaticParams() {
-  return allEntries().map((e) => ({ slug: e.slug }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
   params,
@@ -14,7 +12,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const e = entryBySlug(slug)
+  const e = entryBySlug(await getEntries(), slug)
   if (!e) return { title: 'Not found — Archive' }
   return {
     title: `${e.title} — Abhishek Angad`,
@@ -28,7 +26,7 @@ export default async function ArchiveEntryPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const e = entryBySlug(slug)
+  const e = entryBySlug(await getEntries(), slug)
   if (!e) notFound()
 
   const paras = bodyParagraphs(e)

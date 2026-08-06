@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { entriesByCategory, allEntries, displayDate } from '@/lib/archive'
+import { getEntries, entriesByCategory, displayDate } from '@/lib/archive'
 import './archive.css'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Abhishek Angad — Reportage Archive',
@@ -9,9 +11,10 @@ export const metadata: Metadata = {
     'A collected archive of reportage by Abhishek Angad — politics, investigations, health, climate and criminal justice — published in The Indian Express and Hindustan Times.',
 }
 
-export default function ArchiveIndex() {
-  const groups = entriesByCategory()
-  const total = allEntries().length
+export default async function ArchiveIndex() {
+  const entries = await getEntries()
+  const groups = entriesByCategory(entries)
+  const total = entries.length
 
   return (
     <div className="arc">

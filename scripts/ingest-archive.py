@@ -152,9 +152,13 @@ entries, report, seen = [], [], set()
 for cat, folder in FOLDERS.items():
     if not os.path.isdir(folder):
         report.append((cat, "MISSING FOLDER", "", 0)); continue
-    for fn in sorted(os.listdir(folder)):
-        if not fn.lower().endswith(".pdf"): continue
-        path = os.path.join(folder, fn)
+    # recurse — some beats (Investigations) keep PDFs in subfolders
+    pdfpaths = []
+    for root, _dirs, files in os.walk(folder):
+        for fn in files:
+            if fn.lower().endswith(".pdf"): pdfpaths.append(os.path.join(root, fn))
+    for path in sorted(pdfpaths):
+        fn = os.path.basename(path)
         txt = pdftext(path)
         title = clean_title(fn)
         if EXCLUDE.search(title): continue
