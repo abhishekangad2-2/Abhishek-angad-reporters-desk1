@@ -1,0 +1,268 @@
+/* Personal reportage archive (/archive). Self-contained palette (independent of
+   the Design Studio injection) so it always renders on clean paper. Uses the
+   site's global font vars (Playfair display / Libre Franklin / IBM Plex mono). */
+.arc {
+  --paper: #efeee8;
+  --ink: #14171c;
+  --ink-soft: #55575c;
+  --line: #d7d4c8;
+  --accent: #b43d2a;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+/* ---- masthead ---- */
+.arc-masthead {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 4rem) 1.5rem 0;
+  text-align: center;
+}
+.arc-eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.arc-wordmark {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 900;
+  font-size: clamp(2.6rem, 8vw, 5.5rem);
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  margin: 0.4rem 0 0;
+  text-transform: uppercase;
+}
+.arc-rule {
+  display: block;
+  width: min(460px, 70%);
+  height: 4px;
+  margin: clamp(0.8rem, 2vw, 1.2rem) auto 0.8rem;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.5;
+}
+.arc-tagline {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ---- bio + awards ---- */
+.arc-bio {
+  max-width: 720px;
+  margin: clamp(1.6rem, 4vw, 2.6rem) auto 0;
+  padding: 0 1.5rem;
+}
+.arc-bio > p {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.05rem, 1.8vw, 1.28rem);
+  line-height: 1.6;
+  text-align: center;
+  margin: 0 0 1.4rem;
+}
+.arc-bio em { font-style: italic; }
+.arc-awards {
+  list-style: none;
+  margin: 0 auto;
+  padding: 1.1rem 1.25rem;
+  max-width: 560px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  display: grid;
+  gap: 0.7rem;
+}
+.arc-awards li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+.arc-award-badge {
+  flex-shrink: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+}
+
+/* ---- beat jump nav ---- */
+.arc-jump {
+  max-width: 1000px;
+  margin: clamp(1.8rem, 4vw, 2.8rem) auto 0;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.arc-jump a {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  transition: border-color 0.15s, color 0.15s;
+}
+.arc-jump a:hover { border-color: var(--accent); color: var(--accent); }
+.arc-jump a span { color: var(--accent); font-weight: 700; }
+
+/* ---- beats + article list ---- */
+.arc-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 3.5rem) 1.5rem 4rem;
+}
+.arc-beat { margin-top: clamp(2.2rem, 5vw, 3.4rem); scroll-margin-top: 1rem; }
+.arc-beat:first-child { margin-top: 0; }
+.arc-beat-h {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--ink);
+}
+.arc-beat-count {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  color: var(--accent);
+  vertical-align: super;
+}
+.arc-list { list-style: none; margin: 0; padding: 0; }
+.arc-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.arc-item-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 700;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.25;
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-block;
+}
+.arc-item-title:hover { color: var(--accent); }
+.arc-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin: 0.35rem 0 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+.arc-outlet { color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.arc-item-dek {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0.45rem 0 0;
+  max-width: 62ch;
+}
+
+/* ---- footer ---- */
+.arc-foot {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.arc-foot a { color: var(--accent); text-decoration: none; }
+
+/* ---- reading view (single entry) ---- */
+.arc--reading { background: var(--paper); }
+.arc-entry {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 3rem) 1.5rem 5rem;
+}
+.arc-back {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 1.6rem;
+}
+.arc-back--foot { margin: 2.5rem 0 0; }
+.arc-entry-kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.arc-entry-head {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0.4rem 0 0;
+}
+.arc-entry-dek {
+  font-family: var(--font-display, Georgia, serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0.7rem 0 0;
+}
+.arc-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1.1rem 0 0;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+.arc-entry-by { color: var(--ink); }
+.arc-entry-outlet { color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.arc-approx { opacity: 0.7; }
+.arc-prose { margin-top: 1.8rem; }
+.arc-prose p {
+  font-family: var(--font-body, Georgia, serif);
+  font-size: 1.08rem;
+  line-height: 1.75;
+  margin: 0 0 1.25rem;
+}
+.arc-attrib {
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
