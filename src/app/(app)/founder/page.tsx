@@ -33,7 +33,7 @@ export default function FounderPage() {
     <main className="fd">
       <header className="fd-hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="fd-avatar" src="https://cdn.reportersdesk.abhishekangad.com/IMG_20240801_152018.jpg" alt="Abhishek Angad" />
+        <img className="fd-avatar" src="https://cdn.reporters-desk.org/IMG_20240801_152018.jpg" alt="Abhishek Angad" />
         <p className="fd-kicker">Founder &amp; reporter</p>
         <h1 className="fd-name">Abhishek Angad</h1>
         <p className="fd-lede">
@@ -57,7 +57,7 @@ export default function FounderPage() {
 
       <footer className="fd-foot">
         <Link href="/">← Back to ReportersDesk</Link>
-        <a href="mailto:desk@reportersdesk.abhishekangad.com">Get in touch</a>
+        <a href="mailto:desk@reporters-desk.org">Get in touch</a>
       </footer>
     </main>
   )

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getLandingData } from '@/lib/landing.server'
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://reportersdesk.abhishekangad.com'
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://reporters-desk.org'
 
 export const dynamic = 'force-dynamic'
 

@@ -65,7 +65,7 @@ export const Newsletters: CollectionConfig = {
       async ({ doc, previousDoc, req, operation }) => {
         if (!(operation === 'update' && doc.status === 'sent' && previousDoc.status !== 'sent')) return
         const resendKey = process.env.RESEND_API_KEY
-        const fromAddr = process.env.NEWSLETTER_FROM || 'newsletter@reportersdesk.abhishekangad.com'
+        const fromAddr = process.env.NEWSLETTER_FROM || 'newsletters@reporters-desk.org'
         if (!resendKey || resendKey === 'none') {
           req.payload.logger.warn(`[Newsletter] RESEND_API_KEY not set — '${doc.subject}' not dispatched.`)
           return

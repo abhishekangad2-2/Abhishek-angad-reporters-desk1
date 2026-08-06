@@ -2,7 +2,7 @@
 // Used by story pages so search engines (and Google News) get rich, accurate
 // structured data. Everything degrades gracefully when fields are missing.
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://reportersdesk.abhishekangad.com').replace(
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://reporters-desk.org').replace(
   /\/$/,
   '',
 )

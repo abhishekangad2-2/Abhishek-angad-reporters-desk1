@@ -65,7 +65,7 @@ export default function Template3({ story }: { story: Story }) {
 
         <aside className="newspaper-briefs" aria-labelledby="np-have-tip">
           <h2 id="np-have-tip" className="newspaper-aside-h">Have a tip?</h2>
-          <a className="news-tip" href="mailto:tips@reportersdesk.abhishekangad.com">
+          <a className="news-tip" href="mailto:tips@reporters-desk.org">
             Contact us securely →
           </a>
         </aside>

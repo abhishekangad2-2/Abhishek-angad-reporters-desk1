@@ -5,6 +5,7 @@ const nextConfig = {
   output: 'standalone',
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: 'cdn.reporters-desk.org' },
       { protocol: 'https', hostname: 'cdn.reportersdesk.abhishekangad.com' },
       { protocol: 'https', hostname: 'storage.googleapis.com' },
     ],

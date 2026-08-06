@@ -21,7 +21,7 @@ type Dispatch = {
 
 type Freq = 'all' | 'breaking' | 'off'
 
-const SITE_URL = 'https://reportersdesk.abhishekangad.com'
+const SITE_URL = 'https://reporters-desk.org'
 const POLL_MS = 20_000
 const COOLDOWN_MS = 36 * 60 * 60 * 1000 // 36h, within the spec's 24–48h
 const DWELL_MS = 45_000
