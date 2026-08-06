@@ -56,18 +56,23 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return cmsGate(request)
   }
 
-  // (2) Archive host: root → archive index; bare slug → archive entry; old
-  //     publication paths → canonical. Admin/API/archive routes pass through.
+  // (2) Archive host: clean root URLs. / → archive index; bare slug → archive
+  //     entry; old publication paths → canonical. The internal /archive route is
+  //     never public here — direct hits redirect to the clean root form.
   if (host === ARCHIVE_HOST) {
     if (
       pathname.startsWith('/api') ||
-      pathname.startsWith('/archive') ||
       pathname.startsWith('/admin-login') ||
       pathname.startsWith('/cms')
     ) {
       return NextResponse.next()
     }
+    if (pathname === '/archive' || pathname.startsWith('/archive/')) {
+      const rest = pathname.slice('/archive'.length) || '/'
+      return NextResponse.redirect(new URL(rest, request.url), 301)
+    }
     if (pathname === '/') {
+      // internal rewrite (URL stays "/"); middleware does not re-run on the target
       return NextResponse.rewrite(new URL('/archive', request.url))
     }
     const parts = pathname.split('/').filter(Boolean)
@@ -75,11 +80,16 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (parts.length > 1 || PUB_PREFIXES.has(parts[0])) {
       return NextResponse.redirect(CANONICAL + pathname, 301)
     }
-    // Single bare segment → treat as an archive entry slug.
+    // Single bare segment → the archive entry, served at the clean URL.
     return NextResponse.rewrite(new URL(`/archive/${parts[0]}`, request.url))
   }
 
-  // (3) Everything else (the publication on reporters-desk.org) — untouched.
+  // (3) Publication host (reporters-desk.org): the archive lives on its own
+  //     subdomain — bounce any /archive path there. Everything else untouched.
+  if (pathname === '/archive' || pathname.startsWith('/archive/')) {
+    const rest = pathname.slice('/archive'.length) || '/'
+    return NextResponse.redirect(`https://${ARCHIVE_HOST}${rest}`, 301)
+  }
   return NextResponse.next()
 }
 

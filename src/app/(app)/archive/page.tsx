@@ -63,7 +63,7 @@ export default async function ArchiveIndex() {
             <ul className="arc-list">
               {g.entries.map((e) => (
                 <li key={e.slug} className="arc-item">
-                  <Link href={`/archive/${e.slug}`} className="arc-item-title">
+                  <Link href={`/${e.slug}`} className="arc-item-title">
                     {e.title}
                   </Link>
                   <div className="arc-item-meta">

@@ -34,7 +34,7 @@ export default async function ArchiveEntryPage({
   return (
     <div className="arc arc--reading">
       <div className="arc-entry">
-        <Link href="/archive" className="arc-back">
+        <Link href="/" className="arc-back">
           ← Archive
         </Link>
 
@@ -64,7 +64,7 @@ export default async function ArchiveEntryPage({
           </p>
         )}
 
-        <Link href="/archive" className="arc-back arc-back--foot">
+        <Link href="/" className="arc-back arc-back--foot">
           ← Back to the archive
         </Link>
       </div>
