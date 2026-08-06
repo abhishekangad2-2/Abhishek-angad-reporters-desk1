@@ -18,7 +18,12 @@ export default function Masthead({
     <header className="site-masthead">
       <div className="mh-bar">
         <span className="mh-eyebrow">{est}</span>
-        <span className="mh-eyebrow mh-eyebrow--right">Long-form · Investigative</span>
+        <a
+          className="mh-eyebrow mh-eyebrow--right mh-archives"
+          href="https://reportersdesk.abhishekangad.com"
+        >
+          Archives ↗
+        </a>
       </div>
 
       <div className="mh-brand">

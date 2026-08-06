@@ -1314,6 +1314,21 @@ a {
   opacity: 0.85;
 }
 
+/* Archives tab — a real link to the clips archive subdomain. */
+.mh-archives {
+  text-decoration: none;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  opacity: 1;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.mh-archives:hover {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .mh-editor {
   font-family: var(--font-mono);
   font-size: 0.68rem;
