@@ -1,9 +1,9 @@
 name: CI
 
 on:
+  # PR-only. Push-to-main is already lint-gated + built by the Deploy workflow,
+  # so running the full suite again on every push just doubled the notifications.
   pull_request:
-  push:
-    branches: [main]
 
 jobs:
   build-and-test:
