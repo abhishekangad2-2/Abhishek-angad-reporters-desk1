@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getEntries, entryBySlug, displayDate, bodyParagraphs } from '@/lib/archive'
-import { readLocale, translateBatchChunked } from '@/lib/translate.server'
+import { readLocale, translateBatch, translateBatchChunked } from '@/lib/translate.server'
 import { DEFAULT_LOCALE } from '@/lib/i18n'
 import '../archive.css'
 
@@ -42,11 +42,17 @@ export default async function ArchiveEntryPage({
   let dek = e.dek
   let paras = bodyParagraphs(e)
   if (locale !== DEFAULT_LOCALE) {
-    const t = await translateBatchChunked([e.category, e.title, e.dek, ...paras], locale)
-    category = t[0] ?? e.category
-    title = t[1] ?? e.title
-    dek = t[2] ?? e.dek
-    paras = t.slice(3)
+    // Metadata (short) and body (long paragraphs) translate separately so a big
+    // body chunk can't drop the headline. Body uses a small chunk so each
+    // model call stays parseable.
+    const [meta, body] = await Promise.all([
+      translateBatch([e.category, e.title, e.dek], locale),
+      translateBatchChunked(paras, locale, 6),
+    ])
+    category = meta[0] ?? e.category
+    title = meta[1] ?? e.title
+    dek = meta[2] ?? e.dek
+    paras = body
   }
 
   return (
