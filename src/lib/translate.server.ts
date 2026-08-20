@@ -70,6 +70,21 @@ ${JSON.stringify(missTexts)}`
   return result
 }
 
+/** translateBatch, but split into chunks so a large set (e.g. the 127-entry
+ *  archive index) never overflows a single model prompt. Chunks run in parallel
+ *  and results are cached per string, so later requests are instant. */
+export async function translateBatchChunked(
+  texts: string[],
+  localeCode: string,
+  chunkSize = 40,
+): Promise<string[]> {
+  if (localeCode === 'en' || texts.length === 0) return texts
+  const chunks: string[][] = []
+  for (let i = 0; i < texts.length; i += chunkSize) chunks.push(texts.slice(i, i + chunkSize))
+  const out = await Promise.all(chunks.map((c) => translateBatch(c, localeCode)))
+  return out.flat()
+}
+
 /** Translate a single short label (e.g. "Editor login"). Cached. */
 export async function tr(label: string, localeCode: string): Promise<string> {
   if (localeCode === 'en' || !label) return label

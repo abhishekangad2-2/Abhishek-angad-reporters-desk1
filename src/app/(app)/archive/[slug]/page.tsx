@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getEntries, entryBySlug, displayDate, bodyParagraphs } from '@/lib/archive'
+import { readLocale, translateBatchChunked } from '@/lib/translate.server'
+import { DEFAULT_LOCALE } from '@/lib/i18n'
 import '../archive.css'
 
 export const dynamic = 'force-dynamic'
@@ -22,14 +24,30 @@ export async function generateMetadata({
 
 export default async function ArchiveEntryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ lang?: string | string[] }>
 }) {
   const { slug } = await params
+  const sp = await searchParams
+  const locale = await readLocale(sp.lang)
   const e = entryBySlug(await getEntries(), slug)
   if (!e) notFound()
 
-  const paras = bodyParagraphs(e)
+  // Render in the visitor's language when a non-English locale is active. The
+  // outlet name + date stay as-is (proper noun / already localised by display).
+  let category = e.category
+  let title = e.title
+  let dek = e.dek
+  let paras = bodyParagraphs(e)
+  if (locale !== DEFAULT_LOCALE) {
+    const t = await translateBatchChunked([e.category, e.title, e.dek, ...paras], locale)
+    category = t[0] ?? e.category
+    title = t[1] ?? e.title
+    dek = t[2] ?? e.dek
+    paras = t.slice(3)
+  }
 
   return (
     <div className="arc arc--reading">
@@ -38,9 +56,9 @@ export default async function ArchiveEntryPage({
           ← Archive
         </Link>
 
-        <span className="arc-entry-kicker">{e.category}</span>
-        <h1 className="arc-entry-head">{e.title}</h1>
-        {e.dek && <p className="arc-entry-dek">{e.dek}</p>}
+        <span className="arc-entry-kicker">{category}</span>
+        <h1 className="arc-entry-head">{title}</h1>
+        {dek && <p className="arc-entry-dek">{dek}</p>}
 
         <div className="arc-entry-meta">
           <span className="arc-entry-by">By Abhishek Angad</span>

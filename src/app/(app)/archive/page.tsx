@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getEntries, entriesByCategory, displayDate } from '@/lib/archive'
+import { readLocale, translateBatch, translateBatchChunked } from '@/lib/translate.server'
+import { DEFAULT_LOCALE } from '@/lib/i18n'
 import './archive.css'
 
 export const dynamic = 'force-dynamic'
@@ -11,10 +13,34 @@ export const metadata: Metadata = {
     'A collected archive of reportage by Abhishek Angad — politics, investigations, health, climate and criminal justice — published in The Indian Express and Hindustan Times.',
 }
 
-export default async function ArchiveIndex() {
-  const entries = await getEntries()
-  const groups = entriesByCategory(entries)
+export default async function ArchiveIndex({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string | string[] }>
+}) {
+  const sp = await searchParams
+  const locale = await readLocale(sp.lang)
+
+  let entries = await getEntries()
   const total = entries.length
+
+  // Translate each entry's title + dek (content) when a non-English locale is
+  // active — the archive reads in the visitor's language, like the publication.
+  const catLabel = new Map<string, string>()
+  if (locale !== DEFAULT_LOCALE) {
+    const strings = entries.flatMap((e) => [e.title, e.dek])
+    const t = await translateBatchChunked(strings, locale)
+    entries = entries.map((e, i) => ({ ...e, title: t[i * 2] ?? e.title, dek: t[i * 2 + 1] ?? e.dek }))
+  }
+
+  const groups = entriesByCategory(entries)
+
+  if (locale !== DEFAULT_LOCALE) {
+    const cats = groups.map((g) => g.category)
+    const tc = await translateBatch(cats, locale)
+    cats.forEach((c, i) => catLabel.set(c, tc[i] ?? c))
+  }
+  const label = (cat: string) => catLabel.get(cat) ?? cat
 
   return (
     <div className="arc">
@@ -49,7 +75,7 @@ export default async function ArchiveIndex() {
       <nav className="arc-jump" aria-label="Beats">
         {groups.map((g) => (
           <a key={g.category} href={`#${slugId(g.category)}`}>
-            {g.category} <span>{g.entries.length}</span>
+            {label(g.category)} <span>{g.entries.length}</span>
           </a>
         ))}
       </nav>
