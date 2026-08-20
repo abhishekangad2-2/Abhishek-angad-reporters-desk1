@@ -84,7 +84,7 @@ export default async function ArchiveIndex({
         {groups.map((g) => (
           <section key={g.category} id={slugId(g.category)} className="arc-beat">
             <h2 className="arc-beat-h">
-              {g.category} <span className="arc-beat-count">{g.entries.length}</span>
+              {label(g.category)} <span className="arc-beat-count">{g.entries.length}</span>
             </h2>
             <ul className="arc-list">
               {g.entries.map((e) => (
