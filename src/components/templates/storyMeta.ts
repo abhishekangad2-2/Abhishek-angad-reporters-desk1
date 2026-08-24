@@ -16,7 +16,7 @@ export function heroUrlOf(story: Story): string | null {
 export function heroCreditOf(story: Story): { credit: string | null; source: string | null } {
   const h: any = story.heroMedia
   if (!h || typeof h !== 'object') return { credit: null, source: null }
-  return { credit: h.credit ?? null, source: h.source ?? null }
+  return { credit: (h.credit ?? '').trim() || null, source: (h.source ?? '').trim() || null }
 }
 
 /** "Photograph: <credit> · Source: <source>" — omitting whichever is absent. */

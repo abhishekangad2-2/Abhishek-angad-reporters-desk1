@@ -22,8 +22,8 @@ function heroDetail(story: Story): {
     height: h.height ?? null,
     mime: h.mimeType ?? '',
     id: h.id,
-    credit: h.credit ?? null,
-    source: h.source ?? null,
+    credit: (h.credit ?? '').trim() || null,
+    source: (h.source ?? '').trim() || null,
   }
 }
 
