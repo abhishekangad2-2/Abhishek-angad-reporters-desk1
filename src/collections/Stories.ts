@@ -2,6 +2,7 @@ import type { Block, CollectionConfig } from 'payload'
 import { lexicalEditor, UploadFeature } from '@payloadcms/richtext-lexical'
 import { generateReadDeeperHook } from '../hooks/generateReadDeeper'
 import { isEditorOrAbove, isReporterOrAbove, roleOf } from '../lib/access'
+import { FolderUploadFeature } from '../lib/lexical/folderUpload'
 
 // Prose editor with inline images: the default Lexical feature set plus an
 // UploadFeature so writers can drop a captioned/credited photo from the Media
@@ -20,6 +21,7 @@ const proseEditor = lexicalEditor({
         },
       },
     }),
+    FolderUploadFeature(),
   ],
 })
 
