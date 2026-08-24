@@ -14,6 +14,7 @@ export const CHROME_DEFAULT = {
   bio: 'About the founder',
   photograph: 'Photograph',
   source: 'Source',
+  support: 'Support',
 } as const
 
 export type ChromeLabels = Record<keyof typeof CHROME_DEFAULT, string>

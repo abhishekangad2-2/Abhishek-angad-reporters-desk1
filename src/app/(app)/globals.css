@@ -1479,6 +1479,19 @@ a {
   opacity: 1;
   color: var(--accent);
 }
+/* Support reads as a small CTA, not just another nav item. */
+.mh-nav a.mh-support {
+  opacity: 1;
+  color: var(--accent, #b43d2a);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.18em 0.7em;
+  font-weight: 700;
+}
+.mh-nav a.mh-support:hover {
+  background: var(--accent, #b43d2a);
+  color: #fff;
+}
 
 /* ============ THE WIRE — live dispatch feed (homepage section + /wire) ======
    Self-contained light palette so it reads cleanly under any homepage preset. */

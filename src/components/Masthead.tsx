@@ -30,6 +30,7 @@ export default function Masthead({
           <a href="#wire">{c.wire}</a>
           <Link href="/podcast">{c.podcast}</Link>
           <a href="https://reportersdesk.abhishekangad.com">{c.archives} ↗</a>
+          <Link href="/support" className="mh-support">{c.support}</Link>
         </nav>
       </div>
     </header>
