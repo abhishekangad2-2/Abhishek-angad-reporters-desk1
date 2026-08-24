@@ -92,6 +92,16 @@
   border-radius: var(--radius, 4px);
 }
 
+/* On phones a 74vh cover crop turns a wide establishing shot into a tall,
+   cropped sliver. Show the whole photo at its natural aspect instead. */
+@media (max-width: 640px) {
+  .rd-hero-image img {
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+}
+
 .rd-hero-image figcaption {
   font-family: var(--font-mono);
   font-size: 0.9rem;

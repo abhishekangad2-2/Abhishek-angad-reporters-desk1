@@ -31,13 +31,31 @@ function renderLexicalNode(node: any, key: string | number): React.ReactNode {
     case 'root':
       return <>{node.children?.map((child: any, i: number) => renderLexicalNode(child, i))}</>
 
-    case 'paragraph':
+    case 'paragraph': {
       if (!node.children?.length) return <br key={key} />
+      // Auto-embed: a paragraph whose entire text is a YouTube/Vimeo URL (pasted
+      // straight into the editor) renders as a player instead of a raw link.
+      const only = nodePlainText(node).trim()
+      if (only && isEmbeddableVideoUrl(only)) {
+        const { src, portrait } = toEmbed(only)
+        return (
+          <div key={key} className={`rd-embed${portrait ? ' rd-embed--portrait' : ''}`}>
+            <iframe
+              src={src}
+              title="Embedded video"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowFullScreen
+              loading="lazy"
+            />
+          </div>
+        )
+      }
       return (
         <p key={key}>
           {node.children.map((child: any, i: number) => renderLexicalNode(child, i))}
         </p>
       )
+    }
 
     case 'heading': {
       const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
@@ -364,6 +382,19 @@ function toEmbed(url: string): { src: string; portrait: boolean } {
   const vm = url.match(/vimeo\.com\/(\d+)/)
   if (vm) return { src: `https://player.vimeo.com/video/${vm[1]}`, portrait: false }
   return { src: url, portrait: false }
+}
+
+// True when a string is a YouTube/Vimeo link we can turn into an embed.
+function isEmbeddableVideoUrl(s: string): boolean {
+  return /(?:youtube\.com\/(?:watch\?v=|embed\/|live\/|shorts\/)|youtu\.be\/|vimeo\.com\/\d+)/.test(s)
+}
+
+// Flatten a Lexical node's visible text (used to detect a URL-only paragraph).
+function nodePlainText(node: any): string {
+  if (!node) return ''
+  if (node.type === 'text') return node.text ?? ''
+  if (Array.isArray(node.children)) return node.children.map(nodePlainText).join('')
+  return ''
 }
 
 function VideoBlock({ block }: { block: any }) {
