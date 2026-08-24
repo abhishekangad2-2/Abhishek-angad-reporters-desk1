@@ -83,6 +83,46 @@ function renderLexicalNode(node: any, key: string | number): React.ReactNode {
     case 'linebreak':
       return <br key={key} />
 
+    case 'upload': {
+      // Inline image/video dropped into the Prose editor via UploadFeature.
+      // The populated media doc sits on `node.value`; caption/credit (defined
+      // on the feature) come through on `node.fields`.
+      const { url, width, height, mime } = mediaDetail(node.value)
+      if (!url) return null
+      const caption: string | undefined = node.fields?.caption
+      const credit: string | undefined = node.fields?.credit
+      const cap = (
+        (caption || credit) && (
+          <figcaption className="text-xs font-mono text-ink-soft mt-2">
+            {caption}
+            {caption && credit ? ' · ' : ''}
+            {credit && <span>{credit}</span>}
+          </figcaption>
+        )
+      )
+      if (isVideoMedia(mime, url)) {
+        return (
+          <figure key={key} className="vm-photo my-8">
+            <StoryVideo fallbackUrl={url} width={width} height={height} />
+            {cap}
+          </figure>
+        )
+      }
+      return (
+        <figure key={key} className="vm-photo my-8">
+          <Image
+            src={url}
+            alt={caption ?? ''}
+            width={width ?? 1600}
+            height={height ?? 1000}
+            sizes="(min-width: 720px) 720px, 100vw"
+            className="w-full h-auto rounded"
+          />
+          {cap}
+        </figure>
+      )
+    }
+
     case 'text': {
       let content: React.ReactNode = node.text
       // Payload stores formatting as a bitmask on `format`

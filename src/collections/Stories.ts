@@ -1,6 +1,27 @@
 import type { Block, CollectionConfig } from 'payload'
+import { lexicalEditor, UploadFeature } from '@payloadcms/richtext-lexical'
 import { generateReadDeeperHook } from '../hooks/generateReadDeeper'
 import { isEditorOrAbove, isReporterOrAbove, roleOf } from '../lib/access'
+
+// Prose editor with inline images: the default Lexical feature set plus an
+// UploadFeature so writers can drop a captioned/credited photo from the Media
+// library directly between paragraphs (rendered by LexicalRenderer's 'upload'
+// case). Used for the story body Prose block and immersive chapter content.
+const proseEditor = lexicalEditor({
+  features: ({ defaultFeatures }) => [
+    ...defaultFeatures,
+    UploadFeature({
+      collections: {
+        media: {
+          fields: [
+            { name: 'caption', type: 'text' },
+            { name: 'credit', type: 'text' },
+          ],
+        },
+      },
+    }),
+  ],
+})
 
 const SinglePictureBlock: Block = {
   slug: 'SinglePicture',
@@ -351,7 +372,7 @@ export const Stories: CollectionConfig = {
               blocks: [
                 {
                   slug: 'Prose',
-                  fields: [{ name: 'content', type: 'richText', required: true }]
+                  fields: [{ name: 'content', type: 'richText', required: true, editor: proseEditor }]
                 },
                 ...VISUAL_MEDIA_BLOCKS,
               ],
@@ -506,6 +527,7 @@ export const Stories: CollectionConfig = {
                   name: 'content',
                   type: 'richText',
                   required: true,
+                  editor: proseEditor,
                 },
                 {
                   name: 'alignment',
