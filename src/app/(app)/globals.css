@@ -1122,10 +1122,20 @@ a {
 }
 
 .im-figure {
-  margin: 14vh -8vw;
+  margin: 16vh -15vw;
   opacity: 0;
   transform: scale(0.96);
   transition: opacity 1.1s ease, transform 1.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* The first image is the establishing shot — give it the widest bleed and a
+   commanding min-height so it lands like a proper opening frame. */
+.im-flow .im-figure:first-of-type {
+  margin: 12vh -19vw 18vh;
+}
+.im-flow .im-figure:first-of-type img {
+  min-height: 62vh;
+  object-fit: cover;
 }
 
 .im-figure.in {
@@ -1142,10 +1152,11 @@ a {
 
 .im-figure figcaption {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
   color: var(--ink-soft);
-  margin-top: 0.7rem;
-  letter-spacing: 0.04em;
+  margin-top: 1rem;
+  letter-spacing: 0.03em;
 }
 
 .im-quote {
@@ -1280,8 +1291,12 @@ a {
   .im-graph-label {
     display: none;
   }
-  .im-figure {
+  .im-figure,
+  .im-flow .im-figure:first-of-type {
     margin: 12vh 0;
+  }
+  .im-flow .im-figure:first-of-type img {
+    min-height: 44vh;
   }
 }
 
