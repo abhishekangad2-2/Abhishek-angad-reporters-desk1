@@ -38,6 +38,7 @@ export function WavePlayer({ src, title, transcript, peaks, duration: initialDur
         barRadius: 2,
         height: 56,
         normalize: true,
+        interact: false, // seeking handled explicitly below (reliable with streamed peaks)
         url: src,
         // With peaks + duration, wavesurfer renders the waveform immediately and
         // streams playback (range requests) instead of downloading the whole file.
@@ -53,6 +54,8 @@ export function WavePlayer({ src, title, transcript, peaks, duration: initialDur
         setReady(true)
       })
       ws.on('audioprocess', (t: number) => setCurrentTime(t))
+      // Fires on seek too (not just playback), so the time label tracks scrubbing.
+      ws.on('timeupdate', (t: number) => setCurrentTime(t))
       ws.on('play', () => setPlaying(true))
       ws.on('pause', () => setPlaying(false))
       ws.on('finish', () => setPlaying(false))
@@ -66,6 +69,39 @@ export function WavePlayer({ src, title, transcript, peaks, duration: initialDur
   }, [src])
 
   const toggle = () => wsRef.current?.playPause()
+  const dragging = useRef(false)
+
+  // Click / drag anywhere on the waveform to seek.
+  const seekToClientX = (clientX: number) => {
+    const el = containerRef.current
+    const ws = wsRef.current
+    if (!el || !ws) return
+    const rect = el.getBoundingClientRect()
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+    ws.seekTo(ratio)
+    setCurrentTime(ratio * (ws.getDuration?.() || duration || 0))
+  }
+  const onWavePointerDown = (e: React.PointerEvent) => {
+    dragging.current = true
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    seekToClientX(e.clientX)
+  }
+  const onWavePointerMove = (e: React.PointerEvent) => {
+    if (dragging.current) seekToClientX(e.clientX)
+  }
+  const endDrag = () => {
+    dragging.current = false
+  }
+
+  // Jump the audio ±seconds (podcast-style skip).
+  const skip = (delta: number) => {
+    const ws = wsRef.current
+    if (!ws) return
+    const d = ws.getDuration?.() || duration || 0
+    const t = Math.max(0, Math.min(d, (ws.getCurrentTime?.() || 0) + delta))
+    ws.setTime?.(t)
+    setCurrentTime(t)
+  }
 
   const fmt = (s: number) => {
     const m = Math.floor(s / 60)
@@ -77,6 +113,17 @@ export function WavePlayer({ src, title, transcript, peaks, duration: initialDur
     <div className="wave-player">
       {title && <div className="wave-player__title">{title}</div>}
       <div className="wave-player__controls">
+        <button
+          onClick={() => skip(-15)}
+          disabled={!ready}
+          aria-label="Back 15 seconds"
+          className="wave-player__skip"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 4 5 10l6 6" /><path d="M5 10h9a5 5 0 0 1 0 10h-3" />
+          </svg>
+          <span className="wave-player__skip-n">15</span>
+        </button>
         <button
           onClick={toggle}
           disabled={!ready}
@@ -93,7 +140,35 @@ export function WavePlayer({ src, title, transcript, peaks, duration: initialDur
             </svg>
           )}
         </button>
-        <div className="wave-player__wave" ref={containerRef} />
+        <button
+          onClick={() => skip(15)}
+          disabled={!ready}
+          aria-label="Forward 15 seconds"
+          className="wave-player__skip"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 4 19 10l-6 6" /><path d="M19 10h-9a5 5 0 0 0 0 10h3" />
+          </svg>
+          <span className="wave-player__skip-n">15</span>
+        </button>
+        <div
+          className="wave-player__wave"
+          ref={containerRef}
+          onPointerDown={onWavePointerDown}
+          onPointerMove={onWavePointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          role="slider"
+          aria-label="Seek"
+          aria-valuemin={0}
+          aria-valuemax={Math.round(duration)}
+          aria-valuenow={Math.round(currentTime)}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') skip(5)
+            else if (e.key === 'ArrowLeft') skip(-5)
+          }}
+        />
         <span className="wave-player__time">
           {ready ? `${fmt(currentTime)} / ${fmt(duration)}` : '–:–'}
         </span>

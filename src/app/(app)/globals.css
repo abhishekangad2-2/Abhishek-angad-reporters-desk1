@@ -1517,7 +1517,7 @@ a {
 }
 /* Homepage Wire runs larger and more prominent than the compact feed default;
    the /wire full page (.wire--full) keeps its own sizing. */
-.wire-home .wire { max-width: 900px; border-radius: 18px; box-shadow: 0 20px 50px -26px rgba(0, 0, 0, 0.35); }
+.wire-home .wire { max-width: 1060px; border-radius: 18px; box-shadow: 0 20px 50px -26px rgba(0, 0, 0, 0.35); }
 .wire-home .wire-head { padding: 1.15rem 1.5rem; }
 .wire-home .wire-title { font-size: 0.92rem; letter-spacing: 0.2em; }
 .wire-home .wire-dot { width: 10px; height: 10px; }
@@ -2685,6 +2685,40 @@ a {
 .wave-player__wave {
   flex: 1 1 auto;
   min-width: 0;
+  cursor: pointer;
+  touch-action: none; /* let drag-to-seek work on touch without scrolling */
+}
+.wave-player__skip {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  padding: 0.2rem;
+  color: var(--ink, #14171c);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s, color 0.15s;
+}
+.wave-player__skip:hover:not(:disabled) {
+  opacity: 1;
+  color: var(--accent, #b43d2a);
+}
+.wave-player__skip:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.wave-player__skip-n {
+  position: absolute;
+  font-size: 0.5rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -35%);
+  pointer-events: none;
 }
 .wave-player__time {
   flex: 0 0 auto;
