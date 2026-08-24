@@ -10,7 +10,7 @@ const cache = new Map<string, string>() // `${locale}::${text}` -> translation
 
 // Developer-API model (a free API key, independent of GCP project billing);
 // override with GEMINI_MODEL. Vertex uses its own model id as a fallback.
-const DEV_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash'
+const DEV_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest'
 const VERTEX_MODEL = 'gemini-2.5-flash'
 
 /** Run one prompt through whichever Gemini backend is configured, preferring
@@ -191,7 +191,8 @@ async function translateLexical(content: any, localeCode: string): Promise<any> 
   }
   walk(clone.root)
   if (nodes.length === 0) return clone
-  const translated = await translateBatch(nodes.map((n) => n.text), localeCode)
+  // Chunked + parallel so a long article body doesn't block on one huge call.
+  const translated = await translateBatchChunked(nodes.map((n) => n.text), localeCode, 20)
   nodes.forEach((n, i) => {
     n.text = translated[i] ?? n.text
   })
