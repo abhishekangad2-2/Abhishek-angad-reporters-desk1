@@ -100,6 +100,54 @@
   margin-top: 0.75rem;
 }
 
+/* Hero caption: bold descriptive line, then a muted credit/source line. Shared
+   by StoryHeader (.rd-hero-image) and the newspaper lead (.newspaper-lead-fig). */
+.rd-hero-cap {
+  display: block;
+  margin-top: 0.9rem;
+}
+.rd-hero-cap__text {
+  display: block;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--ink, #14171c);
+}
+.rd-hero-cap__credit {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.newspaper-lead-fig {
+  margin: 0 0 1.5rem;
+}
+
+/* End-of-article finish line: a full-width rule with a centered end-mark. */
+.story-end {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3.5rem 0 1.5rem;
+}
+.story-end::before,
+.story-end::after {
+  content: '';
+  flex: 1 1 0;
+  height: 1px;
+  background: var(--rule, #cfccc2);
+}
+.story-end-mark {
+  color: var(--accent, #b43d2a);
+  font-size: 0.8rem;
+  line-height: 1;
+  letter-spacing: 0.1em;
+}
+
 /* Immersive video-left / text-right hero (wide screens) */
 .rd-hero-split {
   position: relative;

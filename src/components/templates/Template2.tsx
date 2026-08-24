@@ -2,6 +2,7 @@ import { Story } from '@/payload-types'
 import Masthead from '@/components/Masthead'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
 import StoryHeader from '@/components/StoryHeader'
+import StoryEnd from '@/components/StoryEnd'
 
 /** Z-Pattern design (x/y) at the story level: an NYT-style header (full-bleed
  *  hero image, or video-left / text-right when the hero is a video), then the
@@ -15,8 +16,9 @@ export default function Template2({ story }: { story: Story }) {
       <StoryHeader story={story} />
 
       <article className="story-reading story-reading--panel">
-        {story.caption && <p className="story-caption">{story.caption}</p>}
+        {/* Hero caption + credit now live under the hero image (StoryHeader). */}
         <LayoutRenderer layout={(story as any).layout ?? []} />
+        <StoryEnd />
       </article>
     </div>
   )

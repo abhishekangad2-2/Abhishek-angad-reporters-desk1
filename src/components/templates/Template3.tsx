@@ -1,6 +1,7 @@
 import { Story } from '@/payload-types'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
-import { bylineOf, sectionNameOf, heroUrlOf } from './storyMeta'
+import { bylineOf, sectionNameOf, heroUrlOf, heroCreditLine } from './storyMeta'
+import StoryEnd from '@/components/StoryEnd'
 
 /** Newspaper design (broadsheet) at the story level: print masthead band, then
  *  the drop-cap body in the shared reading column with the details rail stacked
@@ -39,13 +40,24 @@ export default function Template3({ story }: { story: Story }) {
           </div>
 
           {heroUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="newspaper-lead-img" src={heroUrl} alt={story.headline} />
+            <figure className="newspaper-lead-fig">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="newspaper-lead-img" src={heroUrl} alt={story.headline} />
+              {(story.caption || heroCreditLine(story)) && (
+                <figcaption className="rd-hero-cap">
+                  {story.caption && <strong className="rd-hero-cap__text">{story.caption}</strong>}
+                  {heroCreditLine(story) && (
+                    <span className="rd-hero-cap__credit">{heroCreditLine(story)}</span>
+                  )}
+                </figcaption>
+              )}
+            </figure>
           )}
 
           <div className="news-body newspaper-dropcap">
-            {story.caption && <p className="story-caption">{story.caption}</p>}
+            {/* Hero caption + credit now sit under the lead image above. */}
             <LayoutRenderer layout={(story as any).layout ?? []} />
+            <StoryEnd />
           </div>
         </article>
 

@@ -10,15 +10,20 @@ function heroDetail(story: Story): {
   height: number | null
   mime: string
   id: any
+  credit: string | null
+  source: string | null
 } {
   const h: any = story.heroMedia
-  if (!h || typeof h !== 'object') return { url: null, width: null, height: null, mime: '', id: undefined }
+  if (!h || typeof h !== 'object')
+    return { url: null, width: null, height: null, mime: '', id: undefined, credit: null, source: null }
   return {
     url: h.url ?? null,
     width: h.width ?? null,
     height: h.height ?? null,
     mime: h.mimeType ?? '',
     id: h.id,
+    credit: h.credit ?? null,
+    source: h.source ?? null,
   }
 }
 
@@ -90,7 +95,18 @@ export default function StoryHeader({ story }: { story: Story }) {
         <figure className="rd-hero-image">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={hero.url} alt={story.headline} />
-          {story.caption && <figcaption>{story.caption}</figcaption>}
+          {(story.caption || hero.credit || hero.source) && (
+            <figcaption className="rd-hero-cap">
+              {story.caption && <strong className="rd-hero-cap__text">{story.caption}</strong>}
+              {(hero.credit || hero.source) && (
+                <span className="rd-hero-cap__credit">
+                  {hero.credit ? `Photograph: ${hero.credit}` : ''}
+                  {hero.credit && hero.source ? ' · ' : ''}
+                  {hero.source ? `Source: ${hero.source}` : ''}
+                </span>
+              )}
+            </figcaption>
+          )}
         </figure>
       )}
     </>
