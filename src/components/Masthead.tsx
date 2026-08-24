@@ -23,6 +23,7 @@ export default function Masthead({
         </div>
         <nav className="mh-nav" aria-label="Primary">
           <a href="#wire">The Wire</a>
+          <Link href="/podcast">Podcast</Link>
           <a href="https://reportersdesk.abhishekangad.com">Archives ↗</a>
         </nav>
       </div>

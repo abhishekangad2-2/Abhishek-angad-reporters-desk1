@@ -10,6 +10,7 @@ import { Stories } from './collections/Stories'
 import { Sections } from './collections/Sections'
 import { Issues } from './collections/Issues'
 import { Media } from './collections/Media'
+import { Podcasts } from './collections/Podcasts'
 import { LiveDispatches } from './collections/LiveDispatches'
 import { Archive } from './collections/Archive'
 import { Polls } from './collections/Polls'
@@ -65,7 +66,7 @@ export default buildConfig({
     // Editorial
     Stories, Sections, Issues, Archive,
     // Multimedia
-    Media,
+    Media, Podcasts,
     // Tools
     LiveDispatches, Polls, Newsletters, NewsletterSubscribers,
     Subscriptions, Transactions, Payments, RTIRequests, InvestigateRequests,
