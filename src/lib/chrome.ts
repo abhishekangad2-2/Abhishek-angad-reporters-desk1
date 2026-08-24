@@ -12,6 +12,8 @@ export const CHROME_DEFAULT = {
   newsletter: 'Subscribe to our newsletter',
   poll: 'Poll Section',
   bio: 'About the founder',
+  photograph: 'Photograph',
+  source: 'Source',
 } as const
 
 export type ChromeLabels = Record<keyof typeof CHROME_DEFAULT, string>

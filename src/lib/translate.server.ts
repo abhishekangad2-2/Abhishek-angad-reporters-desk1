@@ -55,10 +55,40 @@ async function generateText(prompt: string): Promise<string | null> {
   return null
 }
 
+/** One model call translating an array of strings, returning a SAME-LENGTH
+ *  array. If the model errors or returns the wrong count, the batch is split in
+ *  half and retried (down to single strings), so a long article never ends up
+ *  with a whole chunk left in English. Untranslatable singletons keep English. */
+async function modelTranslate(texts: string[], langName: string): Promise<string[]> {
+  if (texts.length === 0) return []
+  const prompt = `You are a professional news translator for an investigative-journalism publication. Translate each string in the following JSON array from English into ${langName}. Translate faithfully: preserve the exact meaning and a serious, precise journalistic tone. Do NOT add, omit, summarise, soften, or editorialise. Keep people's names, organisation names and place names in their standard ${langName} form (transliterate where there is no established translation). Return ONLY a JSON array of the translated strings, in the same order and the same length as the input, with no commentary or code fences.
+
+${JSON.stringify(texts)}`
+
+  let raw = await generateText(prompt)
+  if (raw != null) {
+    raw = raw.replace(/```json/g, '').replace(/```/g, '').trim()
+    try {
+      const arr = JSON.parse(raw)
+      if (Array.isArray(arr) && arr.length === texts.length) {
+        return arr.map((tr: unknown, i: number) => (typeof tr === 'string' && tr.trim() ? tr : texts[i]))
+      }
+    } catch {
+      // fall through to split-retry
+    }
+  }
+  if (texts.length === 1) return texts // give up on this one string
+  const mid = Math.ceil(texts.length / 2)
+  const [a, b] = await Promise.all([
+    modelTranslate(texts.slice(0, mid), langName),
+    modelTranslate(texts.slice(mid), langName),
+  ])
+  return [...a, ...b]
+}
+
 /** Translate an ordered batch of strings into `localeCode`. Cache hits are
- *  returned immediately; misses go to Vertex in a single call. On any error or
- *  if Vertex is unavailable, the original English strings are returned so the
- *  page never breaks. */
+ *  returned immediately; misses go to the model (with split-retry). On any
+ *  error the original English strings are returned so the page never breaks. */
 export async function translateBatch(texts: string[], localeCode: string): Promise<string[]> {
   if (localeCode === 'en' || texts.length === 0) return texts
 
@@ -81,23 +111,13 @@ export async function translateBatch(texts: string[], localeCode: string): Promi
   if (missTexts.length === 0) return result
 
   try {
-    const prompt = `You are a professional news translator for an investigative-journalism publication. Translate each string in the following JSON array from English into ${langName}. Translate faithfully: preserve the exact meaning and a serious, precise journalistic tone. Do NOT add, omit, summarise, soften, or editorialise. Keep people's names, organisation names and place names in their standard ${langName} form (transliterate where there is no established translation). Return ONLY a JSON array of the translated strings, in the same order and the same length as the input, with no commentary or code fences.
-
-${JSON.stringify(missTexts)}`
-
-    let text = await generateText(prompt)
-    if (text == null) return result
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim()
-    const arr = JSON.parse(text)
-
-    if (Array.isArray(arr) && arr.length === missTexts.length) {
-      arr.forEach((tr: unknown, k: number) => {
-        const i = missIdx[k]
-        const val = typeof tr === 'string' && tr.trim() ? tr : texts[i]
-        result[i] = val
-        cache.set(`${localeCode}::${missTexts[k]}`, val)
-      })
-    }
+    const translated = await modelTranslate(missTexts, langName)
+    translated.forEach((val, k) => {
+      const i = missIdx[k]
+      result[i] = val
+      // Only cache real translations, so a temporary failure can be retried.
+      if (val !== missTexts[k]) cache.set(`${localeCode}::${missTexts[k]}`, val)
+    })
   } catch {
     // fall through — originals already in `result`
   }
@@ -197,23 +217,35 @@ export async function translateLandingData(data: LandingData, localeCode: string
 }
 
 /** Translate a Lexical rich-text value in place-of-structure: deep-clone, swap
- *  only the text-node strings, leave headings/lists/links/formatting intact. */
+ *  the text-node strings AND inline-image captions, leaving headings / lists /
+ *  links / formatting intact. */
 async function translateLexical(content: any, localeCode: string): Promise<any> {
   if (!content?.root) return content
   const clone = JSON.parse(JSON.stringify(content))
-  const nodes: any[] = []
+  const strings: string[] = []
+  const setters: ((v: string) => void)[] = []
   const walk = (n: any) => {
     if (!n) return
-    if (n.type === 'text' && typeof n.text === 'string') nodes.push(n)
+    if (n.type === 'text' && typeof n.text === 'string') {
+      strings.push(n.text)
+      setters.push((v) => {
+        n.text = v
+      })
+    }
+    // Inline image caption (from the UploadFeature); credit stays (name/source).
+    if (n.type === 'upload' && n.fields && typeof n.fields.caption === 'string' && n.fields.caption.trim()) {
+      strings.push(n.fields.caption)
+      setters.push((v) => {
+        n.fields.caption = v
+      })
+    }
     if (Array.isArray(n.children)) n.children.forEach(walk)
   }
   walk(clone.root)
-  if (nodes.length === 0) return clone
+  if (strings.length === 0) return clone
   // Chunked + parallel so a long article body doesn't block on one huge call.
-  const translated = await translateBatchChunked(nodes.map((n) => n.text), localeCode, 20)
-  nodes.forEach((n, i) => {
-    n.text = translated[i] ?? n.text
-  })
+  const translated = await translateBatchChunked(strings, localeCode, 25)
+  translated.forEach((v, i) => setters[i](v))
   return clone
 }
 

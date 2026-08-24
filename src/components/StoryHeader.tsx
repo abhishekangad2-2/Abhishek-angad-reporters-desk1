@@ -71,7 +71,8 @@ function HeaderText({ story, byLabel }: { story: Story; byLabel: string }) {
 export default async function StoryHeader({ story }: { story: Story }) {
   const hero = heroDetail(story)
   const heroIsVideo = hero.url ? isVideo(hero.mime, hero.url) : false
-  const byLabel = (await getChromeLabels(await readLocale())).by
+  const chrome = await getChromeLabels(await readLocale())
+  const byLabel = chrome.by
 
   if (heroIsVideo && hero.url) {
     return (
@@ -103,9 +104,9 @@ export default async function StoryHeader({ story }: { story: Story }) {
               {story.caption && <strong className="rd-hero-cap__text">{story.caption}</strong>}
               {(hero.credit || hero.source) && (
                 <span className="rd-hero-cap__credit">
-                  {hero.credit ? `Photograph: ${hero.credit}` : ''}
+                  {hero.credit ? `${chrome.photograph}: ${hero.credit}` : ''}
                   {hero.credit && hero.source ? ' · ' : ''}
-                  {hero.source ? `Source: ${hero.source}` : ''}
+                  {hero.source ? `${chrome.source}: ${hero.source}` : ''}
                 </span>
               )}
             </figcaption>
