@@ -56,11 +56,21 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
     notFound()
   }
 
+  // A parent section (e.g. Visual Essay) lists stories from itself AND all its
+  // subsections (Photo Essay, Video Documentary), so the main desk shows both.
+  const children = await payload.find({
+    collection: 'sections',
+    where: { parent: { equals: section.id } },
+    limit: 50,
+    depth: 0,
+  })
+  const sectionIds = [section.id, ...children.docs.map((c: any) => c.id)]
+
   const stories = await payload.find({
     collection: 'stories',
     where: {
       'section': {
-        equals: section.id,
+        in: sectionIds,
       },
       'status': {
         equals: 'published',
@@ -102,8 +112,10 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {stories.docs.map((story: any) => (
-              <Link 
-                href={`/${resolvedParams.section}/${story.slug}`} 
+              <Link
+                // Link to the story's OWN section slug (may be a subsection),
+                // so aggregated parent-section listings resolve correctly.
+                href={`/${(story.section && typeof story.section === 'object' && story.section.slug) || resolvedParams.section}/${story.slug}`}
                 key={story.id}
                 className="group flex flex-col"
               >

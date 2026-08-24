@@ -37,6 +37,15 @@ export const Sections: CollectionConfig = {
       },
     },
     {
+      name: 'parent',
+      type: 'relationship',
+      relationTo: 'sections',
+      admin: {
+        description:
+          'Optional parent desk. Set it to group this desk as a subsection under a main section (e.g. Photo Essay under Visual Essay). A parent section\'s page lists stories from all its subsections.',
+      },
+    },
+    {
       name: 'defaultAccent',
       type: 'select',
       options: [
