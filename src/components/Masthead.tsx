@@ -1,39 +1,30 @@
 import Link from 'next/link'
 import type { LandingSection } from '@/lib/landing'
 
-/** The shared shell masthead — pure, client+server safe. Translated chrome
- *  strings are passed in as props by the (server) caller so this file never
- *  pulls server-only Vertex deps into the client bundle. */
+/** Shared shell masthead — clean top bar: a bold wordmark + byline on the left,
+ *  nav on the right. Pure/client-safe; translated chrome comes in as props. */
 export default function Masthead({
   labels,
 }: {
-  // `sections` is still accepted (callers pass it) but the nav that used it was
-  // removed; kept in the type so call sites don't need to change.
+  // `sections` still accepted (callers pass it); the section nav was removed.
   sections?: LandingSection[]
   labels?: { est?: string; editor?: string }
 }) {
-  const est = labels?.est || 'Est. 2026'
-
   return (
     <header className="site-masthead">
-      <div className="mh-bar">
-        <span className="mh-eyebrow">{est}</span>
-        <a
-          className="mh-eyebrow mh-eyebrow--right mh-archives"
-          href="https://reportersdesk.abhishekangad.com"
-        >
-          Archives ↗
-        </a>
-      </div>
-
-      <div className="mh-brand">
-        <Link href="/" className="mh-wordmark">
-          Reporters Desk
-        </Link>
-        <span className="mh-rule" aria-hidden />
-        <span className="mh-sub">
-          Abhishek Angad <em className="mh-sub-ink">Ink</em>
-        </span>
+      <div className="mh-line">
+        <div className="mh-brandblock">
+          <Link href="/" className="mh-wordmark">
+            Reporters Desk
+          </Link>
+          <span className="mh-sub">
+            Abhishek Angad <em className="mh-sub-ink">Ink</em>
+          </span>
+        </div>
+        <nav className="mh-nav" aria-label="Primary">
+          <a href="#wire">The Wire</a>
+          <a href="https://reportersdesk.abhishekangad.com">Archives ↗</a>
+        </nav>
       </div>
     </header>
   )
