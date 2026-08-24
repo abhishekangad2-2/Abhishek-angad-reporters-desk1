@@ -215,13 +215,9 @@ export function PaymentTab() {
         <button
           className="pay-button"
           onClick={handleSubscribe}
-          disabled={status === 'loading' || status === 'checking'}
+          disabled={status === 'loading'}
         >
-          {status === 'loading'
-            ? 'Preparing payment…'
-            : status === 'checking'
-              ? 'Loading…'
-              : `Subscribe — ₹${inr(plan.amount)}/yr`}
+          {status === 'loading' ? 'Preparing payment…' : `Subscribe — ₹${inr(plan.amount)}/yr`}
         </button>
       )}
 
