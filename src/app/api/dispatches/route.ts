@@ -111,17 +111,18 @@ function initialsFor(doc: any): string {
   return '??'
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const payload = await getPayload({ config })
     const now = new Date().toISOString()
+    const limit = Math.min(50, Math.max(1, Number(new URL(req.url).searchParams.get('limit')) || 6))
     const result = await payload.find({
       collection: 'live-dispatches',
       where: {
         or: [{ expiresAt: { greater_than: now } }, { expiresAt: { exists: false } }],
       },
       sort: '-publishedAt',
-      limit: 6,
+      limit,
       depth: 1,
     })
 
@@ -134,6 +135,8 @@ export async function GET() {
         initials: initialsFor(d),
         text: d.headline,
         flag, // '' | 'Significant' | 'Breaking'
+        significance: d.significance ?? 'normal',
+        reactions: typeof d.reactions === 'number' ? d.reactions : 0,
         postedAt,
         time: relativeTime(postedAt),
       }

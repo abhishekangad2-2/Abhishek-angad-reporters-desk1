@@ -8,6 +8,7 @@ import ThreeColumnLanding from '@/components/ThreeColumnLanding'
 import ZPatternLanding from '@/components/ZPatternLanding'
 import NewspaperLanding from '@/components/NewspaperLanding'
 import ImmersiveLanding from '@/components/ImmersiveLanding'
+import TheWire from '@/components/TheWire'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,6 +54,9 @@ export default async function Home({
     <>
       <style dangerouslySetInnerHTML={{ __html: `body{${bodyVars}}` }} />
       {landing}
+      <div className="wire-home">
+        <TheWire limit={5} />
+      </div>
     </>
   )
 }

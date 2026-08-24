@@ -66,5 +66,14 @@ export const LiveDispatches: CollectionConfig = {
         description: 'Time when this dispatch should expire and be removed from the floating widget.',
       },
     },
+    {
+      name: 'reactions',
+      type: 'number',
+      defaultValue: 0,
+      admin: {
+        readOnly: true,
+        description: 'Reader ❤ count on The Wire (incremented via the public react endpoint).',
+      },
+    },
   ],
 }

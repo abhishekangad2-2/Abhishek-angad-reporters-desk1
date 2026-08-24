@@ -1436,6 +1436,110 @@ a {
   color: var(--accent);
 }
 
+/* ============ THE WIRE — live dispatch feed (homepage section + /wire) ======
+   Self-contained light palette so it reads cleanly under any homepage preset. */
+.wire {
+  --w-paper: #efeee8; --w-ink: #14171c; --w-soft: #55575c; --w-line: #d7d4c8; --w-accent: #b43d2a;
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid var(--w-line);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 12px 34px -20px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-body, system-ui, sans-serif);
+  color: var(--w-ink);
+}
+.wire--full { max-width: 720px; box-shadow: none; }
+/* Homepage band below the hero */
+.wire-home {
+  position: relative;
+  z-index: 2;
+  background: var(--paper-cool, #efeee8);
+  padding: clamp(2rem, 6vw, 4rem) 1.5rem;
+}
+.wire-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--w-line);
+  background: #fbfaf6;
+}
+.wire-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.wire-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--w-accent);
+  box-shadow: 0 0 0 0 rgba(180, 61, 42, 0.5);
+  animation: wire-pulse 1.8s infinite;
+}
+@keyframes wire-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(180, 61, 42, 0.5); }
+  70% { box-shadow: 0 0 0 7px rgba(180, 61, 42, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(180, 61, 42, 0); }
+}
+.wire-all {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--w-accent);
+  text-decoration: none;
+}
+.wire-empty { padding: 1.5rem 1rem; color: var(--w-soft); font-size: 0.9rem; }
+
+.wpost { padding: 0.9rem 1rem; border-bottom: 1px solid var(--w-line); }
+.wpost:last-child { border-bottom: 0; }
+.wpost-top { display: flex; align-items: center; gap: 0.6rem; }
+.wpost-av {
+  flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--w-accent); color: #fff;
+  font-family: var(--font-display, Georgia, serif); font-weight: 700; font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.wpost-who { font-size: 0.82rem; display: flex; gap: 0.35rem; align-items: baseline; }
+.wpost-h { font-family: var(--font-mono, monospace); font-weight: 600; color: var(--w-ink); }
+.wpost-t { font-family: var(--font-mono, monospace); color: var(--w-soft); font-size: 0.72rem; }
+.wpost-flag {
+  margin-left: auto;
+  font-family: var(--font-mono, monospace); font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 0.12rem 0.4rem; border-radius: 3px; color: #fff;
+}
+.wpost-flag.br { background: var(--w-accent); }
+.wpost-flag.sig { background: #7a5a1e; }
+.wpost-body { font-size: 0.96rem; line-height: 1.5; margin: 0.5rem 0 0.1rem; }
+.wpost-acts { display: flex; gap: 1.4rem; margin-top: 0.5rem; }
+.wpost-react, .wpost-share {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--font-mono, monospace); font-size: 0.78rem; color: var(--w-soft);
+  text-decoration: none; transition: color 0.15s;
+}
+.wpost-react:hover, .wpost-share:hover { color: var(--w-accent); }
+.wpost-react.on { color: var(--w-accent); }
+
+/* /wire full page */
+.wire-page { min-height: 100vh; background: var(--paper-cool, #efeee8); color: var(--ink, #14171c); }
+.wire-page-main { max-width: 720px; margin: 0 auto; padding: clamp(1.5rem, 5vw, 3rem) 1.5rem 5rem; }
+.wire-page-head { text-align: center; margin-bottom: 1.6rem; }
+.wire-page-kicker {
+  font-family: var(--font-mono, monospace); font-size: 0.7rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent, #b43d2a);
+}
+.wire-page-title {
+  font-family: var(--font-display, Georgia, serif); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(2.2rem, 6vw, 3.6rem); letter-spacing: -0.02em; margin: 0.3rem 0 0;
+}
+.wire-page-dek { color: var(--ink-soft, #55575c); max-width: 46ch; margin: 0.6rem auto 0; line-height: 1.5; }
+
 .mh-nav-link {
   font-family: var(--font-mono);
   font-size: 0.7rem;
