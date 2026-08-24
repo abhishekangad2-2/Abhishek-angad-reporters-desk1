@@ -201,7 +201,7 @@ export const Stories: CollectionConfig = {
   slug: 'stories',
   admin: {
     useAsTitle: 'headline',
-    group: 'Newsroom',
+    group: 'Editorial',
     description: 'Every article — drafts, in review, published, and archived.',
     components: {
       edit: {

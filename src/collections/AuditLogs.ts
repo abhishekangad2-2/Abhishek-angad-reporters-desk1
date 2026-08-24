@@ -5,7 +5,7 @@ export const AuditLogs: CollectionConfig = {
   admin: {
     useAsTitle: 'action',
     description: 'Audit log of all admin actions and workflow transitions.',
-    group: 'System',
+    group: 'Admin',
   },
   access: {
     // Admin-only read — the trail holds login-failure IPs and every workflow

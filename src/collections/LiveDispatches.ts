@@ -13,7 +13,7 @@ export const LiveDispatches: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'headline',
-    group: 'Engagement',
+    group: 'Tools',
     description: 'Short-form live updates that appear in the floating widget across the site.',
   },
   fields: [

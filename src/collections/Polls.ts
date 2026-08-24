@@ -14,7 +14,7 @@ export const Polls: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'question',
-    group: 'Engagement',
+    group: 'Tools',
     defaultColumns: ['question', 'active', 'opensAt', 'closesAt'],
     listSearchableFields: ['question'],
     description: 'Reader polls — open/close windows, live vote counts on each option.',

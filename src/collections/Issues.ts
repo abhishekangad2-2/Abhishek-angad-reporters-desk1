@@ -11,7 +11,7 @@ export const Issues: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    group: 'Newsroom',
+    group: 'Editorial',
     description: 'Optional running threads (e.g. "Climate") that group related stories together.',
   },
   fields: [

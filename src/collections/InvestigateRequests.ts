@@ -4,7 +4,7 @@ export const InvestigateRequests: CollectionConfig = {
   slug: 'investigate-requests',
   admin: {
     useAsTitle: 'topic',
-    group: 'Journalism Toolkit',
+    group: 'Tools',
     defaultColumns: ['topic', 'section', 'status', 'email', 'createdAt'],
     listSearchableFields: ['topic', 'details', 'email'],
     description: 'Reader-submitted investigation tips and leads ("Investigate this" callout).',

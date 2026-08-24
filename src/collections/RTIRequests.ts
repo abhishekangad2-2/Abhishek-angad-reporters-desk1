@@ -4,7 +4,7 @@ export const RTIRequests: CollectionConfig = {
   slug: 'rti-requests',
   admin: {
     useAsTitle: 'topic',
-    group: 'Journalism Toolkit',
+    group: 'Tools',
     description: 'Internal tracker for Freedom of Information (FOI) and Right to Information (RTI) requests.',
   },
   access: {

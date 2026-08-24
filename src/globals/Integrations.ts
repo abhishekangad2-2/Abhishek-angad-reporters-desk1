@@ -4,7 +4,7 @@ export const Integrations: GlobalConfig = {
   slug: 'integrations',
   label: 'Integrations',
   admin: {
-    group: 'Appearance',
+    group: 'Tools',
     description:
       'Third-party keys and settings — analytics (GA4), video, translation, and payments. Connect external services the site uses.',
   },

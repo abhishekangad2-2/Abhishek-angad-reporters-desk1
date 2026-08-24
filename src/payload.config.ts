@@ -63,14 +63,17 @@ export default buildConfig({
   // reader-engagement tools (Engagement), money (Finance), and the reporter
   // toolkit last. Order within a group follows this array order too.
   collections: [
-    Stories, Sections, Issues, Media,
-    Users, AuditLogs,
+    // Editorial
+    Stories, Sections, Issues, Archive,
+    // Multimedia
+    Media,
+    // Tools
     LiveDispatches, Polls, Newsletters, NewsletterSubscribers,
-    Subscriptions, Transactions, Payments,
-    RTIRequests, InvestigateRequests,
-    Archive,
+    Subscriptions, Transactions, Payments, RTIRequests, InvestigateRequests,
+    // Admin
+    Users, AuditLogs,
   ],
-  globals: [Integrations, DesignStudio],
+  globals: [DesignStudio, Integrations],
   plugins: [
     gcsStorage({
       collections: {

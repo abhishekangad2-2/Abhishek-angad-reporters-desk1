@@ -26,7 +26,7 @@ export const Archive: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'outlet', 'year'],
-    group: 'Archive',
+    group: 'Editorial',
     description:
       'Published clips shown at reportersdesk.abhishekangad.com. Edit body text here to clean any extraction residue.',
   },

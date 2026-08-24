@@ -7,7 +7,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
     useAsTitle: 'email',
-    group: 'System',
+    group: 'Admin',
     description: 'Newsroom staff accounts, roles, and 2FA status.',
   },
   access: {
