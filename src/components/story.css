@@ -76,7 +76,7 @@
   position: relative;
   z-index: 2;
   margin: 0 auto 2.5rem;
-  max-width: 1200px;
+  max-width: 1320px;
   padding: 0 1.5rem;
 }
 
@@ -85,18 +85,19 @@
   width: 100%;
   /* Fixed band regardless of source aspect ratio, so every article's lead
      picture is the same size (a portrait hero used to run ~2x taller than a
-     landscape one). Matches .newspaper-lead-img. */
-  height: 58vh;
-  max-height: 58vh;
+     landscape one). A commanding establishing frame. */
+  height: 74vh;
+  max-height: 74vh;
   object-fit: cover;
   border-radius: var(--radius, 4px);
 }
 
 .rd-hero-image figcaption {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: var(--ink-soft);
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 /* Immersive video-left / text-right hero (wide screens) */
