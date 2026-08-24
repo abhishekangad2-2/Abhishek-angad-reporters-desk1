@@ -40,6 +40,42 @@ function loadRazorpayCheckout(): Promise<any | null> {
 
 type PayStatus = 'idle' | 'checking' | 'unconfigured' | 'loading' | 'success' | 'error'
 
+// Direct UPI support — a collect QR built from the newsroom's UPI ID, so any
+// UPI app can scan-to-pay any amount without a payment gateway.
+const UPI_ID = '9910270994@kotakbank'
+const UPI_NAME = 'Abhishek Angad'
+const UPI_LINK = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&cu=INR`
+
+function UpiSupport() {
+  const [copied, setCopied] = useState(false)
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(UPI_ID)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      /* clipboard blocked — the id is visible to copy manually */
+    }
+  }
+  return (
+    <div className="upi-support">
+      <div className="qr-box">
+        <QRCodeSVG value={UPI_LINK} size={158} bgColor="transparent" fgColor="#111111" level="M" />
+      </div>
+      <p className="qr-caption">Scan to pay with any UPI app</p>
+      <div className="upi-id-row">
+        <code className="upi-id">{UPI_ID}</code>
+        <button type="button" className="upi-copy" onClick={copy} aria-live="polite">
+          {copied ? 'Copied ✓' : 'Copy'}
+        </button>
+      </div>
+      <p className="pay-note">
+        Pay any amount to support independent journalism. Payments go directly to {UPI_NAME}.
+      </p>
+    </div>
+  )
+}
+
 export function PaymentTab() {
   const [planId, setPlanId] = useState<(typeof PLANS)[number]['id']>('reader')
   const [status, setStatus] = useState<PayStatus>('checking')
@@ -130,13 +166,11 @@ export function PaymentTab() {
     }
   }
 
-  if (status === 'unconfigured') {
+  if (status === 'unconfigured' || status === 'checking') {
+    // No subscription gateway yet — offer direct UPI support, which needs none.
     return (
       <div className="footer-panel">
-        <p className="pay-note">
-          Online payments aren&apos;t set up yet. Please check back soon — we&apos;re finalising our
-          payment gateway.
-        </p>
+        <UpiSupport />
       </div>
     )
   }
