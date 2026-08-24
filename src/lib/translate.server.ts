@@ -8,13 +8,50 @@ import { DEFAULT_LABELS, type LandingData, type LandingLabels } from './landing'
 
 const cache = new Map<string, string>() // `${locale}::${text}` -> translation
 
-function getModel() {
+// Developer-API model (a free API key, independent of GCP project billing);
+// override with GEMINI_MODEL. Vertex uses its own model id as a fallback.
+const DEV_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash'
+const VERTEX_MODEL = 'gemini-2.5-flash'
+
+/** Run one prompt through whichever Gemini backend is configured, preferring
+ *  the Gemini Developer API (an API key — independent of GCP project billing)
+ *  and falling back to Vertex AI. Returns null if neither is available or both
+ *  error, so callers keep the original English text. */
+async function generateText(prompt: string): Promise<string | null> {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY
+  if (apiKey) {
+    try {
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${DEV_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+        },
+      )
+      if (resp.ok) {
+        const data: any = await resp.json()
+        const parts = data?.candidates?.[0]?.content?.parts
+        const text = Array.isArray(parts) ? parts.map((p: any) => p?.text ?? '').join('') : ''
+        if (text.trim()) return text
+      }
+    } catch {
+      // fall through to Vertex
+    }
+  }
+
   const project = process.env.VERTEX_PROJECT
-  const location = process.env.VERTEX_LOCATION || 'us-central1'
-  if (!project) return null
-  // Authenticates via the Cloud Run service account (ADC) — same as Read Deeper.
-  const vertex = new VertexAI({ project, location })
-  return vertex.getGenerativeModel({ model: 'gemini-2.5-flash' })
+  if (project) {
+    try {
+      const location = process.env.VERTEX_LOCATION || 'us-central1'
+      const model = new VertexAI({ project, location }).getGenerativeModel({ model: VERTEX_MODEL })
+      const resp = await model.generateContent(prompt)
+      return resp.response.candidates?.[0]?.content?.parts?.[0]?.text ?? null
+    } catch {
+      return null
+    }
+  }
+  return null
 }
 
 /** Translate an ordered batch of strings into `localeCode`. Cache hits are
@@ -42,16 +79,13 @@ export async function translateBatch(texts: string[], localeCode: string): Promi
 
   if (missTexts.length === 0) return result
 
-  const model = getModel()
-  if (!model) return result
-
   try {
     const prompt = `You are a professional news translator for an investigative-journalism publication. Translate each string in the following JSON array from English into ${langName}. Translate faithfully: preserve the exact meaning and a serious, precise journalistic tone. Do NOT add, omit, summarise, soften, or editorialise. Keep people's names, organisation names and place names in their standard ${langName} form (transliterate where there is no established translation). Return ONLY a JSON array of the translated strings, in the same order and the same length as the input, with no commentary or code fences.
 
 ${JSON.stringify(missTexts)}`
 
-    const resp = await model.generateContent(prompt)
-    let text = resp.response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    let text = await generateText(prompt)
+    if (text == null) return result
     text = text.replace(/```json/g, '').replace(/```/g, '').trim()
     const arr = JSON.parse(text)
 

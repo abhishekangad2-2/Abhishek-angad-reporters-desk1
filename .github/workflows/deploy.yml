@@ -67,12 +67,14 @@ jobs:
             VERTEX_PROJECT=secret-walker-497804-d5
             VERTEX_LOCATION=us-central1
           # Sensitive values come from Secret Manager (not GitHub Secrets / plaintext env).
-          # (Gemini now uses Vertex AI via the service account — no API key.)
+          # Translation uses the Gemini Developer API key (free tier, independent
+          # of GCP project billing) with Vertex AI as a fallback.
           secrets: |
             DATABASE_URI=database-uri:latest
             PAYLOAD_SECRET=payload-secret:latest
             PENDING_2FA_SECRET=pending-2fa-secret:latest
             GOOGLE_CLOUD_VISION_API_KEY=google-cloud-vision-api-key:latest
+            GEMINI_API_KEY=gemini-api-key:latest
           # Preserve the Cloud SQL socket connection the DATABASE_URI relies on.
           # 2Gi memory: Payload + sharp image processing and large video uploads
           # (100MB+) need headroom beyond the 512Mi default.
