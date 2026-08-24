@@ -55,7 +55,7 @@ export default async function Home({
       <style dangerouslySetInnerHTML={{ __html: `body{${bodyVars}}` }} />
       {landing}
       <div className="wire-home">
-        <TheWire limit={5} />
+        <TheWire limit={7} />
       </div>
     </>
   )

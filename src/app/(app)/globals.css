@@ -1456,8 +1456,25 @@ a {
   position: relative;
   z-index: 2;
   background: var(--paper-cool, #efeee8);
-  padding: clamp(2rem, 6vw, 4rem) 1.5rem;
+  padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
 }
+/* Homepage Wire runs larger and more prominent than the compact feed default;
+   the /wire full page (.wire--full) keeps its own sizing. */
+.wire-home .wire { max-width: 900px; border-radius: 18px; box-shadow: 0 20px 50px -26px rgba(0, 0, 0, 0.35); }
+.wire-home .wire-head { padding: 1.15rem 1.5rem; }
+.wire-home .wire-title { font-size: 0.92rem; letter-spacing: 0.2em; }
+.wire-home .wire-dot { width: 10px; height: 10px; }
+.wire-home .wire-all { font-size: 0.82rem; }
+.wire-home .wire-empty { padding: 2.5rem 1.5rem; font-size: 1.05rem; }
+.wire-home .wpost { padding: 1.35rem 1.5rem; }
+.wire-home .wpost-top { gap: 0.75rem; }
+.wire-home .wpost-av { width: 46px; height: 46px; font-size: 1.05rem; }
+.wire-home .wpost-who { font-size: 1rem; }
+.wire-home .wpost-t { font-size: 0.84rem; }
+.wire-home .wpost-flag { font-size: 0.66rem; padding: 0.18rem 0.5rem; }
+.wire-home .wpost-body { font-size: 1.2rem; line-height: 1.6; margin-top: 0.7rem; }
+.wire-home .wpost-acts { gap: 1.9rem; margin-top: 0.85rem; }
+.wire-home .wpost-react, .wire-home .wpost-share { font-size: 0.95rem; }
 .wire-head {
   display: flex;
   align-items: center;
