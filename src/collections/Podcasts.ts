@@ -88,5 +88,12 @@ export const Podcasts: CollectionConfig = {
     { name: 'dek', type: 'textarea', label: 'Short summary', admin: { description: 'One or two lines shown in the episode list.' } },
     { name: 'showNotes', type: 'richText', admin: { description: 'Full show notes, links, chapters.' } },
     { name: 'transcript', type: 'textarea', admin: { description: 'Optional transcript.' } },
+    {
+      // Pre-computed waveform peaks (normalised 0–1). Lets the player render the
+      // waveform instantly and stream the audio instead of downloading it all.
+      name: 'peaks',
+      type: 'json',
+      admin: { hidden: true },
+    },
   ],
 }

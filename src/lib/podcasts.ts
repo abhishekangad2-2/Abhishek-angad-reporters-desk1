@@ -15,6 +15,16 @@ export type Episode = {
   dek: string | null
   showNotes: any
   transcript: string | null
+  peaks: number[] | null
+  durationSeconds: number | null
+}
+
+// "25:35" or "1:02:10" → seconds, for the streaming player's initial timeline.
+function parseDuration(s: string | null): number | null {
+  if (!s) return null
+  const parts = s.split(':').map((p) => parseInt(p, 10))
+  if (parts.some((n) => Number.isNaN(n))) return null
+  return parts.reduce((acc, n) => acc * 60 + n, 0) || null
 }
 
 function mediaUrl(m: any): string | null {
@@ -38,6 +48,8 @@ function toEpisode(doc: any): Episode {
     dek: doc.dek ?? null,
     showNotes: doc.showNotes ?? null,
     transcript: doc.transcript ?? null,
+    peaks: Array.isArray(doc.peaks) ? doc.peaks : null,
+    durationSeconds: parseDuration(doc.duration ?? null),
   }
 }
 

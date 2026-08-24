@@ -55,7 +55,12 @@ export default async function EpisodePage({ params }: { params: Promise<{ slug: 
 
         {ep.audioUrl ? (
           <div className="pod-player">
-            <WavePlayer src={ep.audioUrl} transcript={ep.transcript} />
+            <WavePlayer
+              src={ep.audioUrl}
+              transcript={ep.transcript}
+              peaks={ep.peaks}
+              duration={ep.durationSeconds}
+            />
           </div>
         ) : (
           <p className="pod-empty">Audio for this episode is unavailable.</p>

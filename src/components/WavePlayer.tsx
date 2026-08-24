@@ -6,13 +6,18 @@ type Props = {
   src: string
   title?: string
   transcript?: string | null
+  /** Pre-computed waveform peaks (0–1). When present the player renders the
+   *  waveform instantly and streams the audio instead of downloading it all. */
+  peaks?: number[] | null
+  /** Total duration in seconds, for the initial timeline before metadata loads. */
+  duration?: number | null
 }
 
-export function WavePlayer({ src, title, transcript }: Props) {
+export function WavePlayer({ src, title, transcript, peaks, duration: initialDuration }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const wsRef = useRef<any>(null)
   const [playing, setPlaying] = useState(false)
-  const [duration, setDuration] = useState(0)
+  const [duration, setDuration] = useState(initialDuration ?? 0)
   const [currentTime, setCurrentTime] = useState(0)
   const [ready, setReady] = useState(false)
   const [showTranscript, setShowTranscript] = useState(false)
@@ -22,6 +27,7 @@ export function WavePlayer({ src, title, transcript }: Props) {
     let ws: any
 
     import('wavesurfer.js').then(({ default: WaveSurfer }) => {
+      const hasPeaks = Array.isArray(peaks) && peaks.length > 0
       ws = WaveSurfer.create({
         container: containerRef.current!,
         waveColor: 'var(--accent, #b43d2a)',
@@ -33,7 +39,14 @@ export function WavePlayer({ src, title, transcript }: Props) {
         height: 56,
         normalize: true,
         url: src,
+        // With peaks + duration, wavesurfer renders the waveform immediately and
+        // streams playback (range requests) instead of downloading the whole file.
+        ...(hasPeaks ? { peaks: [peaks as number[]], duration: initialDuration ?? undefined } : {}),
       })
+
+      // Peaks are already drawn — enable playback as soon as the media can play,
+      // rather than waiting on a full decode.
+      if (hasPeaks) setReady(true)
 
       ws.on('ready', (dur: number) => {
         setDuration(dur)
