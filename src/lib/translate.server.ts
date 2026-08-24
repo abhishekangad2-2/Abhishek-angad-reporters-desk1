@@ -61,6 +61,21 @@ async function generateText(prompt: string): Promise<string | null> {
  *  with a whole chunk left in English. Untranslatable singletons keep English. */
 async function modelTranslate(texts: string[], langName: string): Promise<string[]> {
   if (texts.length === 0) return []
+
+  // Single string: a plain-text prompt is far more reliable than JSON-of-one,
+  // especially for short fragments split out by inline formatting.
+  if (texts.length === 1) {
+    const raw = await generateText(
+      `Translate the following text into ${langName}. Keep people's, organisation and place names as they are (transliterate if needed). Return ONLY the translated text — no quotes, no JSON, no notes.\n\n${texts[0]}`,
+    )
+    const cleaned = (raw ?? '')
+      .trim()
+      .replace(/^```[a-z]*\s*|\s*```$/g, '')
+      .replace(/^"|"$/g, '')
+      .trim()
+    return cleaned ? [cleaned] : texts
+  }
+
   const prompt = `You are a professional news translator for an investigative-journalism publication. Translate each string in the following JSON array from English into ${langName}. Translate faithfully: preserve the exact meaning and a serious, precise journalistic tone. Do NOT add, omit, summarise, soften, or editorialise. Keep people's names, organisation names and place names in their standard ${langName} form (transliterate where there is no established translation). Return ONLY a JSON array of the translated strings, in the same order and the same length as the input, with no commentary or code fences.
 
 ${JSON.stringify(texts)}`
@@ -77,7 +92,6 @@ ${JSON.stringify(texts)}`
       // fall through to split-retry
     }
   }
-  if (texts.length === 1) return texts // give up on this one string
   const mid = Math.ceil(texts.length / 2)
   const [a, b] = await Promise.all([
     modelTranslate(texts.slice(0, mid), langName),
