@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 type Dispatch = {
@@ -84,9 +85,9 @@ export default function TheWire({
           <span className="wire-dot" aria-hidden /> The Wire · Live
         </span>
         {!full && (
-          <a className="wire-all" href="/wire">
+          <Link className="wire-all" href="/wire">
             View the full wire →
-          </a>
+          </Link>
         )}
       </div>
 

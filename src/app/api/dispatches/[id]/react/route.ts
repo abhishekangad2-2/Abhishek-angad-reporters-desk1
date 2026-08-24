@@ -23,7 +23,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const payload = await getPayload({ config })
     const doc = await payload.findByID({ collection: 'live-dispatches', id, depth: 0 }).catch(() => null)
     if (!doc) return NextResponse.json({ error: 'not found' }, { status: 404 })
-    const next = (typeof (doc as { reactions?: number }).reactions === 'number' ? (doc as { reactions: number }).reactions : 0) + 1
+    const cur = Number((doc as Record<string, unknown>).reactions ?? 0)
+    const next = (Number.isFinite(cur) ? cur : 0) + 1
     await payload.update({ collection: 'live-dispatches', id, data: { reactions: next }, overrideAccess: true })
     return NextResponse.json({ ok: true, reactions: next })
   } catch {
