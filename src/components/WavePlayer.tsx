@@ -78,8 +78,10 @@ export function WavePlayer({ src, title, transcript, peaks, duration: initialDur
     if (!el || !ws) return
     const rect = el.getBoundingClientRect()
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
-    ws.seekTo(ratio)
-    setCurrentTime(ratio * (ws.getDuration?.() || duration || 0))
+    const d = ws.getDuration?.() || duration || 0
+    // setTime reliably moves the streamed MediaElement; seekTo did not.
+    ws.setTime?.(ratio * d)
+    setCurrentTime(ratio * d)
   }
   const onWavePointerDown = (e: React.PointerEvent) => {
     dragging.current = true
