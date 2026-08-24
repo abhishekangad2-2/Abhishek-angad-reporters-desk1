@@ -348,6 +348,27 @@ export const Stories: CollectionConfig = {
               unique: true,
               admin: {
                 position: 'sidebar',
+                description:
+                  'URL-safe id. Auto-generated from the headline if left blank, and always cleaned on save (lowercase, spaces/punctuation → hyphens).',
+              },
+              hooks: {
+                // Always store a URL-safe slug. If the field is blank, derive it
+                // from the headline; otherwise clean whatever was typed/pasted so
+                // spaces, punctuation, case and trailing junk can't break the URL.
+                beforeValidate: [
+                  ({ value, data }) => {
+                    const source =
+                      value && String(value).trim() ? String(value) : String(data?.headline ?? '')
+                    const slug = source
+                      .toLowerCase()
+                      .normalize('NFKD') // decompose accents so the next step drops them
+                      .replace(/[^a-z0-9]+/g, '-') // spaces/punctuation/marks → hyphen
+                      .replace(/^-+|-+$/g, '') // trim leading/trailing hyphens
+                      .slice(0, 96)
+                      .replace(/-+$/g, '') // re-trim if the slice cut mid-hyphen
+                    return slug || value
+                  },
+                ],
               },
             },
             {
