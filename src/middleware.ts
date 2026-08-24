@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { clientIpFromXff } from './lib/clientIp'
+import { isLocale, LOCALE_COOKIE } from './lib/i18n'
 
 // Middleware does two independent jobs, gated so each only touches its own paths:
 //  1. /cms admin: IP allowlist + 2FA-session gate + no-store (unchanged).
@@ -94,6 +95,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (pathname === '/archive' || pathname.startsWith('/archive/')) {
     const rest = pathname.slice('/archive'.length) || '/'
     return NextResponse.redirect(`https://${ARCHIVE_HOST}${rest}`, 301)
+  }
+
+  // (4) ?lang=<locale> → sync the rd_lang cookie so the shared site chrome
+  //     (masthead nav, byline, footer), which reads the cookie, matches the
+  //     language even on a fresh link that has no cookie yet.
+  const lang = request.nextUrl.searchParams.get('lang')
+  if (lang && isLocale(lang) && request.cookies.get(LOCALE_COOKIE)?.value !== lang) {
+    request.cookies.set(LOCALE_COOKIE, lang)
+    const res = NextResponse.next({ request: { headers: request.headers } })
+    res.cookies.set(LOCALE_COOKIE, lang, { path: '/', maxAge: 31536000, sameSite: 'lax' })
+    return res
   }
   return NextResponse.next()
 }
