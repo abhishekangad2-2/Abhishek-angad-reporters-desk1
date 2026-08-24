@@ -1,6 +1,7 @@
 import { VertexAI } from '@google-cloud/vertexai'
 import { localeByCode } from './i18n'
 import { DEFAULT_LABELS, type LandingData, type LandingLabels } from './landing'
+import { CHROME_DEFAULT, type ChromeLabels } from './chrome'
 
 // Server-only: imports the Vertex SDK. Machine-only translation (no human
 // review) tuned to stay faithful and keep a journalistic tone. Results are
@@ -117,6 +118,23 @@ export async function translateBatchChunked(
   for (let i = 0; i < texts.length; i += chunkSize) chunks.push(texts.slice(i, i + chunkSize))
   const out = await Promise.all(chunks.map((c) => translateBatch(c, localeCode)))
   return out.flat()
+}
+
+/** Translate the shared site-chrome labels (masthead nav, byline, footer tabs)
+ *  into `localeCode`. Cached per string, so it's one model call the first time
+ *  a language is used and instant thereafter. */
+export async function getChromeLabels(localeCode: string): Promise<ChromeLabels> {
+  const keys = Object.keys(CHROME_DEFAULT) as (keyof ChromeLabels)[]
+  if (localeCode === 'en') return { ...CHROME_DEFAULT }
+  const translated = await translateBatch(
+    keys.map((k) => CHROME_DEFAULT[k]),
+    localeCode,
+  )
+  const out = { ...CHROME_DEFAULT } as ChromeLabels
+  keys.forEach((k, i) => {
+    out[k] = translated[i] || CHROME_DEFAULT[k]
+  })
+  return out
 }
 
 /** Translate a single short label (e.g. "Editor login"). Cached. */

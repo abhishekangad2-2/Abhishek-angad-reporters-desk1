@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { PaymentTab, NewsletterTab, PollTab, InvestigateTab, FounderBioTab } from './FooterPanels'
+import { useChrome } from '@/components/ChromeLabels'
 
 const TABS = [
   { id: 'investigate', label: 'Investigate this', Component: InvestigateTab },
@@ -15,6 +16,11 @@ export default function FooterTabs() {
   const [openTab, setOpenTab] = useState<(typeof TABS)[number]['id'] | null>(null)
   const ActiveTab = TABS.find((t) => t.id === openTab)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const c = useChrome()
+  // Tab ids line up with the chrome-label keys, so the visible labels follow
+  // the reader's language.
+  const labelFor = (id: (typeof TABS)[number]['id']) =>
+    (c as Record<string, string>)[id] ?? TABS.find((t) => t.id === id)?.label ?? id
 
   // Roving focus via arrow keys, per the WAI-ARIA tablist pattern. Home/End
   // jump to the ends; the focused tab is what the user activates with Enter.
@@ -50,7 +56,7 @@ export default function FooterTabs() {
               onKeyDown={(e) => onKeyDown(e, i)}
               className={`footer-tab ${selected ? 'footer-tab--active' : ''}`}
             >
-              {t.label}
+              {labelFor(t.id)}
             </button>
           )
         })}

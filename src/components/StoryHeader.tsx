@@ -1,6 +1,7 @@
 import type { Story } from '@/payload-types'
 import { bylineOf, sectionNameOf } from './templates/storyMeta'
 import StoryVideo from './StoryVideo'
+import { getChromeLabels, readLocale } from '@/lib/translate.server'
 import './story.css'
 
 /** Pull display details off a populated upload (hero media). */
@@ -42,9 +43,10 @@ function formatDate(story: Story): string | null {
 }
 
 /** The headline / standfirst / byline block, server-rendered for SEO. */
-function HeaderText({ story }: { story: Story }) {
+function HeaderText({ story, byLabel }: { story: Story; byLabel: string }) {
   const sectionName = sectionNameOf(story)
-  const byline = bylineOf(story)
+  // Translate only the "By" prefix; the author's name stays as written.
+  const byline = bylineOf(story).replace(/^By\b/, byLabel)
   const date = formatDate(story)
   return (
     <header className="rd-header">
@@ -66,9 +68,10 @@ function HeaderText({ story }: { story: Story }) {
  * VIDEO, renders an immersive video-left / text-right split hero on wide
  * screens; otherwise a full-bleed hero image (or no media).
  */
-export default function StoryHeader({ story }: { story: Story }) {
+export default async function StoryHeader({ story }: { story: Story }) {
   const hero = heroDetail(story)
   const heroIsVideo = hero.url ? isVideo(hero.mime, hero.url) : false
+  const byLabel = (await getChromeLabels(await readLocale())).by
 
   if (heroIsVideo && hero.url) {
     return (
@@ -82,7 +85,7 @@ export default function StoryHeader({ story }: { story: Story }) {
           />
         </div>
         <div className="rd-hero-split__text">
-          <HeaderText story={story} />
+          <HeaderText story={story} byLabel={byLabel} />
         </div>
       </div>
     )
@@ -90,7 +93,7 @@ export default function StoryHeader({ story }: { story: Story }) {
 
   return (
     <>
-      <HeaderText story={story} />
+      <HeaderText story={story} byLabel={byLabel} />
       {hero.url && (
         <figure className="rd-hero-image">
           {/* eslint-disable-next-line @next/next/no-img-element */}

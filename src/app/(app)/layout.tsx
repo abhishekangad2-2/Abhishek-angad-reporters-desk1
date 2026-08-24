@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
+import { ChromeProvider } from "@/components/ChromeLabels";
+import { getChromeLabels } from "@/lib/translate.server";
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE, localeByCode } from "@/lib/i18n";
 
 // Newspaper pairing: Playfair Display (high-contrast masthead/display serif)
@@ -50,6 +52,10 @@ export default async function RootLayout({
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const dir = localeByCode(locale).dir ?? "ltr";
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  // Translate the shared chrome (masthead nav, byline, footer tabs) once here
+  // and provide it to the client chrome, so the whole page — not just the
+  // article body — reads in the visitor's language.
+  const chrome = await getChromeLabels(locale);
 
   return (
     <html
@@ -60,6 +66,7 @@ export default async function RootLayout({
       className={`notranslate ${displayFace.variable} ${bodyFace.variable} ${monoFace.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
+        <ChromeProvider value={chrome}>
         <main className="flex-1">
           {children}
         </main>
@@ -75,6 +82,7 @@ export default async function RootLayout({
             `}</Script>
           </>
         )}
+        </ChromeProvider>
       </body>
     </html>
   );
