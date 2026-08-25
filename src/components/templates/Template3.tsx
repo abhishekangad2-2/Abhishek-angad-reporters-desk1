@@ -2,6 +2,7 @@ import { Story } from '@/payload-types'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
 import { bylineOf, sectionNameOf, heroUrlOf, heroCreditLine } from './storyMeta'
 import StoryEnd from '@/components/StoryEnd'
+import StorySupport from '@/components/StorySupport'
 
 /** Newspaper design (broadsheet) at the story level: print masthead band, then
  *  the drop-cap body in the shared reading column with the details rail stacked
@@ -58,6 +59,7 @@ export default function Template3({ story }: { story: Story }) {
             {/* Hero caption + credit now sit under the lead image above. */}
             <LayoutRenderer layout={(story as any).layout ?? []} />
             <StoryEnd />
+            <StorySupport />
           </div>
         </article>
 

@@ -158,6 +158,40 @@
   letter-spacing: 0.1em;
 }
 
+/* Reader-funding note at the foot of an article. */
+.story-support {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  margin: 1.5rem 0 0.5rem;
+  padding: 1.1rem 1.3rem;
+  background: var(--paper-cool, #f2f0ea);
+  border: 1px solid var(--rule, #e4e1d8);
+  border-radius: 12px;
+}
+.story-support-text {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1rem;
+  color: var(--ink, #14171c);
+}
+.story-support-btn {
+  flex: none;
+  background: var(--accent, #b43d2a);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.story-support-btn:hover {
+  filter: brightness(1.08);
+}
+
 /* Immersive video-left / text-right hero (wide screens) */
 .rd-hero-split {
   position: relative;

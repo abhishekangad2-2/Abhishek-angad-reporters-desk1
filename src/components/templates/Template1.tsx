@@ -3,6 +3,7 @@ import Masthead from '@/components/Masthead'
 import { LayoutRenderer } from '@/components/LexicalRenderer'
 import StoryHeader from '@/components/StoryHeader'
 import StoryEnd from '@/components/StoryEnd'
+import StorySupport from '@/components/StorySupport'
 
 /** Three-Column design (z-axis) at the story level: an NYT-style header
  *  (full-bleed hero image, or video-left / text-right when the hero is a
@@ -20,6 +21,7 @@ export default function Template1({ story }: { story: Story }) {
         {/* Hero caption + credit now live under the hero image (StoryHeader). */}
         <LayoutRenderer layout={(story as any).layout ?? []} />
         <StoryEnd />
+            <StorySupport />
       </article>
     </div>
   )
