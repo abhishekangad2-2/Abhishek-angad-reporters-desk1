@@ -17,6 +17,7 @@ export type Episode = {
   transcript: string | null
   peaks: number[] | null
   durationSeconds: number | null
+  audioBytes: number | null
 }
 
 // "25:35" or "1:02:10" → seconds, for the streaming player's initial timeline.
@@ -50,6 +51,8 @@ function toEpisode(doc: any): Episode {
     transcript: doc.transcript ?? null,
     peaks: Array.isArray(doc.peaks) ? doc.peaks : null,
     durationSeconds: parseDuration(doc.duration ?? null),
+    audioBytes:
+      typeof doc.audio === 'object' && typeof doc.audio?.filesize === 'number' ? doc.audio.filesize : null,
   }
 }
 

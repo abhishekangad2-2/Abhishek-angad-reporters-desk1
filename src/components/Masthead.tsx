@@ -28,6 +28,7 @@ export default function Masthead({
         </div>
         <nav className="mh-nav" aria-label="Primary">
           <a href="#wire">{c.wire}</a>
+          <Link href="/visual-essay">{c.visualEssay}</Link>
           <Link href="/podcast">{c.podcast}</Link>
           <a href="https://reportersdesk.abhishekangad.com">{c.archives} ↗</a>
           <Link href="/support" className="mh-support">{c.support}</Link>

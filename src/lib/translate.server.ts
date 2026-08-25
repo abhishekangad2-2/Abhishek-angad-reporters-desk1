@@ -1,4 +1,5 @@
 import { VertexAI } from '@google-cloud/vertexai'
+import { createHash } from 'crypto'
 import { localeByCode } from './i18n'
 import { DEFAULT_LABELS, type LandingData, type LandingLabels } from './landing'
 import { CHROME_DEFAULT, type ChromeLabels } from './chrome'
@@ -7,7 +8,64 @@ import { CHROME_DEFAULT, type ChromeLabels } from './chrome'
 // review) tuned to stay faithful and keep a journalistic tone. Results are
 // cached in-process so a given (locale, string) is only translated once.
 
-const cache = new Map<string, string>() // `${locale}::${text}` -> translation
+const cache = new Map<string, string>() // `${locale}::${text}` -> translation (in-process)
+
+// ── Persistent DB cache (rd_translations) ─────────────────────────────────────
+// Survives instance restarts and is shared across all instances, so once any
+// visitor has translated a page it renders instantly for everyone thereafter.
+const hashOf = (s: string) => createHash('md5').update(s).digest('hex')
+
+async function getPool(): Promise<any | null> {
+  try {
+    const { getPayload } = await import('payload')
+    const { default: config } = await import('@/payload.config')
+    const payload = await getPayload({ config })
+    return (payload.db as any)?.pool ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Fetch cached translations for these texts from the DB. Returns text→target. */
+async function dbGet(pool: any, locale: string, texts: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>()
+  try {
+    const hashes = texts.map(hashOf)
+    const res = await pool.query(
+      'SELECT hash, target FROM rd_translations WHERE locale = $1 AND hash = ANY($2)',
+      [locale, hashes],
+    )
+    const byHash = new Map<string, string>(res.rows.map((r: any) => [r.hash, r.target]))
+    texts.forEach((t, i) => {
+      const hit = byHash.get(hashes[i])
+      if (hit != null) out.set(t, hit)
+    })
+  } catch {
+    /* table missing / DB blip — behave as a cache miss */
+  }
+  return out
+}
+
+/** Persist newly translated strings (fire-and-forget). */
+async function dbPut(pool: any, locale: string, entries: Array<{ text: string; target: string }>): Promise<void> {
+  if (!entries.length) return
+  try {
+    const values: string[] = []
+    const params: any[] = []
+    entries.forEach((e, i) => {
+      const b = i * 4
+      values.push(`($${b + 1}, $${b + 2}, $${b + 3}, $${b + 4}, now())`)
+      params.push(locale, hashOf(e.text), e.text, e.target)
+    })
+    await pool.query(
+      `INSERT INTO rd_translations (locale, hash, source, target, updated_at) VALUES ${values.join(', ')}
+       ON CONFLICT (locale, hash) DO UPDATE SET target = EXCLUDED.target, updated_at = now()`,
+      params,
+    )
+  } catch {
+    /* non-fatal: translation still returned to the caller */
+  }
+}
 
 // Developer-API model (a free API key, independent of GCP project billing);
 // override with GEMINI_MODEL. Vertex uses its own model id as a fallback.
@@ -124,14 +182,43 @@ export async function translateBatch(texts: string[], localeCode: string): Promi
 
   if (missTexts.length === 0) return result
 
-  try {
-    const translated = await modelTranslate(missTexts, langName)
-    translated.forEach((val, k) => {
+  // Persistent DB cache next: fill what we can, narrow the misses further.
+  const pool = await getPool()
+  let stillIdx = missIdx
+  let stillTexts = missTexts
+  if (pool) {
+    const dbMap = await dbGet(pool, localeCode, missTexts)
+    const nIdx: number[] = []
+    const nTexts: string[] = []
+    missTexts.forEach((t, k) => {
       const i = missIdx[k]
+      const hit = dbMap.get(t)
+      if (hit != null) {
+        result[i] = hit
+        cache.set(`${localeCode}::${t}`, hit)
+      } else {
+        nIdx.push(i)
+        nTexts.push(t)
+      }
+    })
+    stillIdx = nIdx
+    stillTexts = nTexts
+  }
+  if (stillTexts.length === 0) return result
+
+  try {
+    const translated = await modelTranslate(stillTexts, langName)
+    const persist: Array<{ text: string; target: string }> = []
+    translated.forEach((val, k) => {
+      const i = stillIdx[k]
       result[i] = val
       // Only cache real translations, so a temporary failure can be retried.
-      if (val !== missTexts[k]) cache.set(`${localeCode}::${missTexts[k]}`, val)
+      if (val !== stillTexts[k]) {
+        cache.set(`${localeCode}::${stillTexts[k]}`, val)
+        persist.push({ text: stillTexts[k], target: val })
+      }
     })
+    if (pool && persist.length) void dbPut(pool, localeCode, persist)
   } catch {
     // fall through — originals already in `result`
   }
