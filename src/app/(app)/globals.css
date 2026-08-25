@@ -283,6 +283,25 @@ a {
   gap: 0.7rem;
   text-align: center;
 }
+.upi-plan {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.upi-amount {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 800;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--ink, #14171c);
+}
+.upi-period {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #6b6a64);
+}
 .upi-support .qr-box {
   background: #fff;
   padding: 0.9rem;
