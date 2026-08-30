@@ -21,6 +21,12 @@ RUN npm run generate:types || true
 # must be kept in sync by hand when admin/plugin components change — `payload
 # generate:importmap` is not run here because it requires a live DB/GCS init at
 # build time. When adding an admin component, add its entry to importMap.js.
+# GA4 Measurement ID is a NEXT_PUBLIC_* value, so it must be present at build
+# time (Next inlines it into the bundle) — a Cloud Run runtime env var would be
+# too late. Supplied as a build-arg from CI; when empty the app renders no GA
+# snippet (layout.tsx guards on `gaId && …`), so the build stays valid unset.
+ARG NEXT_PUBLIC_GA_ID=""
+ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
 RUN npm run build
 
 # Production image, copy all the files and run next

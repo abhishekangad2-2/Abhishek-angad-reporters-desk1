@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import Link from 'next/link'
 import Masthead from './Masthead'
 import SimulationBackground from './sims/SimulationBackground'
 import { buildCards, type LandingData } from '@/lib/landing'
 import { designCssVars, DEFAULT_DESIGN } from '@/lib/design'
+import type { Episode } from '@/lib/podcasts'
 
 /** Single full-bleed feature — a hero title over an evolving dark background,
  *  scroll-revealed text blocks and large figures (IntersectionObserver fade-in),
@@ -20,7 +22,13 @@ const THEMES = [
 ]
 const LINE_COLORS = ['#3e6b66', '#9c7b3e', '#7a3f3f']
 
-export default function ImmersiveLanding({ data }: { data: LandingData }) {
+export default function ImmersiveLanding({
+  data,
+  latestEpisode = null,
+}: {
+  data: LandingData
+  latestEpisode?: Episode | null
+}) {
   const cards = buildCards(data, 3).slice(0, 3)
   const hero = cards[0]
   const body = cards.slice(1)
@@ -34,11 +42,9 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
   const graphRef = useRef<HTMLCanvasElement>(null)
   const graphLabelRef = useRef<HTMLDivElement>(null)
   const linksRef = useRef<HTMLCanvasElement>(null)
-  const vizRef = useRef<HTMLDivElement>(null)
   const lineColorRef = useRef('#3e6b66')
 
   const [intensity, setIntensity] = useState(0.25)
-  const [playing, setPlaying] = useState(false)
 
   // Reveal-on-scroll, evolving background, progress bar, growing graph.
   useEffect(() => {
@@ -47,7 +53,7 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
     if (!root) return
 
     const revealEls = root.querySelectorAll<HTMLElement>(
-      '.im-block,.im-figure,.im-quote,.im-audio',
+      '.im-block,.im-figure,.im-quote,.im-pod',
     )
     if (reduce) {
       revealEls.forEach((el) => el.classList.add('in'))
@@ -195,31 +201,6 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
     }
   }, [])
 
-  // Audio visualiser (simulated bars).
-  useEffect(() => {
-    const bars = vizRef.current
-    if (!bars) return
-    if (!playing) {
-      Array.from(bars.children).forEach((s) => ((s as HTMLElement).style.height = '20%'))
-      return
-    }
-    let timer: ReturnType<typeof setTimeout>
-    let raf = 0
-    const tick = () => {
-      Array.from(bars.children).forEach(
-        (s) => ((s as HTMLElement).style.height = 15 + Math.random() * 85 + '%'),
-      )
-      timer = setTimeout(() => {
-        raf = requestAnimationFrame(tick)
-      }, 110)
-    }
-    tick()
-    return () => {
-      clearTimeout(timer)
-      cancelAnimationFrame(raf)
-    }
-  }, [playing])
-
   return (
     <div
       className="landing landing--immersive"
@@ -283,21 +264,37 @@ export default function ImmersiveLanding({ data }: { data: LandingData }) {
           left to live with it.”
         </blockquote>
 
-        <div className="im-audio">
-          <button
-            type="button"
-            aria-label={playing ? 'Pause reporter’s note' : 'Play reporter’s note'}
-            onClick={() => setPlaying((p) => !p)}
-          >
-            {playing ? '❚❚' : '▶'}
-          </button>
-          <div className="im-viz" ref={vizRef}>
-            {Array.from({ length: 28 }).map((_, i) => (
-              <span key={i} />
-            ))}
-          </div>
-          <span className="im-audio-label">Reporter’s note · 0:48</span>
-        </div>
+        {latestEpisode && (
+          <aside className="im-pod" aria-label="Latest from the podcast">
+            <Link className="im-pod-card" href={`/podcast/${latestEpisode.slug}`}>
+              {latestEpisode.coverUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="im-pod-cover" src={latestEpisode.coverUrl} alt="" />
+              ) : (
+                <span className="im-pod-cover im-pod-cover--ph" aria-hidden>
+                  ▶
+                </span>
+              )}
+              <span className="im-pod-body">
+                <span className="im-pod-eyebrow">
+                  Latest podcast
+                  {latestEpisode.episodeNumber != null && (
+                    <span className="im-pod-num"> · EP {latestEpisode.episodeNumber}</span>
+                  )}
+                  {latestEpisode.duration && (
+                    <span className="im-pod-dur"> · {latestEpisode.duration}</span>
+                  )}
+                </span>
+                <span className="im-pod-title">{latestEpisode.title}</span>
+                {latestEpisode.dek && <span className="im-pod-dek">{latestEpisode.dek}</span>}
+                <span className="im-pod-cta">Listen to the episode →</span>
+              </span>
+            </Link>
+            <Link className="im-pod-all" href="/podcast">
+              Browse all episodes →
+            </Link>
+          </aside>
+        )}
       </main>
     </div>
   )

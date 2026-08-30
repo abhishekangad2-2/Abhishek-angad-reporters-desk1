@@ -20,7 +20,7 @@ async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 const NAV = [
   { group: 'Workspace', items: [['Dashboard', '/desk', true], ['Content', '/cms/collections/stories'], ['Media Library', '/cms/collections/media']] },
   { group: 'Engagement', items: [['Polls', '/cms/collections/polls'], ['Newsletter', '/cms/collections/newsletter-subscribers'], ['Live Dispatches', '/cms/collections/live-dispatches'], ['Patronage', '/cms/collections/payments']] },
-  { group: 'Tools', items: [['Translation', '/cms/globals/integrations'], ['Analytics', '/cms/globals/integrations']] },
+  { group: 'Tools', items: [['Comments', '/cms/collections/comments'], ['Analytics', '/desk/insights']] },
   { group: 'Admin', items: [['Roles & Access', '/cms/collections/users'], ['Settings', '/cms/globals/integrations']] },
 ]
 

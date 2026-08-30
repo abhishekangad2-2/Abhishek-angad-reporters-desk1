@@ -11,6 +11,7 @@ import Template1 from '@/components/templates/Template1'
 import Template2 from '@/components/templates/Template2'
 import Template3 from '@/components/templates/Template3'
 import Template4 from '@/components/templates/Template4'
+import Comments from '@/components/Comments'
 
 export const dynamic = 'force-dynamic'
 
@@ -167,6 +168,7 @@ export default async function StoryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Template story={story as any} />
+      <Comments storyId={String((story as any).id)} storySlug={slug} />
     </>
   )
 }

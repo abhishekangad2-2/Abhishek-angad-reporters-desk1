@@ -44,7 +44,12 @@ jobs:
         # latest (Cloud Run deploys the pinned SHA below).
         run: |
           IMG=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/reportersdesk-repo/cms
-          docker build -t "$IMG:${{ github.sha }}" -t "$IMG:latest" .
+          # NEXT_PUBLIC_GA_ID is inlined at build time (see Dockerfile). It's the
+          # public GA4 Measurement ID (G-…), safe to expose — stored as a repo
+          # Actions Variable, not a secret. Empty when unset → no GA snippet.
+          docker build \
+            --build-arg NEXT_PUBLIC_GA_ID="${{ vars.NEXT_PUBLIC_GA_ID }}" \
+            -t "$IMG:${{ github.sha }}" -t "$IMG:latest" .
           docker push "$IMG:${{ github.sha }}"
           docker push "$IMG:latest"
 
@@ -59,6 +64,7 @@ jobs:
             GCS_BUCKET_NAME=reportersdesk-media-secret-walker-497804-d5
             GCS_PROJECT_ID=secret-walker-497804-d5
             MEDIA_CDN_BASE_URL=https://cdn.reporters-desk.org
+            GA_PROPERTY_ID=${{ vars.GA_PROPERTY_ID }}
             RAZORPAY_KEY_ID=none
             RAZORPAY_KEY_SECRET=none
             RAZORPAY_PLAN_ID_READER=none

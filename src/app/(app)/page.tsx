@@ -3,6 +3,7 @@ import { isLandingTemplate, DEFAULT_TEMPLATE, type LandingTemplate } from '@/lib
 import { getLandingData, getLandingLayout } from '@/lib/landing.server'
 import { designCssVarString, DEFAULT_DESIGN } from '@/lib/design'
 import { translateLandingData } from '@/lib/translate.server'
+import { getEpisodes } from '@/lib/podcasts'
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
 import ThreeColumnLanding from '@/components/ThreeColumnLanding'
 import ZPatternLanding from '@/components/ZPatternLanding'
@@ -33,13 +34,18 @@ export default async function Home({
   let data = await getLandingData()
   if (locale !== DEFAULT_LOCALE) data = await translateLandingData(data, locale)
 
+  // Latest published episode, surfaced on the immersive landing in place of the
+  // old simulated "reporter's note" audio block. Fails soft to null (getEpisodes
+  // swallows its own errors), so the landing renders fine with no podcast.
+  const latestEpisode = (await getEpisodes())[0] ?? null
+
   const landing =
     template === 'z-pattern' ? (
       <ZPatternLanding data={data} />
     ) : template === 'newspaper' ? (
       <NewspaperLanding data={data} />
     ) : template === 'immersive' ? (
-      <ImmersiveLanding data={data} />
+      <ImmersiveLanding data={data} latestEpisode={latestEpisode} />
     ) : (
       <ThreeColumnLanding data={data} />
     )

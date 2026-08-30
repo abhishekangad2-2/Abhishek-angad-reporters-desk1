@@ -22,6 +22,7 @@ import { Payments } from './collections/Payments'
 import { AuditLogs } from './collections/AuditLogs'
 import { RTIRequests } from './collections/RTIRequests'
 import { InvestigateRequests } from './collections/InvestigateRequests'
+import { Comments } from './collections/Comments'
 import { Integrations } from './globals/Integrations'
 import { DesignStudio } from './globals/DesignStudio'
 
@@ -69,7 +70,7 @@ export default buildConfig({
     Media, Podcasts,
     // Tools
     LiveDispatches, Polls, Newsletters, NewsletterSubscribers,
-    Subscriptions, Transactions, Payments, RTIRequests, InvestigateRequests,
+    Subscriptions, Transactions, Payments, RTIRequests, InvestigateRequests, Comments,
     // Admin
     Users, AuditLogs,
   ],

@@ -28,5 +28,24 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Also register them with the email provider (Resend) so they actually join
+  // the list the newsletter is dispatched to — the Newsletters collection sends
+  // from newsletters@reporters-desk.org via this same audience. Optional and
+  // best-effort: the DB record above is the source of truth, so a Resend hiccup
+  // must never fail the subscription. Mirrors the /api/investigate flow.
+  const resendKey = process.env.RESEND_API_KEY
+  const audienceId = process.env.RESEND_AUDIENCE_ID
+  if (resendKey && resendKey !== 'none' && audienceId) {
+    try {
+      await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: String(email).trim(), unsubscribed: false }),
+      })
+    } catch (err: any) {
+      payload.logger?.warn?.(`[Newsletter] Resend subscribe failed: ${err?.message}`)
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }

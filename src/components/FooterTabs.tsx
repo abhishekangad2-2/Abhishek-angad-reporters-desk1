@@ -12,6 +12,55 @@ const TABS = [
   { id: 'bio', label: 'About the founder', Component: FounderBioTab },
 ] as const
 
+// Contact + social strip in the footer. Only entries with a non-empty `href`
+// render, so adding Instagram/YouTube/X later is just filling in the URL.
+const SOCIAL_LINKS: { id: string; label: string; href: string; icon: React.ReactNode }[] = [
+  {
+    id: 'email',
+    label: 'Email the newsroom',
+    href: 'mailto:newsletters@reporters-desk.org',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </svg>
+    ),
+  },
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    href: '',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    id: 'youtube',
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@reportersdeskabhishekangad',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7">
+        <rect x="2.5" y="5.5" width="19" height="13" rx="3.5" />
+        <path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    id: 'x',
+    label: 'X (Twitter)',
+    href: 'https://x.com/RDreportersdesk',
+    icon: (
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor">
+        <path d="M18.244 2H21.5l-7.5 8.57L22.5 22h-6.9l-4.7-6.14L5.5 22H2.24l8.02-9.17L1.5 2h6.9l4.26 5.63L18.244 2Zm-1.21 18h1.8L7.04 3.86H5.1L17.034 20Z" />
+      </svg>
+    ),
+  },
+]
+
 export default function FooterTabs() {
   const [openTab, setOpenTab] = useState<(typeof TABS)[number]['id'] | null>(null)
   const ActiveTab = TABS.find((t) => t.id === openTab)
@@ -72,6 +121,27 @@ export default function FooterTabs() {
           <ActiveTab.Component />
         </div>
       )}
+
+      <div className="footer-connect">
+        <span className="footer-connect-label">Connect</span>
+        <nav className="footer-social" aria-label="Contact and social">
+          {SOCIAL_LINKS.filter((s) => s.href).map((s) => {
+            const external = !s.href.startsWith('mailto:')
+            return (
+              <a
+                key={s.id}
+                className="footer-social-link"
+                href={s.href}
+                aria-label={s.label}
+                title={s.label}
+                {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {s.icon}
+              </a>
+            )
+          })}
+        </nav>
+      </div>
     </footer>
   )
 }
