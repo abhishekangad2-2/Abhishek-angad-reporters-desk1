@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isEditorOrAbove } from '../lib/access'
+import { unsubUrl } from '../lib/newsletterToken'
 
 // Minimal Lexical → HTML for newsletter content. Handles paragraphs, headings,
 // bold/italic, lists, blockquotes, and links — enough for newsroom dispatches
@@ -82,18 +83,29 @@ export const Newsletters: CollectionConfig = {
             req.payload.logger.info('[Newsletter] no active subscribers')
             return
           }
-          const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:640px;margin:auto;padding:24px"><h1 style="font-family:Georgia,serif">${doc.subject}</h1>${lexicalToHtml((doc as any).content?.root)}<hr style="margin:32px 0;border:0;border-top:1px solid #ddd"/><p style="font-size:12px;color:#666">ReportersDesk · Abhishek Angad Ink</p></div>`
-          const batches: string[][] = []
-          for (let i = 0; i < recipients.length; i += 100) batches.push(recipients.slice(i, i + 100))
+          const body = lexicalToHtml((doc as any).content?.root)
+          // Per-recipient send so each gets a personalised, one-click unsubscribe
+          // link (required for deliverability + compliance).
           let ok = 0, fail = 0
-          for (const batch of batches) {
+          for (const email of recipients) {
+            const unsub = unsubUrl(email)
+            const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:640px;margin:auto;padding:24px"><h1 style="font-family:Georgia,serif">${doc.subject}</h1>${body}<hr style="margin:32px 0;border:0;border-top:1px solid #ddd"/><p style="font-size:12px;color:#666">ReportersDesk · Abhishek Angad Ink<br/><a href="${unsub}" style="color:#666">Unsubscribe</a></p></div>`
             const res = await fetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ from: fromAddr, to: fromAddr, bcc: batch, subject: doc.subject, html }),
+              body: JSON.stringify({
+                from: fromAddr,
+                to: email,
+                subject: doc.subject,
+                html,
+                headers: {
+                  'List-Unsubscribe': `<${unsub}>`,
+                  'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+                },
+              }),
             })
-            if (res.ok) ok += batch.length
-            else { fail += batch.length; req.payload.logger.error(`[Newsletter] Resend ${res.status} for batch`) }
+            if (res.ok) ok++
+            else { fail++; req.payload.logger.error(`[Newsletter] Resend ${res.status} for ${email}`) }
           }
           req.payload.logger.info(`[Newsletter] '${doc.subject}' dispatched: ${ok} sent, ${fail} failed`)
         } catch (err) {
