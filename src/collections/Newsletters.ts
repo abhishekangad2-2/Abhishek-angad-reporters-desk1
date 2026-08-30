@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isEditorOrAbove } from '../lib/access'
 import { unsubUrl } from '../lib/newsletterToken'
+import { sendMail, mailerConfigured, mailerChannel } from '../lib/mailer'
 
 // Minimal Lexical → HTML for newsletter content. Handles paragraphs, headings,
 // bold/italic, lists, blockquotes, and links — enough for newsroom dispatches
@@ -65,10 +66,10 @@ export const Newsletters: CollectionConfig = {
       // ship dark — a key flip in deploy.yml turns it on.
       async ({ doc, previousDoc, req, operation }) => {
         if (!(operation === 'update' && doc.status === 'sent' && previousDoc.status !== 'sent')) return
-        const resendKey = process.env.RESEND_API_KEY
-        const fromAddr = process.env.NEWSLETTER_FROM || 'newsletters@reporters-desk.org'
-        if (!resendKey || resendKey === 'none') {
-          req.payload.logger.warn(`[Newsletter] RESEND_API_KEY not set — '${doc.subject}' not dispatched.`)
+        const fromAddr =
+          process.env.NEWSLETTER_FROM || process.env.SMTP_USER || 'newsletters@reporters-desk.org'
+        if (!mailerConfigured()) {
+          req.payload.logger.warn(`[Newsletter] No mail transport (SMTP/Resend) set — '${doc.subject}' not dispatched.`)
           return
         }
         try {
@@ -90,24 +91,20 @@ export const Newsletters: CollectionConfig = {
           for (const email of recipients) {
             const unsub = unsubUrl(email)
             const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:640px;margin:auto;padding:24px"><h1 style="font-family:Georgia,serif">${doc.subject}</h1>${body}<hr style="margin:32px 0;border:0;border-top:1px solid #ddd"/><p style="font-size:12px;color:#666">ReportersDesk · Abhishek Angad Ink<br/><a href="${unsub}" style="color:#666">Unsubscribe</a></p></div>`
-            const res = await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                from: fromAddr,
-                to: email,
-                subject: doc.subject,
-                html,
-                headers: {
-                  'List-Unsubscribe': `<${unsub}>`,
-                  'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-                },
-              }),
+            const sent = await sendMail({
+              from: fromAddr,
+              to: email,
+              subject: doc.subject,
+              html,
+              headers: {
+                'List-Unsubscribe': `<${unsub}>`,
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+              },
             })
-            if (res.ok) ok++
-            else { fail++; req.payload.logger.error(`[Newsletter] Resend ${res.status} for ${email}`) }
+            if (sent) ok++
+            else { fail++; req.payload.logger.error(`[Newsletter] send failed for ${email}`) }
           }
-          req.payload.logger.info(`[Newsletter] '${doc.subject}' dispatched: ${ok} sent, ${fail} failed`)
+          req.payload.logger.info(`[Newsletter] '${doc.subject}' dispatched via ${mailerChannel()}: ${ok} sent, ${fail} failed`)
         } catch (err) {
           req.payload.logger.error('[Newsletter] dispatch failed: ' + String(err))
         }
