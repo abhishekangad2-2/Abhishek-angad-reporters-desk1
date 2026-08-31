@@ -76,8 +76,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Receipt email (best-effort).
-    try {
+    // Receipt email (best-effort) — only for the annual memberships. A one-time
+    // coffee (₹200) is just recorded, no receipt.
+    if (tier === 'reader' || tier === 'foi') try {
       const amtStr = amount ? `₹${amount.toLocaleString('en-IN')}` : ''
       const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:560px;margin:auto;padding:24px">
         <h1 style="font-family:Georgia,serif">Thank you for supporting Reporters Desk</h1>
