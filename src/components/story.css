@@ -236,14 +236,10 @@
 
 .rd-gallery__grid {
   display: grid;
+  /* Two columns on every screen so the "one big, two small" rhythm holds:
+     a full-width lead photo, then a pair side by side, then repeat. */
   grid-template-columns: repeat(2, 1fr);
   gap: clamp(8px, 1vw, 16px);
-}
-
-@media (min-width: 700px) {
-  .rd-gallery__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 .rd-gallery__item {
@@ -254,13 +250,27 @@
   background: none;
   border: 0;
   width: 100%;
-  /* Uniform tiles — every photo occupies an identical cell. */
+  /* Default = the two "small" tiles that follow each lead photo. */
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: var(--radius, 4px);
   text-align: left;
   font: inherit;
   color: inherit;
+}
+
+/* Zig-zag rhythm: every third tile, starting with the first, is the large
+   lead photo — full width and cinematic; the next two sit side by side. */
+.rd-gallery__item:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+}
+
+/* A trailing single tile (no partner) spans the full width so no half-empty
+   row is left dangling at the end of the essay. */
+.rd-gallery__item:last-child:nth-child(3n + 2) {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
 }
 
 .rd-gallery__item img {
@@ -285,12 +295,20 @@
   outline-offset: 3px;
 }
 
+/* Caption sits as a legible scrim over the foot of each photo — the tiles are
+   cover-cropped, so a caption below the image would be clipped. */
 .rd-gallery__cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.6rem 0.8rem 0.6rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1.4;
-  color: var(--ink-soft);
-  margin-top: 0.4rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: #fff;
+  background: linear-gradient(to top, rgba(10, 11, 13, 0.82), rgba(10, 11, 13, 0));
+  pointer-events: none;
 }
 
 /* Small per-item media badge (audio/video clip attached to gallery item) */
