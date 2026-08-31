@@ -19,6 +19,7 @@ import { Transactions } from './collections/Transactions'
 import { Newsletters } from './collections/Newsletters'
 import { NewsletterSubscribers } from './collections/NewsletterSubscribers'
 import { Payments } from './collections/Payments'
+import { Supporters } from './collections/Supporters'
 import { AuditLogs } from './collections/AuditLogs'
 import { RTIRequests } from './collections/RTIRequests'
 import { InvestigateRequests } from './collections/InvestigateRequests'
@@ -70,7 +71,7 @@ export default buildConfig({
     Media, Podcasts,
     // Tools
     LiveDispatches, Polls, Newsletters, NewsletterSubscribers,
-    Subscriptions, Transactions, Payments, RTIRequests, InvestigateRequests, Comments,
+    Subscriptions, Transactions, Payments, Supporters, RTIRequests, InvestigateRequests, Comments,
     // Admin
     Users, AuditLogs,
   ],
