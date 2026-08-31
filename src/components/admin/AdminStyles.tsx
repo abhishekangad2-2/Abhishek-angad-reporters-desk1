@@ -62,12 +62,44 @@ const CSS = `
 }
 .dashboard .card:hover::before { transform: scaleX(1); }
 
-/* Stronger card titles — the default is a touch anaemic. */
+/* Roomier cards so the icon + title + description breathe. */
+.dashboard .card,
+.card { padding: 1.05rem 1.15rem; }
+
+/* Stronger card titles — the default is a touch anaemic — and lay the title out
+   as a row so the injected icon chip sits cleanly to its left. */
 .dashboard .card .card__title,
 .dashboard .card h3,
 .card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+/* Leading category icon: a tinted accent chip, fixed size, before each title. */
+.rd-card-ico {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(180, 61, 42, 0.12);
+  color: var(--rd-accent);
+}
+.rd-card-ico svg { width: 17px; height: 17px; display: block; }
+
+/* One-line description under the title. Aligns under the title text (past the
+   icon chip) so the card reads as a tidy two-line unit. */
+.rd-card-hint {
+  margin: 0.45rem 0 0;
+  padding-left: calc(30px + 0.6rem);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--theme-elevation-500);
 }
 
 /* The "+ create" affordance on each card in the accent. */
