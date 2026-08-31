@@ -34,7 +34,7 @@ async function broadcast(payload: any, subject: string, contentHtml: string) {
   const recipients = subs.docs
     .map((s: any) => s.email)
     .filter((e: string) => e && !AUTHORISED.includes(String(e).toLowerCase()))
-  const from = process.env.NEWSLETTER_FROM || process.env.SMTP_USER || AUTHORISED
+  const from = process.env.NEWSLETTER_FROM || process.env.SMTP_USER || AUTHORISED[0] || 'abhishek.angad@reporters-desk.org'
   let ok = 0, fail = 0
   for (const email of recipients) {
     const unsub = unsubUrl(email)
