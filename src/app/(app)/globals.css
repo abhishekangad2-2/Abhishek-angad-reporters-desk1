@@ -326,7 +326,72 @@ a {
   display: flex;
   gap: 0.6rem;
   width: 100%;
+  max-width: 420px;
+  flex-wrap: wrap;
+}
+.upi-hook {
+  margin: 0;
   max-width: 340px;
+  text-align: center;
+  font: 400 0.86rem/1.45 Georgia, serif;
+  color: var(--ink-soft, #6b6a64);
+}
+.upi-hook b {
+  color: var(--accent, #b43d2a);
+}
+
+/* Homepage "Next investigation" teaser band. */
+.coming-next {
+  position: relative;
+  z-index: 2;
+  background: #14171c;
+  color: #f5f3ef;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem;
+}
+.coming-next-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+.cn-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: 700 0.72rem/1 var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e6b8ac;
+}
+.cn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b43d2a;
+  animation: wire-pulse 1.8s infinite;
+}
+.cn-title {
+  margin: 0.9rem 0 0;
+  font: 800 clamp(1.7rem, 4.5vw, 3rem) / 1.1 Georgia, 'Times New Roman', serif;
+}
+.cn-dek {
+  margin: 0.9rem auto 0;
+  max-width: 52ch;
+  font: 400 1.05rem/1.55 Georgia, serif;
+  color: #cbc7bf;
+}
+.cn-cta {
+  display: inline-block;
+  margin-top: 1.5rem;
+  background: #b43d2a;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 999px;
+}
+.cn-cta:hover {
+  filter: brightness(1.08);
 }
 .upi-plan-card {
   flex: 1 1 0;
