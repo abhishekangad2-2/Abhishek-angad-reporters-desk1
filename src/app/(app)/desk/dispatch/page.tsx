@@ -11,6 +11,17 @@ import './dispatch.css'
 // cookie, so this page gate and the write gate are independent.
 export const dynamic = 'force-dynamic'
 
+// Home-screen app metadata: adding this page to an iPhone home screen installs
+// a standalone "RD Wire" launcher that opens straight into the composer.
+export const metadata = {
+  title: 'RD Wire — File a dispatch',
+  appleWebApp: {
+    capable: true,
+    title: 'RD Wire',
+    statusBarStyle: 'black-translucent' as const,
+  },
+}
+
 type StaffUser = {
   id: string
   role?: string
@@ -43,7 +54,7 @@ export default async function DispatchPage() {
     user = null
   }
   if (!user || !['admin', 'editor', 'reporter'].includes(user.role ?? '')) {
-    redirect('/admin-login')
+    redirect('/admin-login?next=/desk/dispatch')
   }
 
   const recent = await payload

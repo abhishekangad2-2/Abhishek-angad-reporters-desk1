@@ -2886,6 +2886,18 @@ a {
   border-color: var(--accent, #b43d2a);
 }
 .rd-login__btn:disabled { opacity: 0.55; cursor: default; }
+.rd-login__remember {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-family: var(--font-ibm-plex-sans, system-ui, sans-serif);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba(20, 23, 28, 0.72);
+  margin: 0.9rem 0 0.25rem;
+  cursor: pointer;
+}
+.rd-login__remember input { margin-top: 0.15rem; flex: none; }
 .rd-login__text { font-family: var(--font-ibm-plex-sans, system-ui, sans-serif); font-size: 0.9rem; color: var(--ink, #14171c); margin: 0 0 1rem; line-height: 1.5; }
 .rd-login__hint { font-family: var(--font-ibm-plex-sans, system-ui, sans-serif); font-size: 0.8rem; color: rgba(20, 23, 28, 0.6); margin: 0.75rem 0; }
 .rd-login__error {

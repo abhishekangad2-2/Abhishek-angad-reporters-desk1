@@ -12,6 +12,16 @@ export default function AdminLoginPage() {
   const [pendingToken, setPendingToken] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [remember, setRemember] = useState(false)
+
+  // Where to go after login. Honour a same-site ?next= (e.g. /desk/dispatch),
+  // rejecting absolute/protocol-relative URLs; otherwise the admin panel.
+  const destination = () => {
+    if (typeof window === 'undefined') return '/cms'
+    const next = new URLSearchParams(window.location.search).get('next')
+    if (next && next.startsWith('/') && !next.startsWith('//')) return next
+    return '/cms'
+  }
 
   // Step 1: Email + Password
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
@@ -57,7 +67,7 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/auth/verify-2fa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pendingToken, code }),
+        body: JSON.stringify({ pendingToken, code, remember }),
       })
 
       if (!res.ok) {
@@ -66,11 +76,11 @@ export default function AdminLoginPage() {
         return
       }
 
-      // Success — session cookies set. Use a hard navigation so the request to
-      // /cms carries the new cookies through the auth middleware. A
-      // client-side router.push fetches the RSC payload through the
-      // redirecting middleware and can fail with "this page couldn't load".
-      window.location.href = '/cms'
+      // Success — session cookies set. Use a hard navigation so the request
+      // carries the new cookies through the auth middleware. A client-side
+      // router.push fetches the RSC payload through the redirecting middleware
+      // and can fail with "this page couldn't load".
+      window.location.href = destination()
     } catch (err) {
       setError('Network error. Please try again.')
     } finally {
@@ -129,8 +139,8 @@ export default function AdminLoginPage() {
 
       // Success — enrollment complete AND logged in: confirm-enrollment set
       // the session cookies, so there's no need to enter a second code. Hard
-      // navigate to the admin (carries cookies through the middleware).
-      window.location.href = '/cms'
+      // navigate (carries cookies through the middleware).
+      window.location.href = destination()
     } catch (err) {
       setError('Network error. Please try again.')
     } finally {
@@ -244,6 +254,14 @@ export default function AdminLoginPage() {
                 required
                 className="rd-login__input rd-login__input--code"
               />
+              <label className="rd-login__remember">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+                <span>Keep me signed in on this device (30 days) — for filing dispatches from your phone.</span>
+              </label>
               {error && <p className="rd-login__error">{error}</p>}
               <button type="submit" className="rd-login__btn">
                 {loading ? 'Verifying…' : 'Verify & log in'}

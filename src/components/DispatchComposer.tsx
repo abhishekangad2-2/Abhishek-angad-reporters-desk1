@@ -164,6 +164,12 @@ export default function DispatchComposer({
           </div>
         ))}
       </section>
+
+      <p className="dc-install">
+        Tip: add this page to your home screen (Share → “Add to Home Screen”) to
+        file dispatches with one tap. Tick “Keep me signed in” at login so you
+        won’t re-enter your code in the field.
+      </p>
     </div>
   )
 }

@@ -9,7 +9,11 @@ import { SESSION_COOKIE } from '../../../../lib/auth/session'
 const PENDING_2FA_SECRET = process.env.PENDING_2FA_SECRET!
 
 export async function POST(req: NextRequest) {
-  const { pendingToken, code } = await req.json()
+  const { pendingToken, code, remember } = await req.json()
+  // Field reporters filing dispatches from a phone opt into a long-lived
+  // session so they aren't re-entering a TOTP every couple of hours mid-event.
+  // Default stays short (2h) for the admin panel on shared machines.
+  const sessionTtl = remember === true ? 60 * 60 * 24 * 30 : 60 * 60 * 2
   if (!pendingToken || !code) {
     return NextResponse.json({ error: 'Missing token or code.' }, { status: 400 })
   }
@@ -73,7 +77,7 @@ export async function POST(req: NextRequest) {
 
   // 1) Custom session used by middleware.ts to gate /admin server-side.
   const sessionToken = jwt.sign({ userId: user.id, role: user.role }, process.env.PAYLOAD_SECRET!, {
-    expiresIn: '2h',
+    expiresIn: sessionTtl,
   })
 
   // 2) A real Payload auth token so the admin panel itself treats the user as
@@ -83,7 +87,9 @@ export async function POST(req: NextRequest) {
   //    (getFieldsToSign), which is valid because Users uses stateless JWTs
   //    (auth.useSessions = false), so no server-side session record is needed.
   const usersConfig = payload.collections['users'].config
-  const tokenExpiration = usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
+  const tokenExpiration = remember === true
+    ? sessionTtl
+    : usersConfig.auth?.tokenExpiration ?? 60 * 60 * 2
   const fieldsToSign = getFieldsToSign({
     collectionConfig: usersConfig,
     email: user.email,
@@ -107,7 +113,7 @@ export async function POST(req: NextRequest) {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
-    maxAge: 60 * 60 * 2,
+    maxAge: sessionTtl,
     path: '/',
   })
   res.cookies.set('payload-token', payloadToken, {

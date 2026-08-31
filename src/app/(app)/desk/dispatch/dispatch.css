@@ -188,3 +188,14 @@
 .dc-dot.md { background: #c69a3a; }
 .dc-dot.hi { background: var(--dc-accent); box-shadow: 0 0 0 3px rgba(180, 61, 42, 0.25); }
 .dc-recent-text { line-height: 1.4; }
+
+.dc-install {
+  font-family: var(--font-ibm-plex-sans, system-ui, sans-serif);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(20, 23, 28, 0.55);
+  margin: 1.5rem 0 0;
+  padding: 0.9rem 1rem;
+  background: rgba(20, 23, 28, 0.04);
+  border-radius: 10px;
+}
