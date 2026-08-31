@@ -33,9 +33,32 @@ const monoFace = IBM_Plex_Mono({
   display: "swap",
 });
 
+const SITE_DESCRIPTION =
+  "Independent, reader-funded investigative journalism — long-form ground reportage from Jharkhand and eastern India by Abhishek Angad.";
+
 export const metadata: Metadata = {
-  title: "ReportersDesk · Abhishek Angad Ink",
-  description: "Independent Journalism",
+  metadataBase: new URL("https://reporters-desk.org"),
+  title: {
+    default: "ReportersDesk · Abhishek Angad Ink",
+    template: "%s · ReportersDesk",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "ReportersDesk",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "ReportersDesk",
+    title: "ReportersDesk · Abhishek Angad Ink",
+    description: SITE_DESCRIPTION,
+    url: "https://reporters-desk.org",
+    images: [{ url: "/og-default.jpg", width: 1200, height: 630, alt: "ReportersDesk — independent, reader-funded journalism" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ReportersDesk · Abhishek Angad Ink",
+    description: SITE_DESCRIPTION,
+    images: ["/og-default.jpg"],
+  },
   // Discourage Chrome auto-translate, which rewrites text nodes before React
   // hydrates and triggers React #418 text-mismatch crashes. i18n is handled
   // server-side via the locale cookie, so browser translation isn't needed.
