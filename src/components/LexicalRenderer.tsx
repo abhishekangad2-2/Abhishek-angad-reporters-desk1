@@ -188,9 +188,10 @@ function mediaDetail(media: any): {
   height: number | null
   mime: string
   id: any
+  alt: string | null
 } {
   if (!media || typeof media !== 'object') {
-    return { url: typeof media === 'string' ? media : null, width: null, height: null, mime: '', id: undefined }
+    return { url: typeof media === 'string' ? media : null, width: null, height: null, mime: '', id: undefined, alt: null }
   }
   return {
     url: media.url ?? null,
@@ -198,6 +199,7 @@ function mediaDetail(media: any): {
     height: media.height ?? null,
     mime: media.mimeType ?? '',
     id: media.id,
+    alt: media.alt ?? null,
   }
 }
 
@@ -266,7 +268,8 @@ function GalleryBlock({ block }: { block: any }) {
         url: d.url,
         width: d.width,
         height: d.height,
-        caption: item.caption ?? null,
+        // Per-item caption if set, otherwise the image's own alt text.
+        caption: item.caption ?? d.alt ?? null,
       } as GalleryImage
     })
     .filter(Boolean) as GalleryImage[]
