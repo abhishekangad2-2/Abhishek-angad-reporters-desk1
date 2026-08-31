@@ -13,7 +13,14 @@ import { unsubUrl } from '@/lib/newsletterToken'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120
 
-const AUTHORISED = (process.env.NEWSLETTER_SENDER || 'abhishek.angad@reporters-desk.org').toLowerCase()
+// Any of these addresses may broadcast (comma-separated via NEWSLETTER_SENDERS).
+const AUTHORISED = (
+  process.env.NEWSLETTER_SENDERS ||
+  'abhishek.angad@reporters-desk.org,newsletters@reporters-desk.org'
+)
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean)
 const INBOX_ADDR = (process.env.NEWSLETTER_INBOX || 'newsletters@reporters-desk.org').toLowerCase()
 
 async function broadcast(payload: any, subject: string, contentHtml: string) {
@@ -23,7 +30,10 @@ async function broadcast(payload: any, subject: string, contentHtml: string) {
     limit: 10000,
     depth: 0,
   })
-  const recipients = subs.docs.map((s: any) => s.email).filter(Boolean)
+  // Never send to a broadcaster address itself — prevents a self-send loop.
+  const recipients = subs.docs
+    .map((s: any) => s.email)
+    .filter((e: string) => e && !AUTHORISED.includes(String(e).toLowerCase()))
   const from = process.env.NEWSLETTER_FROM || process.env.SMTP_USER || AUTHORISED
   let ok = 0, fail = 0
   for (const email of recipients) {
@@ -99,7 +109,7 @@ export async function POST(req: NextRequest) {
           // from being reprocessed.
           if (!toAddrs.includes(INBOX_ADDR)) {
             out.skipped++
-          } else if (from === AUTHORISED) {
+          } else if (AUTHORISED.includes(from)) {
             out.lastBroadcast = await broadcast(payload, subject, contentHtml)
             out.broadcasts++
           } else if (from) {
