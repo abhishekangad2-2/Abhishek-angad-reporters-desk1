@@ -7,8 +7,8 @@ export const UPI_ID = '9910270994@kotakbank'
 export const UPI_NAME = 'Abhishek Angad'
 
 const PLANS = [
-  { id: 'reader', label: 'Founding Member', amount: 5000, period: '/ year', blurb: 'Write one long-form piece a month + everything we publish' },
-  { id: 'foi', label: 'Founding Patron', amount: 10000, period: '/ year', blurb: 'Funds RTI filings and document access' },
+  { id: 'reader', label: 'Member', amount: 5000, period: '/ year', blurb: 'Write one long-form piece a month + everything we publish' },
+  { id: 'foi', label: 'Patron', amount: 10000, period: '/ year', blurb: 'Funds RTI filings and document access' },
   { id: 'coffee', label: 'Buy me a coffee', amount: 200, period: 'one-time', blurb: 'A one-time thank-you' },
 ] as const
 
@@ -111,7 +111,7 @@ export default function UpiSupport({ size = 158 }: { size?: number }) {
 
       {annual && (
         <p className="upi-hook">
-          Founding members can <b>write one long-form piece a month</b> for Reporters Desk.
+          Members can <b>write one long-form piece a month</b> for Reporters Desk.
         </p>
       )}
 

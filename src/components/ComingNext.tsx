@@ -11,7 +11,7 @@ export default function ComingNext() {
         </span>
         <h2 className="cn-title">Internal migration and the intersectionalities</h2>
         <p className="cn-dek">
-          A long-form investigation, in the works. Founding Members get it first — and help shape what we report.
+          A long-form investigation, in the works. Members get it first — and help shape what we report.
         </p>
         <Link href="/support" className="cn-cta">
           Support this reporting →

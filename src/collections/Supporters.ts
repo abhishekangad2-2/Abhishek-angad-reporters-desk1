@@ -29,8 +29,8 @@ export const Supporters: CollectionConfig = {
       name: 'tier',
       type: 'select',
       options: [
-        { label: 'Founding Member (₹5,000/yr)', value: 'reader' },
-        { label: 'Founding Patron (₹10,000/yr)', value: 'foi' },
+        { label: 'Member (₹5,000/yr)', value: 'reader' },
+        { label: 'Patron (₹10,000/yr)', value: 'foi' },
         { label: 'Coffee (one-time)', value: 'coffee' },
         { label: 'Other', value: 'other' },
       ],

@@ -16,8 +16,8 @@ export default async function SupportPage() {
   const locale = await readLocale()
   const [title, dek, note] = await translateBatch(
     [
-      'Become a Founding Member',
-      'Reporters Desk is reader-funded ground reportage — investigations, RTIs and field journalism, with no paywall and no ads. As a Founding Member you help decide what gets reported, and you can write one long-form piece a month.',
+      'Become a Member',
+      'Reporters Desk is reader-funded ground reportage — investigations, RTIs and field journalism, with no paywall and no ads. As a Member you help decide what gets reported, and you can write one long-form piece a month.',
       'Not ready for a membership? Buy me a coffee, or gift a membership to someone who values independent journalism.',
     ],
     locale,

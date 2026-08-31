@@ -10,8 +10,8 @@ const recent = new Map<string, number>() // ip -> last ts (light anti-spam)
 
 const AMOUNT_BY_TIER: Record<string, number> = { reader: 5000, foi: 10000, coffee: 200 }
 const TIER_LABEL: Record<string, string> = {
-  reader: 'Founding Member',
-  foi: 'Founding Patron',
+  reader: 'Member',
+  foi: 'Patron',
   coffee: 'Coffee',
   other: 'Supporter',
 }
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
         <h1 style="font-family:Georgia,serif">Thank you for supporting Reporters Desk</h1>
         <p>${name ? `Dear ${name},` : 'Hello,'}</p>
         <p>Thank you for choosing to support independent, reader-funded journalism${amtStr ? ` with <b>${amtStr}</b>` : ''} (${TIER_LABEL[tier]}).${isGift ? ` This is a gift${giftRecipientEmail ? ` for ${giftRecipientEmail}` : ''} — thank you for passing it on.` : ''} If you haven't completed the UPI payment yet, please do — it goes directly to Abhishek Angad.</p>
-        ${(tier === 'reader' || tier === 'foi') ? `<p>As a Founding ${tier === 'foi' ? 'Patron' : 'Member'}, you can also <b>write one long-form piece a month</b> for Reporters Desk — around 7,000–10,000 words. I hope you'll make the best use of it.</p>` : ''}
+        ${(tier === 'reader' || tier === 'foi') ? `<p>As a ${tier === 'foi' ? 'Patron' : 'Member'}, you can also <b>write one long-form piece a month</b> for Reporters Desk — around 7,000–10,000 words. I hope you'll make the best use of it.</p>` : ''}
         <p style="background:#f2f0ea;border:1px solid #e4e1d8;border-radius:8px;padding:12px 16px">
           Your reference ID: <b>${referenceId}</b>${upiReference ? `<br/>UPI reference: ${upiReference}` : ''}
         </p>
