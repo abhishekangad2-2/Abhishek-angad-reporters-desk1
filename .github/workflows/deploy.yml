@@ -85,6 +85,7 @@ jobs:
             GOOGLE_CLOUD_VISION_API_KEY=google-cloud-vision-api-key:latest
             GEMINI_API_KEY=gemini-api-key:latest
             SMTP_PASS=smtp-pass:latest
+            INBOX_TOKEN=inbox-token:latest
           # Preserve the Cloud SQL socket connection the DATABASE_URI relies on.
           # 2Gi memory: Payload + sharp image processing and large video uploads
           # (100MB+) need headroom beyond the 512Mi default.
