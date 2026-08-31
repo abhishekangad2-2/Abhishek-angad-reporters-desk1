@@ -376,9 +376,10 @@ function DiptychBlk({ block }: { block: any }) {
 // portrait flag so Shorts/vertical clips render 9:16 instead of 16:9.
 function toEmbed(url: string): { src: string; portrait: boolean } {
   const short = url.match(/youtube\.com\/shorts\/([\w-]+)/)
-  if (short) return { src: `https://www.youtube-nocookie.com/embed/${short[1]}`, portrait: true }
+  // enablejsapi=1 lets GA4 enhanced measurement track video engagement.
+  if (short) return { src: `https://www.youtube-nocookie.com/embed/${short[1]}?enablejsapi=1`, portrait: true }
   const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([\w-]+)/)
-  if (yt) return { src: `https://www.youtube-nocookie.com/embed/${yt[1]}`, portrait: false }
+  if (yt) return { src: `https://www.youtube-nocookie.com/embed/${yt[1]}?enablejsapi=1`, portrait: false }
   const vm = url.match(/vimeo\.com\/(\d+)/)
   if (vm) return { src: `https://player.vimeo.com/video/${vm[1]}`, portrait: false }
   return { src: url, portrait: false }

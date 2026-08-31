@@ -31,6 +31,22 @@ export default function Masthead({
           <Link href="/visual-essay">{c.visualEssay}</Link>
           <Link href="/podcast">{c.podcast}</Link>
           <a href="https://reportersdesk.abhishekangad.com">{c.archives} ↗</a>
+          <a
+            href="https://www.youtube.com/@reportersdeskabhishekangad"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              try {
+                ;(window as any).gtag?.('event', 'youtube_channel_click', {
+                  link_url: 'https://www.youtube.com/@reportersdeskabhishekangad',
+                })
+              } catch {
+                /* GA not loaded — the link still works */
+              }
+            }}
+          >
+            YouTube ↗
+          </a>
           <Link href="/support" className="mh-support">{c.support}</Link>
         </nav>
       </div>
