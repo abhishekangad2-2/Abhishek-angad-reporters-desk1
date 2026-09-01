@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import WhatsAppBroadcast from './WhatsAppBroadcast'
 
 type RecentDispatch = { id: string; headline: string; significance?: string; publishedAt?: string }
 
@@ -147,7 +148,18 @@ export default function DispatchComposer({
         </div>
 
         {status === 'error' && <p className="dc-msg dc-msg--err">{error}</p>}
-        {status === 'ok' && <p className="dc-msg dc-msg--ok">Filed — it is live now.</p>}
+        {status === 'ok' && (
+          <div className="dc-filed-ok">
+            <p className="dc-msg dc-msg--ok">Filed — it is live now.</p>
+            {filed[0] && (
+              <WhatsAppBroadcast
+                block
+                label="Broadcast on WhatsApp"
+                text={`${filed[0].significance === 'breaking' ? '🔴 BREAKING — ' : ''}${filed[0].headline}\n\nReporters Desk · https://reporters-desk.org/wire`}
+              />
+            )}
+          </div>
+        )}
 
         <button className="dc-send" type="submit" disabled={!canSend}>
           {status === 'sending' ? 'Filing…' : 'File dispatch →'}

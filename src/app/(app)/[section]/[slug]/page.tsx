@@ -12,6 +12,7 @@ import Template2 from '@/components/templates/Template2'
 import Template3 from '@/components/templates/Template3'
 import Template4 from '@/components/templates/Template4'
 import Comments from '@/components/Comments'
+import WhatsAppBroadcast from '@/components/WhatsAppBroadcast'
 
 export const dynamic = 'force-dynamic'
 
@@ -168,6 +169,11 @@ export default async function StoryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Template story={story as any} />
+      <div style={{ maxWidth: 720, margin: '2.5rem auto 0', padding: '0 1.2rem', display: 'flex', justifyContent: 'center' }}>
+        <WhatsAppBroadcast
+          text={`${(story as any).headline}\n\n${SITE_URL}/${sectionSlug}/${slug}`}
+        />
+      </div>
       <Comments storyId={String((story as any).id)} storySlug={slug} />
     </>
   )
