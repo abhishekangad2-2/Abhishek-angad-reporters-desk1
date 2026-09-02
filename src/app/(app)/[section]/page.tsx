@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import PlexusBackground from '@/components/LazyPlexus'
@@ -80,19 +81,38 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
     limit: 20,
   })
 
+  // On thelongpress.org this section index IS the imprint's home page, so it
+  // wears the LongPress masthead instead of the "← Home / Archive" strip.
+  const host = (await headers()).get('host')?.toLowerCase() ?? ''
+  const isLongPress = host === 'thelongpress.org' || host === 'www.thelongpress.org'
+
   return (
     <div className="relative min-h-screen font-sans selection:bg-stone-300 selection:text-stone-900 bg-stone-50">
       <PlexusBackground className="fixed inset-0 z-0 pointer-events-none" />
 
       <main className="relative z-10 max-w-screen-2xl mx-auto px-6 md:px-12 py-24 flex flex-col min-h-screen">
-        <header className="flex justify-between items-center mb-24 border-b border-stone-300 pb-6">
-          <Link href="/" className="text-xs uppercase tracking-[0.2em] font-bold text-stone-500 hover:text-stone-900 transition-colors">
-            ← Home
-          </Link>
-          <div className="text-xs uppercase tracking-widest font-bold text-stone-900">
-            {section.name} Archive
-          </div>
-        </header>
+        {isLongPress ? (
+          <header className="flex justify-between items-center mb-24 border-b border-stone-300 pb-6">
+            <Link href="/" className="text-2xl md:text-3xl font-serif font-black tracking-tight text-stone-900">
+              The Long Press
+            </Link>
+            <a
+              href="https://reporters-desk.org"
+              className="text-xs uppercase tracking-[0.2em] font-bold text-stone-500 hover:text-stone-900 transition-colors"
+            >
+              A Reporters Desk imprint ↗
+            </a>
+          </header>
+        ) : (
+          <header className="flex justify-between items-center mb-24 border-b border-stone-300 pb-6">
+            <Link href="/" className="text-xs uppercase tracking-[0.2em] font-bold text-stone-500 hover:text-stone-900 transition-colors">
+              ← Home
+            </Link>
+            <div className="text-xs uppercase tracking-widest font-bold text-stone-900">
+              {section.name} Archive
+            </div>
+          </header>
+        )}
 
         <div className="mb-24 max-w-4xl">
           <h1 className="text-5xl md:text-7xl font-serif font-black tracking-tighter uppercase text-stone-900 mix-blend-multiply">
