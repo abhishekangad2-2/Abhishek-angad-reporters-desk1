@@ -11,6 +11,7 @@ import NewspaperLanding from '@/components/NewspaperLanding'
 import ImmersiveLanding from '@/components/ImmersiveLanding'
 import TheWire from '@/components/TheWire'
 import ComingNext from '@/components/ComingNext'
+import BooksAndBooks from '@/components/BooksAndBooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,6 +63,7 @@ export default async function Home({
       <style dangerouslySetInnerHTML={{ __html: `body{${bodyVars}}` }} />
       {landing}
       <ComingNext />
+      <BooksAndBooks />
       <div className="wire-home">
         <TheWire limit={7} />
       </div>

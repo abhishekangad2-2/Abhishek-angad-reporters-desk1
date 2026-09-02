@@ -71,7 +71,7 @@ export default function Masthead({
               <Link href="/visual-essay">{c.visualEssay}</Link>
               <Link href="/podcast">{c.podcast}</Link>
               <a href="https://reporters-desk.abhishekangad.com">{c.archives} ↗</a>
-              <a href="https://thelongpress.org">The Long Press ↗</a>
+              <a href="https://thelongpress.org">Books &amp; Books ↗</a>
               <a
                 href="https://www.youtube.com/@reportersdeskabhishekangad"
                 target="_blank"

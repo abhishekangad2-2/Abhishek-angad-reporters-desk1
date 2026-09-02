@@ -393,6 +393,59 @@ a {
 .cn-cta:hover {
   filter: brightness(1.08);
 }
+
+/* Books & Books — the LongPress book-review band on the homepage. Paper-toned
+   with a deep-ink accent so it reads as its own imprint next to the dark
+   Coming-Next band. The whole band is a link out to thelongpress.org. */
+.books-books {
+  position: relative;
+  z-index: 2;
+  background: #ece7db;
+  border-top: 1px solid #ddd6c6;
+  border-bottom: 1px solid #ddd6c6;
+  padding: clamp(2.2rem, 5vw, 3.8rem) 1.5rem;
+}
+.bb-inner {
+  display: block;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+}
+.bb-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: 700 0.72rem/1 var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #1f2a44;
+}
+.bb-dot { width: 8px; height: 8px; border-radius: 50%; background: #1f2a44; }
+.bb-title {
+  margin: 0.9rem 0 0;
+  font: 800 clamp(1.6rem, 4.2vw, 2.7rem) / 1.12 Georgia, 'Times New Roman', serif;
+  color: #1a1c22;
+}
+.bb-dek {
+  margin: 0.8rem auto 0;
+  max-width: 52ch;
+  font: 400 1.05rem/1.55 Georgia, serif;
+  color: #4a4a44;
+}
+.bb-cta {
+  display: inline-block;
+  margin-top: 1.4rem;
+  background: #1f2a44;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.6rem 1.35rem;
+  border-radius: 999px;
+}
+.bb-inner:hover .bb-cta { filter: brightness(1.15); }
+.bb-inner:hover .bb-title { text-decoration: underline; text-underline-offset: 3px; }
 .upi-plan-card {
   flex: 1 1 0;
   display: flex;
