@@ -25,8 +25,9 @@ export async function POST(req: NextRequest) {
   } catch {
     user = null
   }
+  // 303 on every redirect so a POST never gets re-POSTed to a GET page.
   if (!user || !['admin', 'editor', 'reporter'].includes(user.role ?? '')) {
-    return NextResponse.redirect(new URL('/admin-login?next=/cms/collections/stories', req.url))
+    return NextResponse.redirect(new URL('/admin-login?next=/cms/collections/stories', req.url), 303)
   }
 
   try {
@@ -38,13 +39,19 @@ export async function POST(req: NextRequest) {
     })
     const section = sec.docs[0] as { id: string | number } | undefined
     if (!section) {
-      return NextResponse.redirect(new URL('/cms/collections/stories/create', req.url))
+      return NextResponse.redirect(new URL('/cms/collections/stories/create', req.url), 303)
     }
 
+    // The slug field is unique, so each draft needs its own — otherwise the
+    // second "Untitled book review" collides and the create fails. A short
+    // token keeps it unique; the editor sets a real slug from the headline
+    // (clear the slug field to auto-regenerate) before publishing.
+    const token = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`
     const doc = await payload.create({
       collection: 'stories',
       data: {
         headline: 'Untitled book review',
+        slug: `book-review-${token}`,
         section: section.id,
         author: [user.id],
         status: 'draft',
@@ -55,6 +62,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(new URL(`/cms/collections/stories/${doc.id}`, req.url), 303)
   } catch {
     // If anything goes wrong, fall back to the normal create form.
-    return NextResponse.redirect(new URL('/cms/collections/stories/create', req.url))
+    return NextResponse.redirect(new URL('/cms/collections/stories/create', req.url), 303)
   }
 }
