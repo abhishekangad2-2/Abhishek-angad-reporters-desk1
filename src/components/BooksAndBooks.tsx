@@ -7,8 +7,10 @@ import config from '@/payload.config'
 // its headline + strap appear here automatically; the whole band links out to
 // that review on thelongpress.org. Falls back to a generic promo when no review
 // has been published yet, so the band is always safe to render.
+type Review = { headline?: string; strap?: string; slug?: string }
+
 export default async function BooksAndBooks() {
-  let review: { headline?: string; strap?: string; slug?: string } | null = null
+  let review: Review | null = null
   try {
     const payload = await getPayload({ config })
     const sec = await payload.find({
@@ -26,7 +28,7 @@ export default async function BooksAndBooks() {
         limit: 1,
         depth: 0,
       })
-      review = (res.docs[0] as typeof review) ?? null
+      review = (res.docs[0] as Review | undefined) ?? null
     }
   } catch {
     review = null
