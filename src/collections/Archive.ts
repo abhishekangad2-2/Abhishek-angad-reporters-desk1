@@ -28,7 +28,7 @@ export const Archive: CollectionConfig = {
     defaultColumns: ['title', 'category', 'outlet', 'year'],
     group: 'Editorial',
     description:
-      'Published clips shown at reportersdesk.abhishekangad.com. Edit body text here to clean any extraction residue.',
+      'Published clips shown at reporters-desk.abhishekangad.com. Edit body text here to clean any extraction residue.',
   },
   fields: [
     { name: 'title', type: 'text', required: true },
@@ -38,7 +38,7 @@ export const Archive: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
-      admin: { description: 'URL: reportersdesk.abhishekangad.com/<slug>' },
+      admin: { description: 'URL: reporters-desk.abhishekangad.com/<slug>' },
     },
     {
       name: 'category',

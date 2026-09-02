@@ -53,7 +53,7 @@ export default function Masthead({
           <a href="#wire">{c.wire}</a>
           <Link href="/visual-essay">{c.visualEssay}</Link>
           <Link href="/podcast">{c.podcast}</Link>
-          <a href="https://reportersdesk.abhishekangad.com">{c.archives} ↗</a>
+          <a href="https://reporters-desk.abhishekangad.com">{c.archives} ↗</a>
           <a
             href="https://www.youtube.com/@reportersdeskabhishekangad"
             target="_blank"

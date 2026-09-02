@@ -5,12 +5,15 @@ import { isLocale, LOCALE_COOKIE } from './lib/i18n'
 
 // Middleware does two independent jobs, gated so each only touches its own paths:
 //  1. /cms admin: IP allowlist + 2FA-session gate + no-store (unchanged).
-//  2. Archive host (reportersdesk.abhishekangad.com): serve the /archive pages
+//  2. Archive host (reporters-desk.abhishekangad.com): serve the /archive pages
 //     at the root, and 301 any leftover publication deep-links to the canonical
 //     reporters-desk.org. Every other request passes straight through.
 const SESSION_COOKIE = 'rd_session'
 const NO_STORE = 'no-store, no-cache, must-revalidate, proxy-revalidate'
-const ARCHIVE_HOST = 'reportersdesk.abhishekangad.com'
+// Primary archive host (used for outbound links/redirects). The un-hyphenated
+// form is kept as a served alias so old links don't break during the DNS move.
+const ARCHIVE_HOST = 'reporters-desk.abhishekangad.com'
+const ARCHIVE_HOSTS = new Set([ARCHIVE_HOST, 'reportersdesk.abhishekangad.com'])
 const CANONICAL = 'https://reporters-desk.org'
 
 // LongPress — the book-review imprint, served off this same service once its
@@ -73,7 +76,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // (2) Archive host: clean root URLs. / → archive index; bare slug → archive
   //     entry; old publication paths → canonical. The internal /archive route is
   //     never public here — direct hits redirect to the clean root form.
-  if (host === ARCHIVE_HOST) {
+  if (ARCHIVE_HOSTS.has(host)) {
     if (
       pathname.startsWith('/api') ||
       pathname.startsWith('/admin-login') ||
