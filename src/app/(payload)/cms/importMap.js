@@ -32,6 +32,7 @@ import { SimulationPicker as SimulationPicker_0de382ef9c71c9b81b1be238fac575b5 }
 import { AdminIcon as AdminIcon_db845eae23ef682757f9df5d4893ae70 } from '../../../components/admin/AdminBrand'
 import { AdminLogo as AdminLogo_db845eae23ef682757f9df5d4893ae70 } from '../../../components/admin/AdminBrand'
 import { DashboardCardHints as DashboardCardHints_7f3e0b9a7f501942557e1250d385e2dd } from '../../../components/admin/DashboardCardHints'
+import { LongPressCTA as LongPressCTA_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6 } from '../../../components/admin/LongPressCTA'
 import { SpecGaps as SpecGaps_46bd7b4c33d6ef9024cf12322c252c53 } from '../../../components/admin/SpecGaps'
 import { DashboardWelcome as DashboardWelcome_rd } from '../../../components/admin/DashboardWelcome'
 import { AdminStyles as AdminStyles_f197b846d27112380112cfb9c8d88624 } from '../../../components/admin/AdminStyles'
@@ -75,6 +76,7 @@ export const importMap = {
   "/components/admin/AdminBrand#AdminIcon": AdminIcon_db845eae23ef682757f9df5d4893ae70,
   "/components/admin/AdminBrand#AdminLogo": AdminLogo_db845eae23ef682757f9df5d4893ae70,
   "/components/admin/DashboardCardHints#DashboardCardHints": DashboardCardHints_7f3e0b9a7f501942557e1250d385e2dd,
+  "/components/admin/LongPressCTA#LongPressCTA": LongPressCTA_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6,
   "/components/admin/SpecGaps#SpecGaps": SpecGaps_46bd7b4c33d6ef9024cf12322c252c53,
   "/components/admin/DashboardWelcome#DashboardWelcome": DashboardWelcome_rd,
   "/components/admin/AdminStyles#AdminStyles": AdminStyles_f197b846d27112380112cfb9c8d88624,

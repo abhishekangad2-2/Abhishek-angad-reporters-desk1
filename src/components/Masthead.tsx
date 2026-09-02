@@ -18,19 +18,36 @@ export default function Masthead({
   return (
     <header className="site-masthead">
       <div className="mh-line">
-        <div className="mh-brandrow">
-          <Link href="/" className="mh-logo" aria-label="Reporters Desk — home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-mark.png" alt="Reporters Desk logo" width={200} height={200} />
+        <div className="mh-brandblock">
+          <Link href="/" className="mh-wordmark">
+            Reporters Desk
           </Link>
-          <div className="mh-brandblock">
-            <Link href="/" className="mh-wordmark">
-              Reporters Desk
-            </Link>
-            <span className="mh-sub">
-              Abhishek Angad <em className="mh-sub-ink">Ink</em>
-            </span>
-          </div>
+          {/* Logo mark: a desk (bracketed rule) with two pen nibs meeting at
+              its centre. Desk inherits the masthead text colour; nibs are the
+              house red. */}
+          <svg
+            className="mh-deskmark"
+            viewBox="0 0 200 30"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="Reporters Desk"
+          >
+            <path
+              d="M6 22 V10 H194 V22"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M84 10 L92 6 L100 10 L92 14 Z" fill="#b43d2a" />
+            <path d="M116 10 L108 6 L100 10 L108 14 Z" fill="#b43d2a" />
+            <path d="M90.5 10 H99" stroke="#5e1a12" strokeWidth="0.8" strokeLinecap="round" />
+            <path d="M109.5 10 H101" stroke="#5e1a12" strokeWidth="0.8" strokeLinecap="round" />
+          </svg>
+          <span className="mh-sub">
+            Abhishek Angad <em className="mh-sub-ink">Ink</em>
+          </span>
         </div>
         <nav className="mh-nav" aria-label="Primary">
           <a href="#wire">{c.wire}</a>

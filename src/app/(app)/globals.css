@@ -1607,24 +1607,14 @@ a {
   gap: 0.6rem 1.5rem;
   flex-wrap: wrap;
 }
-.mh-brandrow {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: clamp(0.55rem, 1.4vw, 1rem);
-  min-width: 0;
-}
-.mh-logo {
-  display: flex;
-  flex: none;
-  line-height: 0;
-}
-.mh-logo img {
+.mh-deskmark {
   display: block;
-  width: clamp(42px, 6.4vw, 64px);
+  width: clamp(150px, 22vw, 250px);
   height: auto;
-  /* Gentle lift so the mark reads as a badge, not a pasted sticker. */
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+  margin: 0.4rem 0 0.15rem;
+  /* Desk rule inherits the masthead text colour (cream on dark, ink on light);
+     the nibs carry their own red. */
+  color: inherit;
 }
 .mh-brandblock {
   display: flex;

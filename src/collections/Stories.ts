@@ -227,6 +227,8 @@ export const Stories: CollectionConfig = {
     group: 'Editorial',
     description: 'Every article — drafts, in review, published, and archived.',
     components: {
+      // Quick-action banner above the Stories list to start a LongPress book review.
+      beforeListTable: ['/components/admin/LongPressCTA#LongPressCTA'],
       edit: {
         beforeDocumentControls: ['/components/admin/PublishGateChecklist#PublishGateChecklist'],
       },
