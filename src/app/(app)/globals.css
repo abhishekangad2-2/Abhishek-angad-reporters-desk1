@@ -1607,6 +1607,24 @@ a {
   gap: 0.6rem 1.5rem;
   flex-wrap: wrap;
 }
+.mh-brand {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.55rem, 1.4vw, 1rem);
+  min-width: 0;
+}
+.mh-logo {
+  display: flex;
+  flex: none;
+  line-height: 0;
+}
+.mh-logo img {
+  display: block;
+  width: clamp(42px, 6.4vw, 64px);
+  height: auto;
+  /* Gentle lift so the mark reads as a badge, not a pasted sticker. */
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+}
 .mh-brandblock {
   display: flex;
   flex-direction: column;

@@ -18,13 +18,19 @@ export default function Masthead({
   return (
     <header className="site-masthead">
       <div className="mh-line">
-        <div className="mh-brandblock">
-          <Link href="/" className="mh-wordmark">
-            Reporters Desk
+        <div className="mh-brand">
+          <Link href="/" className="mh-logo" aria-label="Reporters Desk — home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-mark.png" alt="Reporters Desk logo" width={200} height={200} />
           </Link>
-          <span className="mh-sub">
-            Abhishek Angad <em className="mh-sub-ink">Ink</em>
-          </span>
+          <div className="mh-brandblock">
+            <Link href="/" className="mh-wordmark">
+              Reporters Desk
+            </Link>
+            <span className="mh-sub">
+              Abhishek Angad <em className="mh-sub-ink">Ink</em>
+            </span>
+          </div>
         </div>
         <nav className="mh-nav" aria-label="Primary">
           <a href="#wire">{c.wire}</a>
