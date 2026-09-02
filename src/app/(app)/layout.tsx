@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Libre_Franklin, IBM_Plex_Mono } from "next/font/google";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Script from "next/script";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 import { ChromeProvider } from "@/components/ChromeLabels";
+import { BrandProvider, type Brand } from "@/components/Brand";
 import { getChromeLabels } from "@/lib/translate.server";
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE, localeByCode } from "@/lib/i18n";
 
@@ -75,6 +76,10 @@ export default async function RootLayout({
   const locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const dir = localeByCode(locale).dir ?? "ltr";
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  // Serve the LongPress imprint (thelongpress.org) with its own chrome; every
+  // other host is Reporters Desk. Decided here from the Host header.
+  const host = (await headers()).get("host")?.toLowerCase() ?? "";
+  const brand: Brand = host === "thelongpress.org" || host === "www.thelongpress.org" ? "longpress" : "reportersdesk";
   // Translate the shared chrome (masthead nav, byline, footer tabs) once here
   // and provide it to the client chrome, so the whole page — not just the
   // article body — reads in the visitor's language.
@@ -89,6 +94,7 @@ export default async function RootLayout({
       className={`notranslate ${displayFace.variable} ${bodyFace.variable} ${monoFace.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
+        <BrandProvider value={brand}>
         <ChromeProvider value={chrome}>
         <main className="flex-1">
           {children}
@@ -106,6 +112,7 @@ export default async function RootLayout({
           </>
         )}
         </ChromeProvider>
+        </BrandProvider>
       </body>
     </html>
   );
