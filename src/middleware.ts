@@ -13,6 +13,19 @@ const NO_STORE = 'no-store, no-cache, must-revalidate, proxy-revalidate'
 const ARCHIVE_HOST = 'reportersdesk.abhishekangad.com'
 const CANONICAL = 'https://reporters-desk.org'
 
+// LongPress — the book-review imprint, served off this same service once its
+// domain mapping is live. Book reviews are ordinary stories filed under the
+// 'book-reviews' section; on longpress.org they get clean roots
+// (longpress.org/ → the index, longpress.org/<slug> → a review). Paths that
+// belong to the shared shell pass straight through untouched.
+const LONGPRESS_HOSTS = new Set(['longpress.org', 'www.longpress.org'])
+const LONGPRESS_SECTION = 'book-reviews'
+// First segment of these is NOT a review slug — leave it alone on longpress.org.
+const LONGPRESS_RESERVED = new Set([
+  'api', 'admin-login', 'cms', 'desk', 'book-reviews',
+  'wire', 'podcast', 'visual-essay', 'support', 'founder', 'archive',
+])
+
 // First path segment of these → an old publication URL, redirect to canonical.
 const PUB_PREFIXES = new Set([
   'investigative-journalism', 'ground-reportage', 'data-journalism', 'analysis',
@@ -88,6 +101,24 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const url = request.nextUrl.clone()
     url.pathname = `/archive/${parts[0]}`
     return NextResponse.rewrite(url)
+  }
+
+  // (2b) LongPress host: book reviews served at clean roots.
+  if (LONGPRESS_HOSTS.has(host)) {
+    const parts = pathname.split('/').filter(Boolean)
+    if (pathname === '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${LONGPRESS_SECTION}`
+      return NextResponse.rewrite(url)
+    }
+    // A bare slug that isn't a reserved shell path → the review under book-reviews.
+    if (parts.length === 1 && !LONGPRESS_RESERVED.has(parts[0])) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${LONGPRESS_SECTION}/${parts[0]}`
+      return NextResponse.rewrite(url)
+    }
+    // Everything else (/book-reviews/<slug>, /api, /cms, shell paths) is untouched.
+    return NextResponse.next()
   }
 
   // (3) Publication host (reporters-desk.org): the archive lives on its own
