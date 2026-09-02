@@ -2,11 +2,11 @@
 
 // A quick-action banner rendered above the Stories list (collection
 // admin.components.beforeListTable). LongPress is Reporters Desk's book-review
-// imprint — a separate site (longpress.org) that runs on this same Payload
+// imprint — a separate site (thelongpress.org) that runs on this same Payload
 // backend. This gives an editor a one-click way to start a book review and
 // publish it under the LongPress banner, without leaving the Stories section.
 // No schema change: book reviews are ordinary stories, distinguished by their
-// section; longpress.org will serve those once its domain is pointed here.
+// section; thelongpress.org will serve those once its domain is pointed here.
 
 import React from 'react'
 
@@ -42,7 +42,7 @@ export function LongPressCTA() {
           LongPress · Book reviews
         </div>
         <div style={{ fontSize: '0.9rem', lineHeight: 1.4, color: 'var(--theme-text)' }}>
-          Publishing a book review for <strong>longpress.org</strong>? Start it here — it lives in Stories on
+          Publishing a book review for <strong>thelongpress.org</strong>? Start it here — it lives in Stories on
           this same backend and goes live on LongPress once the domain is pointed.
         </div>
       </div>

@@ -18,12 +18,12 @@ const CANONICAL = 'https://reporters-desk.org'
 
 // LongPress — the book-review imprint, served off this same service once its
 // domain mapping is live. Book reviews are ordinary stories filed under the
-// 'book-reviews' section; on longpress.org they get clean roots
-// (longpress.org/ → the index, longpress.org/<slug> → a review). Paths that
+// 'book-reviews' section; on thelongpress.org they get clean roots
+// (thelongpress.org/ → the index, thelongpress.org/<slug> → a review). Paths that
 // belong to the shared shell pass straight through untouched.
-const LONGPRESS_HOSTS = new Set(['longpress.org', 'www.longpress.org'])
+const LONGPRESS_HOSTS = new Set(['thelongpress.org', 'www.thelongpress.org'])
 const LONGPRESS_SECTION = 'book-reviews'
-// First segment of these is NOT a review slug — leave it alone on longpress.org.
+// First segment of these is NOT a review slug — leave it alone on thelongpress.org.
 const LONGPRESS_RESERVED = new Set([
   'api', 'admin-login', 'cms', 'desk', 'book-reviews',
   'wire', 'podcast', 'visual-essay', 'support', 'founder', 'archive',
