@@ -1607,8 +1607,9 @@ a {
   gap: 0.6rem 1.5rem;
   flex-wrap: wrap;
 }
-.mh-brand {
+.mh-brandrow {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: clamp(0.55rem, 1.4vw, 1rem);
   min-width: 0;

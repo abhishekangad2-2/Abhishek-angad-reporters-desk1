@@ -18,7 +18,7 @@ export default function Masthead({
   return (
     <header className="site-masthead">
       <div className="mh-line">
-        <div className="mh-brand">
+        <div className="mh-brandrow">
           <Link href="/" className="mh-logo" aria-label="Reporters Desk — home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-mark.png" alt="Reporters Desk logo" width={200} height={200} />
