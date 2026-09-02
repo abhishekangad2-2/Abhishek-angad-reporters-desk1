@@ -42,35 +42,35 @@ export function LongPressCTA() {
           LongPress · Book reviews
         </div>
         <div style={{ fontSize: '0.9rem', lineHeight: 1.4, color: 'var(--theme-text)' }}>
-          Publishing a book review for <strong>thelongpress.org</strong>? Start it here — it lives in Stories on
-          this same backend and goes live on LongPress once the domain is pointed.
+          Publishing a book review for <strong>thelongpress.org</strong>? Start a new story here and set its{' '}
+          <strong>Section → Book Reviews</strong> — it lives in Stories on this same backend and surfaces on
+          Reporters Desk and thelongpress.org automatically.
         </div>
       </div>
 
-      {/* POST (not a link) so it creates a draft already filed under Book
-          Reviews, then redirects to its edit page — and so admin prefetch can't
-          spawn stray drafts. */}
-      <form action="/api/desk/new-book-review" method="post" style={{ flex: 'none', margin: 0 }}>
-        <button
-          type="submit"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.6rem 1rem',
-            borderRadius: 6,
-            border: 'none',
-            background: INK,
-            color: '#fff',
-            fontSize: '0.8rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          ＋ New book review → publish with LongPress
-        </button>
-      </form>
+      {/* Plain link to the native create form — reliable, creates nothing until
+          the editor saves. (Payload can't pre-fill a blank form's Section, so
+          it's a one-tap dropdown choice.) */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a
+        href="/cms/collections/stories/create"
+        style={{
+          flex: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.4rem',
+          padding: '0.6rem 1rem',
+          borderRadius: 6,
+          background: INK,
+          color: '#fff',
+          fontSize: '0.8rem',
+          fontWeight: 600,
+          textDecoration: 'none',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        ＋ New book review
+      </a>
     </div>
   )
 }
