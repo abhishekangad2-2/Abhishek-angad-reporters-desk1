@@ -47,6 +47,9 @@ export function LongPressCTA() {
         </div>
       </div>
 
+      {/* Plain anchor: this renders inside the Payload admin, which owns its own
+          routing — a full navigation is correct, not a Next App-Router Link. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a
         href="/cms/collections/stories/create"
         style={{
