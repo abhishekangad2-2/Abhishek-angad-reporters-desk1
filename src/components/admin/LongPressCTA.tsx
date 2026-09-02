@@ -47,28 +47,30 @@ export function LongPressCTA() {
         </div>
       </div>
 
-      {/* Plain anchor: this renders inside the Payload admin, which owns its own
-          routing — a full navigation is correct, not a Next App-Router Link. */}
-      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-      <a
-        href="/cms/collections/stories/create"
-        style={{
-          flex: 'none',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.4rem',
-          padding: '0.6rem 1rem',
-          borderRadius: 6,
-          background: INK,
-          color: '#fff',
-          fontSize: '0.8rem',
-          fontWeight: 600,
-          textDecoration: 'none',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        ＋ New book review → publish with LongPress
-      </a>
+      {/* POST (not a link) so it creates a draft already filed under Book
+          Reviews, then redirects to its edit page — and so admin prefetch can't
+          spawn stray drafts. */}
+      <form action="/api/desk/new-book-review" method="post" style={{ flex: 'none', margin: 0 }}>
+        <button
+          type="submit"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            padding: '0.6rem 1rem',
+            borderRadius: 6,
+            border: 'none',
+            background: INK,
+            color: '#fff',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          ＋ New book review → publish with LongPress
+        </button>
+      </form>
     </div>
   )
 }
