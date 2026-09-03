@@ -6,7 +6,15 @@ import { cookies } from 'next/headers'
 
 import { translateStory } from '@/lib/translate.server'
 import { LOCALE_COOKIE, isLocale, DEFAULT_LOCALE } from '@/lib/i18n'
-import { SITE_URL, absoluteUrl, buildArticleJsonLd } from '@/lib/seo'
+import {
+  SITE_URL,
+  buildArticleJsonLd,
+  pickTitle,
+  pickDescription,
+  ogImageUrl,
+  OG_IMAGE_WIDTH,
+  OG_IMAGE_HEIGHT,
+} from '@/lib/seo'
 import Template1 from '@/components/templates/Template1'
 import Template2 from '@/components/templates/Template2'
 import Template3 from '@/components/templates/Template3'
@@ -57,9 +65,9 @@ export async function generateMetadata({
     const story: any = res.docs[0]
     if (!story) return {}
     const seo = story.seoMeta || {}
-    const title: string = seo.title || story.headline
-    const description: string = seo.description || story.strap
-    const img = absoluteUrl(
+    const title: string = pickTitle(seo.title, story.headline)
+    const description: string = pickDescription(seo.description, story.strap)
+    const img = ogImageUrl(
       story.heroMedia && typeof story.heroMedia === 'object' ? story.heroMedia.url : undefined,
     )
     const canonical = `${SITE_URL}/${sectionSlug}/${slug}`
@@ -82,7 +90,9 @@ export async function generateMetadata({
         publishedTime: story.publishedAt ? new Date(story.publishedAt).toISOString() : undefined,
         modifiedTime: story.updatedAt ? new Date(story.updatedAt).toISOString() : undefined,
         authors: authors.length ? authors : undefined,
-        images: img ? [{ url: img }] : undefined,
+        images: img
+          ? [{ url: img, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT, alt: title }]
+          : undefined,
       },
       twitter: {
         card: 'summary_large_image',
