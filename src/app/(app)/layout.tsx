@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Libre_Franklin, IBM_Plex_Mono } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import Script from "next/script";
@@ -66,6 +66,14 @@ export const metadata: Metadata = {
   other: { google: "notranslate" },
 };
 
+// Browser UI tint (mobile address bar / PWA) — matches the paper/ink grounds.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c1917" },
+  ],
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -85,6 +93,33 @@ export default async function RootLayout({
   // article body — reads in the visitor's language.
   const chrome = await getChromeLabels(locale);
 
+  // Site-wide WebSite + Organization structured data (per-article NewsArticle
+  // schema is emitted by the story pages). Brand-aware so the LongPress imprint
+  // identifies itself correctly. No SearchAction — the site has no search
+  // endpoint yet; add one here once it does.
+  const siteName = brand === "longpress" ? "The Long Press" : "ReportersDesk";
+  const siteUrl = brand === "longpress" ? "https://thelongpress.org" : "https://reporters-desk.org";
+  const siteJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}#website`,
+        url: siteUrl,
+        name: siteName,
+        inLanguage: locale,
+        publisher: { "@id": `${siteUrl}#org` },
+      },
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}#org`,
+        name: siteName,
+        url: siteUrl,
+        logo: { "@type": "ImageObject", url: `${siteUrl}/icon.png` },
+      },
+    ],
+  };
+
   return (
     <html
       lang={locale}
@@ -94,6 +129,10 @@ export default async function RootLayout({
       className={`notranslate ${displayFace.variable} ${bodyFace.variable} ${monoFace.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-stone-200 selection:text-stone-900">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+        />
         <BrandProvider value={brand}>
         <ChromeProvider value={chrome}>
         <main className="flex-1">
