@@ -1,8 +1,8 @@
-'use client'
+import { readLocale, translateBatch } from '@/lib/translate.server'
+import { DEFAULT_LOCALE } from '@/lib/i18n'
+import FounderClient, { type FounderContent } from './FounderClient'
 
-import { useEffect, useRef } from 'react'
-import Link from 'next/link'
-import './founder.css'
+export const dynamic = 'force-dynamic'
 
 const TIMELINE = [
   { year: 'The beat', title: 'Ground reportage from Jharkhand & eastern India', body: 'Reporting where policy meets the people it is meant to serve — public health, the rural belt, and the distan[...]' },
@@ -12,53 +12,52 @@ const TIMELINE = [
   { year: 'Now', title: 'ReportersDesk', body: 'A reader-funded home for independent, long-form ground reportage — no paywall on the reporting, supported directly by the people who value it.' },
 ]
 
-export default function FounderPage() {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const els = ref.current?.querySelectorAll('.fd-step') ?? []
-    if (reduce) {
-      els.forEach((e) => e.classList.add('in'))
-      return
-    }
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
-      { threshold: 0.3 },
-    )
-    els.forEach((e) => io.observe(e))
-    return () => io.disconnect()
-  }, [])
+const KICKER = 'Founder & reporter'
+const LEDE =
+  'An independent journalist reporting from Jharkhand and eastern India — public health, the rural belt, electoral integrity, and where public money is spent. ReportersDesk is his reader-funded home for long-form ground reportage and visual investigations.'
+const BACK = '← Back to ReportersDesk'
+const CONTACT = 'Get in touch'
 
-  return (
-    <main className="fd">
-      <header className="fd-hero">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="fd-avatar" src="https://cdn.reporters-desk.org/IMG_20240801_152018.jpg" alt="Abhishek Angad" />
-        <p className="fd-kicker">Founder &amp; reporter</p>
-        <h1 className="fd-name">Abhishek Angad</h1>
-        <p className="fd-lede">
-          An independent journalist reporting from Jharkhand and eastern India — public health, the rural
-          belt, electoral integrity, and where public money is spent. ReportersDesk is his reader-funded
-          home for long-form ground reportage and visual investigations.
-        </p>
-      </header>
+export default async function FounderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string | string[] }>
+}) {
+  const sp = await searchParams
+  const locale = await readLocale(sp.lang)
 
-      <section className="fd-timeline" ref={ref}>
-        {TIMELINE.map((t, i) => (
-          <div className="fd-step" key={i}>
-            <div className="fd-year">{t.year}</div>
-            <div className="fd-card">
-              <h2>{t.title}</h2>
-              <p>{t.body}</p>
-            </div>
-          </div>
-        ))}
-      </section>
+  const content: FounderContent = {
+    avatar: 'https://cdn.reporters-desk.org/IMG_20240801_152018.jpg',
+    // Abhishek Angad is a proper name — never translated.
+    name: 'Abhishek Angad',
+    kicker: KICKER,
+    lede: LEDE,
+    timeline: TIMELINE.map((t) => ({ year: t.year, title: t.title, body: t.body })),
+    back: BACK,
+    contact: CONTACT,
+  }
 
-      <footer className="fd-foot">
-        <Link href="/">← Back to ReportersDesk</Link>
-        <a href="mailto:desk@reporters-desk.org">Get in touch</a>
-      </footer>
-    </main>
-  )
+  // Translate the fixed copy (kicker, lede, timeline entries, footer) into the
+  // reader's language via the same Vertex path as the rest of the site.
+  if (locale !== DEFAULT_LOCALE) {
+    const flat = [
+      KICKER,
+      LEDE,
+      BACK,
+      CONTACT,
+      ...TIMELINE.flatMap((t) => [t.year, t.title, t.body]),
+    ]
+    const t = await translateBatch(flat, locale)
+    content.kicker = t[0] || KICKER
+    content.lede = t[1] || LEDE
+    content.back = t[2] || BACK
+    content.contact = t[3] || CONTACT
+    content.timeline = TIMELINE.map((orig, i) => ({
+      year: t[4 + i * 3] || orig.year,
+      title: t[4 + i * 3 + 1] || orig.title,
+      body: t[4 + i * 3 + 2] || orig.body,
+    }))
+  }
+
+  return <FounderClient content={content} />
 }

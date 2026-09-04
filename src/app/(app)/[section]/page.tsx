@@ -6,6 +6,8 @@ import config from '@/payload.config'
 import PlexusBackground from '@/components/LazyPlexus'
 import { notFound } from 'next/navigation'
 import { SITE_URL } from '@/lib/seo'
+import { readLocale, translateBatch } from '@/lib/translate.server'
+import { DEFAULT_LOCALE } from '@/lib/i18n'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,8 +42,15 @@ export async function generateMetadata({
   }
 }
 
-export default async function SectionArchive({ params }: { params: Promise<{ section: string }> }) {
+export default async function SectionArchive({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ section: string }>
+  searchParams: Promise<{ lang?: string | string[] }>
+}) {
   const resolvedParams = await params;
+  const sp = await searchParams
   const payload = await getPayload({ config })
 
   // Resolve the section from the Sections collection by slug (the hardcoded
@@ -81,6 +90,45 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
     limit: 20,
   })
 
+  // Translate the section chrome + each story card into the reader's language
+  // when a non-English locale is active (same Vertex path the homepage and story
+  // pages use). English passes straight through untouched.
+  const locale = await readLocale(sp.lang)
+  let sectionName: string = section.name
+  let sectionDesc: string = section.description || ''
+  const ui = {
+    home: '← Home',
+    archive: 'Archive',
+    imprint: 'A Reporters Desk imprint ↗',
+    empty: 'No published stories in this desk yet.',
+    noMedia: 'No Media',
+  }
+  let storyDocs: any[] = stories.docs
+  if (locale !== DEFAULT_LOCALE) {
+    const uiKeys = Object.keys(ui) as (keyof typeof ui)[]
+    const [secT, uiT] = await Promise.all([
+      translateBatch([sectionName, sectionDesc], locale),
+      translateBatch(uiKeys.map((k) => ui[k]), locale),
+    ])
+    sectionName = secT[0] || sectionName
+    sectionDesc = secT[1] || sectionDesc
+    uiKeys.forEach((k, i) => {
+      ui[k] = uiT[i] || ui[k]
+    })
+    const cardText = storyDocs.flatMap((s: any) => [
+      s.headline || '',
+      s.strap || '',
+      (typeof s.issueTags?.[0] === 'object' ? s.issueTags[0]?.title : s.issueTags?.[0]) || '',
+    ])
+    const t = await translateBatch(cardText, locale)
+    storyDocs = storyDocs.map((s: any, i: number) => ({
+      ...s,
+      headline: t[i * 3] || s.headline,
+      strap: t[i * 3 + 1] || s.strap,
+      _tagLabel: t[i * 3 + 2] || undefined,
+    }))
+  }
+
   // On thelongpress.org this section index IS the imprint's home page, so it
   // wears the LongPress masthead instead of the "← Home / Archive" strip.
   const host = (await headers()).get('host')?.toLowerCase() ?? ''
@@ -100,38 +148,38 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
               href="https://reporters-desk.org"
               className="text-xs uppercase tracking-[0.2em] font-bold text-stone-500 hover:text-stone-900 transition-colors"
             >
-              A Reporters Desk imprint ↗
+              {ui.imprint}
             </a>
           </header>
         ) : (
           <header className="flex justify-between items-center mb-24 border-b border-stone-300 pb-6">
             <Link href="/" className="text-xs uppercase tracking-[0.2em] font-bold text-stone-500 hover:text-stone-900 transition-colors">
-              ← Home
+              {ui.home}
             </Link>
             <div className="text-xs uppercase tracking-widest font-bold text-stone-900">
-              {section.name} Archive
+              {sectionName} {ui.archive}
             </div>
           </header>
         )}
 
         <div className="mb-24 max-w-4xl">
           <h1 className="text-5xl md:text-7xl font-serif font-black tracking-tighter uppercase text-stone-900 mix-blend-multiply">
-            {section.name}
+            {sectionName}
           </h1>
-          {section.description && (
+          {sectionDesc && (
             <p className="mt-6 text-xl text-stone-600 font-sans max-w-2xl">
-              {section.description}
+              {sectionDesc}
             </p>
           )}
         </div>
 
-        {stories.docs.length === 0 ? (
+        {storyDocs.length === 0 ? (
           <div className="text-center py-24 border border-dashed border-stone-300">
-            <p className="text-stone-500 font-serif italic text-xl">No published stories in this desk yet.</p>
+            <p className="text-stone-500 font-serif italic text-xl">{ui.empty}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {stories.docs.map((story: any) => (
+            {storyDocs.map((story: any) => (
               <Link
                 // Link to the story's OWN section slug (may be a subsection),
                 // so aggregated parent-section listings resolve correctly.
@@ -148,7 +196,7 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-stone-400 font-serif italic">
-                      No Media
+                      {ui.noMedia}
                     </div>
                   )}
                 </div>
@@ -160,7 +208,7 @@ export default async function SectionArchive({ params }: { params: Promise<{ sec
                     <>
                       <span className="w-1 h-1 bg-stone-300 rounded-full"></span>
                       <span className="text-xs font-bold uppercase tracking-widest text-stone-500 truncate">
-                        {typeof story.issueTags[0] === 'object' ? story.issueTags[0].title : story.issueTags[0]}
+                        {story._tagLabel ?? (typeof story.issueTags[0] === 'object' ? story.issueTags[0].title : story.issueTags[0])}
                       </span>
                     </>
                   )}
