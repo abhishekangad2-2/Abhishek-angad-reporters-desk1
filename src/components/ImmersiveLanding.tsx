@@ -22,6 +22,22 @@ const THEMES = [
 ]
 const LINE_COLORS = ['#3e6b66', '#9c7b3e', '#7a3f3f']
 
+// The hero CTA should name what the reader is actually opening — a book review
+// is not an "investigation". Derive the label from the story's section slug
+// (the first path segment of its href, which is locale-independent), and fall
+// back to a neutral "Read the story" for anything not explicitly mapped.
+const INVESTIGATION_SECTIONS = new Set([
+  'investigative-journalism',
+  'accountability-journalism',
+  'data-journalism',
+])
+function storyCtaLabel(href: string): string {
+  const slug = href.split(/[?#]/)[0].split('/').filter(Boolean)[0] ?? ''
+  if (slug === 'book-reviews') return 'Read the book review →'
+  if (INVESTIGATION_SECTIONS.has(slug)) return 'Read the investigation →'
+  return 'Read the story →'
+}
+
 export default function ImmersiveLanding({
   data,
   latestEpisode = null,
@@ -226,7 +242,7 @@ export default function ImmersiveLanding({
         {hero?.strap && <p className="im-sub">{hero.strap}</p>}
         {hero && (
           <a className="audio-toggle" href={hero.href}>
-            {hero.kind === 'story' ? 'Read the investigation →' : 'Explore the desk →'}
+            {hero.kind === 'story' ? storyCtaLabel(hero.href) : 'Explore the desk →'}
           </a>
         )}
       </header>
