@@ -55,7 +55,7 @@ async function cmsGate(request: NextRequest): Promise<NextResponse> {
   const token = request.cookies.get(SESSION_COOKIE)?.value
   if (!token) return noStore(NextResponse.redirect(new URL('/admin-login', request.url)))
   try {
-    await jwtVerify(token, new TextEncoder().encode(process.env.PAYLOAD_SECRET))
+    await jwtVerify(token, new TextEncoder().encode(process.env.PAYLOAD_SECRET), { algorithms: ['HS256'] })
     return noStore(NextResponse.next())
   } catch {
     const res = noStore(NextResponse.redirect(new URL('/admin-login', request.url)))

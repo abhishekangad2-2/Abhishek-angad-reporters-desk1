@@ -23,6 +23,29 @@ const AUTHORISED = (
   .filter(Boolean)
 const INBOX_ADDR = (process.env.NEWSLETTER_INBOX || 'newsletters@reporters-desk.org').toLowerCase()
 
+// Email `From` is trivially spoofable, so an authorised address in From is NOT
+// on its own enough to authorise a broadcast to the whole list. We additionally
+// require the receiving server's Authentication-Results to show the message
+// actually passed DKIM/DMARC for the sender's domain. Fails closed: if the
+// header is missing or doesn't pass, the message is not treated as a broadcast.
+function authResultsText(mail: any): string {
+  const lines = (mail.headerLines || [])
+    .filter((h: any) => h.key === 'authentication-results')
+    .map((h: any) => String(h.line))
+  return lines.join('\n').toLowerCase()
+}
+function fromDomainAuthenticated(mail: any, fromDomain: string): boolean {
+  const ar = authResultsText(mail)
+  if (!ar || !fromDomain) return false
+  const domain = fromDomain.toLowerCase()
+  const dmarcPass = /\bdmarc=pass\b/.test(ar)
+  const dkimPass = /\bdkim=pass\b/.test(ar) && ar.includes(domain)
+  const spfPass = /\bspf=pass\b/.test(ar) && ar.includes(domain)
+  // DMARC pass already implies aligned DKIM or SPF; otherwise demand a
+  // domain-aligned DKIM or SPF pass explicitly.
+  return dmarcPass || dkimPass || spfPass
+}
+
 async function broadcast(payload: any, subject: string, contentHtml: string) {
   const subs = await payload.find({
     collection: 'newsletter-subscribers',
@@ -110,8 +133,16 @@ export async function POST(req: NextRequest) {
           if (!toAddrs.includes(INBOX_ADDR)) {
             out.skipped++
           } else if (AUTHORISED.includes(from)) {
-            out.lastBroadcast = await broadcast(payload, subject, contentHtml)
-            out.broadcasts++
+            // Spoof guard: only broadcast if the message genuinely passed
+            // DKIM/DMARC for the sender domain — a forged From is ignored.
+            const fromDomain = from.split('@')[1] || ''
+            if (fromDomainAuthenticated(mail, fromDomain)) {
+              out.lastBroadcast = await broadcast(payload, subject, contentHtml)
+              out.broadcasts++
+            } else {
+              out.skipped++
+              out.errors.push(`spoof-guard: dropped unauthenticated broadcast attempt from ${from}`)
+            }
           } else if (from) {
             await addSubscriber(payload, from)
             out.subscribed++

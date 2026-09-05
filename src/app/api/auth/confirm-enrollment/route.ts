@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   let userId: string
   if (pendingToken) {
     try {
-      const decoded = jwt.verify(pendingToken, PENDING_2FA_SECRET) as { userId: string; step: string }
+      const decoded = jwt.verify(pendingToken, PENDING_2FA_SECRET, { algorithms: ['HS256'] }) as { userId: string; step: string }
       if (decoded.step !== 'pending-2fa') {
         return NextResponse.json({ error: 'Invalid token.' }, { status: 401 })
       }

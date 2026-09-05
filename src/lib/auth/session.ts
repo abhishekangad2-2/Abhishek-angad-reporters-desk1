@@ -16,7 +16,7 @@ export async function getSessionUser(req: NextRequest, opts: { allowUnenrolled?:
   if (!token) return null
 
   try {
-    const decoded = jwt.verify(token, process.env.PAYLOAD_SECRET!) as { userId: string }
+    const decoded = jwt.verify(token, process.env.PAYLOAD_SECRET!, { algorithms: ['HS256'] }) as { userId: string }
     const payload = await getPayload({ config })
     const user = await payload.findByID({ collection: 'users', id: decoded.userId })
     if (!user.twoFactorEnabled && !opts.allowUnenrolled) return null

@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/comments — leave a comment. Auto-published (status 'visible').
+// POST /api/comments — leave a comment. Held for moderation (status 'pending')
+// until an editor approves it; never auto-published.
 export async function POST(req: NextRequest) {
   // 6 comments per IP per 10 minutes.
   if (!checkRateLimit(`comment:${getClientIp(req)}`, 6, 10 * 60 * 1000)) {
@@ -73,20 +74,21 @@ export async function POST(req: NextRequest) {
 
   try {
     const payload = await getPayload({ config })
-    const created = await payload.create({
+    await payload.create({
       collection: 'comments' as any,
       data: {
         author: name,
         body: text,
         story,
         storySlug: typeof storySlug === 'string' ? storySlug : undefined,
-        status: 'visible',
+        // Held for moderation — an editor approves it to 'visible' in the CMS.
+        // Never auto-publish anonymous input on a public news site.
+        status: 'pending',
       },
     })
-    return NextResponse.json({
-      ok: true,
-      comment: { id: created.id, author: name, body: text, createdAt: (created as any).createdAt },
-    })
+    // Deliberately do NOT echo the comment back: it isn't public yet, so the
+    // client shows a "held for review" acknowledgement rather than rendering it.
+    return NextResponse.json({ ok: true, pending: true })
   } catch {
     return NextResponse.json({ error: 'Could not post your comment right now.' }, { status: 500 })
   }

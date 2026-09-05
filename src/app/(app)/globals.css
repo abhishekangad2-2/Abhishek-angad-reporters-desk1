@@ -1372,7 +1372,9 @@ a {
 .audio-toggle {
   display: inline-block;
   margin-top: 1.6rem;
-  background: var(--accent);
+  /* Darkened from var(--accent) (#d24a32 → 4.4:1) to #cc4630 so white text on
+     this small uppercase label clears the WCAG AA 4.5:1 contrast floor. */
+  background: #cc4630;
   color: #fff;
   border: none;
   padding: 0.7rem 1.4rem;

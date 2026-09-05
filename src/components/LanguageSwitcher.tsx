@@ -45,7 +45,9 @@ export default function LanguageSwitcher({ current }: { current: string }) {
       <button
         className="lang-toggle"
         onClick={() => setOpen((o) => !o)}
-        aria-label="Change language"
+        // Include the visible label text (cur.native) in the accessible name so
+        // it matches what's on screen (WCAG 2.5.3, label-in-name).
+        aria-label={`Change language (currently ${cur.native})`}
         aria-expanded={open}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

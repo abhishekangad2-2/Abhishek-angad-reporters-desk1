@@ -30,7 +30,31 @@ import { DesignStudio } from './globals/DesignStudio'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Explicit origin allowlist for CORS (cross-origin API reads) and CSRF (which
+// Origins may drive authenticated, cookie-based admin/API writes). Previously
+// unset, which left both to Payload defaults; pinning the known imprints + hosts
+// makes the trust boundary explicit and drift-proof. Anything not listed here
+// gets no Access-Control-Allow-Origin and is rejected on CSRF-protected writes.
+const allowedOrigins = Array.from(
+  new Set(
+    [
+      'https://reporters-desk.org',
+      'https://www.reporters-desk.org',
+      'https://thelongpress.org',
+      'https://www.thelongpress.org',
+      'https://reporters-desk.abhishekangad.com',
+      'https://reportersdesk.abhishekangad.com',
+      // Local dev origin (only when explicitly running against localhost).
+      process.env.NODE_ENV !== 'production' ? 'http://localhost:3000' : '',
+      // Allow an env override to add the canonical site URL without a code edit.
+      process.env.NEXT_PUBLIC_SITE_URL || '',
+    ].filter(Boolean),
+  ),
+)
+
 export default buildConfig({
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   // Admin panel mounted at /cms (branded), not the Payload default /admin.
   // Must stay in sync with the (payload)/cms route folder + middleware matcher.
   routes: {
@@ -119,6 +143,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || 'postgres://postgres:password@127.0.0.1:5432/reporters_desk',
     },
-    push: true,
+    // Drizzle "push" applies schema diffs directly to the connected DB. That is
+    // fine for local dev, but production runs a hand-managed migration workflow
+    // (see ops notes) — auto-push against prod risks unintended DDL / drift, so
+    // it is disabled outside development.
+    push: process.env.NODE_ENV !== 'production',
   }),
 })
