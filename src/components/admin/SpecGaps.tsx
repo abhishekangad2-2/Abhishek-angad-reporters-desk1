@@ -45,7 +45,7 @@ const ITEMS: { pillar: string; entries: { name: string; status: Status; note?: s
     entries: [
       { name: 'Patronage Beacon (dwell + scroll triggers, cooldown)', status: 'built' },
       { name: 'Polls, newsletter, Investigate-this intake', status: 'built' },
-      { name: 'Razorpay payments live', status: 'pending', note: 'Mount RAZORPAY_WEBHOOK_SECRET + real keys/plan IDs on Cloud Run' },
+      { name: 'Support payments (UPI QR / UPI ID)', status: 'built', note: 'Direct UPI via UpiSupport → /api/support/record. Razorpay integration removed.' },
       { name: 'GA4 traffic-spike beacon trigger', status: 'pending', note: 'Needs GA_PROPERTY_ID + GA_SA_KEY env' },
       { name: 'ML-learned layout optimization', status: 'deferred', note: 'Heuristic today' },
       { name: 'Collaborative cursors (CRDT)', status: 'deferred', note: 'Presence-only today' },
