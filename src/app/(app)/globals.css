@@ -2983,9 +2983,52 @@ a {
 .rd-login__backup-title { font-family: var(--font-ibm-plex-sans, system-ui, sans-serif); font-weight: 700; font-size: 0.85rem; margin: 0 0 0.5rem; }
 .rd-login__backup-codes { display: block; white-space: pre-wrap; font-family: var(--font-ibm-plex-mono, monospace); font-size: 0.85rem; line-height: 1.7; }
 
-/* WaveSurfer audio player */
+/* Audio player (react-h5-audio-player) — brand-themed via .rhap_* overrides.
+   The legacy .wave-player__controls/__btn/__wave/__skip/__time rules below are
+   unused now but kept harmless; .wave-player, __title and __transcript* still
+   style the wrapper, heading and transcript toggle. */
 .wave-player {
   margin: 0;
+}
+
+/* --- react-h5-audio-player brand overrides --- */
+.wave-player .rhap_container {
+  background: transparent;
+  box-shadow: none;
+  padding: 10px 0;
+  font-family: var(--font-mono, inherit);
+}
+.wave-player .rhap_time {
+  color: var(--ink, #14171c);
+  font-size: 0.72rem;
+}
+.wave-player .rhap_progress-bar {
+  background: rgba(20, 23, 28, 0.15);
+}
+.wave-player .rhap_progress-filled,
+.wave-player .rhap_download-progress {
+  background: var(--accent, #cc4630);
+}
+.wave-player .rhap_progress-indicator {
+  background: var(--accent, #cc4630);
+  box-shadow: none;
+}
+.wave-player .rhap_progress-indicator:focus-visible {
+  outline: 2px solid var(--ink, #14171c);
+  outline-offset: 2px;
+}
+.wave-player .rhap_main-controls-button,
+.wave-player .rhap_volume-button {
+  color: var(--ink, #14171c);
+}
+.wave-player .rhap_main-controls-button:hover {
+  color: var(--accent, #cc4630);
+}
+.wave-player .rhap_volume-indicator {
+  background: var(--ink, #14171c);
+}
+.wave-player .rhap_volume-bar {
+  background: rgba(20, 23, 28, 0.15);
 }
 .wave-player__title {
   font-family: var(--font-display);
