@@ -8,6 +8,10 @@ export const dynamic = 'force-dynamic'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const recent = new Map<string, number>() // ip -> last ts (light anti-spam)
 
+// Escape user-supplied strings before they go into the receipt email's HTML.
+const esc = (s: string) =>
+  s.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]!))
+
 const AMOUNT_BY_TIER: Record<string, number> = { reader: 5000, foi: 10000, coffee: 200 }
 const TIER_LABEL: Record<string, string> = {
   reader: 'Member',
@@ -82,11 +86,11 @@ export async function POST(req: NextRequest) {
       const amtStr = amount ? `₹${amount.toLocaleString('en-IN')}` : ''
       const html = `<div style="font-family:Georgia,serif;line-height:1.6;color:#14171c;max-width:560px;margin:auto;padding:24px">
         <h1 style="font-family:Georgia,serif">Thank you for supporting Reporters Desk</h1>
-        <p>${name ? `Dear ${name},` : 'Hello,'}</p>
-        <p>Thank you for choosing to support independent, reader-funded journalism${amtStr ? ` with <b>${amtStr}</b>` : ''} (${TIER_LABEL[tier]}).${isGift ? ` This is a gift${giftRecipientEmail ? ` for ${giftRecipientEmail}` : ''} — thank you for passing it on.` : ''} If you haven't completed the UPI payment yet, please do — it goes directly to Abhishek Angad.</p>
+        <p>${name ? `Dear ${esc(name)},` : 'Hello,'}</p>
+        <p>Thank you for choosing to support independent, reader-funded journalism${amtStr ? ` with <b>${amtStr}</b>` : ''} (${TIER_LABEL[tier]}).${isGift ? ` This is a gift${giftRecipientEmail ? ` for ${esc(giftRecipientEmail)}` : ''} — thank you for passing it on.` : ''} If you haven't completed the UPI payment yet, please do — it goes directly to Abhishek Angad.</p>
         ${(tier === 'reader' || tier === 'foi') ? `<p>As a ${tier === 'foi' ? 'Patron' : 'Member'}, you can also <b>write one long-form piece a month</b> for Reporters Desk — around 7,000–10,000 words. I hope you'll make the best use of it.</p>` : ''}
         <p style="background:#f2f0ea;border:1px solid #e4e1d8;border-radius:8px;padding:12px 16px">
-          Your reference ID: <b>${referenceId}</b>${upiReference ? `<br/>UPI reference: ${upiReference}` : ''}
+          Your reference ID: <b>${referenceId}</b>${upiReference ? `<br/>UPI reference: ${esc(upiReference)}` : ''}
         </p>
         <p style="font-size:13px;color:#666">Keep this reference for your records. Questions? Just reply to this email.</p>
         <hr style="margin:28px 0;border:0;border-top:1px solid #ddd"/>

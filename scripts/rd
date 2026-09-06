@@ -234,6 +234,14 @@ cmd_idle() {
 # ── deploy / logs / open / checklist ──────────────────────────────────────
 cmd_deploy() {
   command -v gh >/dev/null 2>&1 || { echo "${RED}gh not installed${R}"; exit 1; }
+  # Sync the prod DB schema BEFORE shipping code. Production skips Payload's
+  # auto db-push, so a new collection/field/enum value must be applied here or
+  # the new revision 500s. Additive + idempotent, so it's safe to run every
+  # time; a failure aborts the deploy rather than shipping code without schema.
+  echo "→ syncing prod DB schema (scripts/migrate-prod.sh) ..."
+  if ! bash "$REPO_DIR/scripts/migrate-prod.sh"; then
+    echo "${RED}✗ schema migration failed — aborting deploy. Fix migrations-sql/ first.${R}"; exit 1
+  fi
   ( cd "$REPO_DIR" && gh workflow run Deploy && sleep 4 && gh run watch "$(gh run list --workflow Deploy --limit 1 --json databaseId --jq '.[0].databaseId')" )
 }
 cmd_logs() {

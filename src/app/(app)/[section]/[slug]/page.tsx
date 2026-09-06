@@ -176,7 +176,7 @@ export default async function StoryPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
       <Template story={story as any} />
       <div style={{ maxWidth: 720, margin: '2.5rem auto 0', padding: '0 1.2rem', display: 'flex', justifyContent: 'center' }}>
