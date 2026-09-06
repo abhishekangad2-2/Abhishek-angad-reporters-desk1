@@ -1,10 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
-// Subscriber ledger. Rows are created/updated exclusively by the Razorpay
-// webhook (src/app/api/webhooks/razorpay/route.ts) via the Payload Local API,
-// which bypasses access control. Public REST create/update is therefore blocked
-// so a forged request cannot mint or mutate a subscription. Read is admin/editor
-// only — this holds subscriber PII (email).
+// Subscriber ledger (LEGACY). Historically rows were created/updated by the
+// Razorpay webhook, which has since been removed (support is now UPI-only). The
+// collection is retained read-only for its historical records; no code writes to
+// it anymore. Public REST create/update stays blocked so a forged request cannot
+// mint or mutate a subscription. Read is admin/editor only — holds PII (email).
 export const Subscriptions: CollectionConfig = {
   slug: 'subscriptions',
   admin: {

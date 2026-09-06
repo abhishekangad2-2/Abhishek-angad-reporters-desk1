@@ -1,0 +1,7 @@
+# ReportersDesk security contact — RFC 9116
+# NOTE: ensure the mailbox below actually exists (or change it to a monitored
+# address) before relying on this. Update `Expires` before the date passes.
+Contact: mailto:security@reporters-desk.org
+Expires: 2027-09-05T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://reporters-desk.org/.well-known/security.txt

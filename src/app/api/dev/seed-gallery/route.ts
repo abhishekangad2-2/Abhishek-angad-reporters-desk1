@@ -7,6 +7,11 @@ import config from '@/payload.config'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
+  // Dev-only utility: never expose seeding in production, even if SEED_TOKEN
+  // happens to be set there.
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found.' }, { status: 404 })
+  }
   const token = process.env.SEED_TOKEN
   if (!token || req.headers.get('x-seed-token') !== token) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })

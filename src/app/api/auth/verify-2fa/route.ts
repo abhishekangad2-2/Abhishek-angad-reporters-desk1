@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   let decoded: { userId: string; step: string }
   try {
-    decoded = jwt.verify(pendingToken, PENDING_2FA_SECRET) as any
+    decoded = jwt.verify(pendingToken, PENDING_2FA_SECRET, { algorithms: ['HS256'] }) as any
   } catch {
     return NextResponse.json({ error: 'That login attempt expired — start again.' }, { status: 401 })
   }

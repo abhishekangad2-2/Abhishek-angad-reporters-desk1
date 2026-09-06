@@ -63,6 +63,11 @@ function prose(...paragraphs: string[]) {
 // ---------------------------------------------------------------------------
 
 export async function POST(req: NextRequest) {
+  // Dev-only utility: never expose seeding in production, even if SEED_TOKEN
+  // happens to be set there.
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found.' }, { status: 404 })
+  }
   const expected = process.env.SEED_TOKEN
   const provided = req.headers.get('x-seed-token')
   if (!expected || provided !== expected) {

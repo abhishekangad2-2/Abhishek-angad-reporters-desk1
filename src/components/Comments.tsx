@@ -21,7 +21,7 @@ export default function Comments({ storyId, storySlug }: { storyId: string; stor
   const [author, setAuthor] = useState('')
   const [body, setBody] = useState('')
   const [website, setWebsite] = useState('') // honeypot
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'pending'>('idle')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -56,9 +56,11 @@ export default function Comments({ storyId, storySlug }: { storyId: string; stor
         setStatus('error')
         return
       }
+      // Comments are held for moderation, so the server doesn't echo one back;
+      // show a "held for review" acknowledgement instead of rendering it live.
       if (data.comment) setComments((prev) => [...prev, data.comment])
       setBody('')
-      setStatus('idle')
+      setStatus(data?.pending ? 'pending' : 'idle')
     } catch {
       setError('Could not post your comment.')
       setStatus('error')
@@ -124,6 +126,9 @@ export default function Comments({ storyId, storySlug }: { storyId: string; stor
           {status === 'loading' ? 'Posting…' : 'Post comment'}
         </button>
         {status === 'error' && <p className="comment-error" role="alert">{error}</p>}
+        {status === 'pending' && (
+          <p className="comment-note" role="status">Thanks — your comment has been sent for review and will appear once approved.</p>
+        )}
       </form>
     </section>
   )

@@ -1,12 +1,27 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/session'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 // #1 AI caption + optimal-crop suggestions. Uses Google Cloud Vision
 // (LABEL_DETECTION + CROP_HINTS) when GOOGLE_CLOUD_VISION_API_KEY is set;
 // otherwise returns a graceful "not configured" response so the UI degrades
 // cleanly. POST { imageUrl } -> { caption, focalPoint, configured }.
+//
+// This calls a paid external API, so it is gated: only an authenticated CMS
+// user may invoke it (it is an editor authoring tool), and each caller is
+// rate-limited, so it can't be looped by an anonymous client to burn quota.
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const user = await getSessionUser(req)
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 })
+  }
+  // 30 caption requests per authoring session per 10 minutes.
+  if (!checkRateLimit(`ai-caption:${user.id}:${getClientIp(req)}`, 30, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many requests. Try again shortly.' }, { status: 429 })
+  }
+
   const key = process.env.GOOGLE_CLOUD_VISION_API_KEY
   let imageUrl = ''
   try {

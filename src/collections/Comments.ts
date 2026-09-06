@@ -53,10 +53,13 @@ export const Comments: CollectionConfig = {
       name: 'status',
       type: 'select',
       options: [
+        // New reader comments land as 'pending' and are invisible to the public
+        // until an editor approves them to 'visible'. 'hidden' un-publishes one.
+        { label: 'Pending review', value: 'pending' },
         { label: 'Visible', value: 'visible' },
         { label: 'Hidden', value: 'hidden' },
       ],
-      defaultValue: 'visible',
+      defaultValue: 'pending',
       required: true,
       index: true,
     },
