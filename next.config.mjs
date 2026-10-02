@@ -9,10 +9,21 @@ import { withPayload } from '@payloadcms/next/withPayload'
 // explicitly: Next.js and some libs spawn blob workers that would otherwise fall
 // back to `default-src 'self'` and be blocked once the policy is enforced.
 //
-// REMAINING HARDENING (separate change): script-src still carries 'unsafe-inline'
-// and 'unsafe-eval'. Removing them requires per-request nonces threaded through
-// the app (middleware nonce + next/script strategy), so it is intentionally left
-// for a dedicated pass rather than bundled here.
+// 'unsafe-eval' is now dropped in PRODUCTION (kept only in dev, where React uses
+// eval for enhanced error overlays — see Next's CSP guide; neither React nor
+// Next use eval in prod, and three/GSAP/wavesurfer/hls don't either).
+// REMAINING HARDENING (separate, staged change): script-src still carries
+// 'unsafe-inline'. Removing it requires per-request nonces threaded through the
+// app (middleware nonce + next/script) AND verification of the Payload admin,
+// so it's intentionally left for a dedicated pass with preview QA.
+const isDev = process.env.NODE_ENV !== 'production'
+const scriptSrc = [
+  "script-src 'self' 'unsafe-inline'",
+  isDev ? "'unsafe-eval'" : '',
+  'https://www.googletagmanager.com https://www.google-analytics.com https://www.youtube.com https://s.ytimg.com',
+]
+  .filter(Boolean)
+  .join(' ')
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -23,7 +34,7 @@ const csp = [
   "media-src 'self' blob: https:",
   "font-src 'self' data: https://fonts.gstatic.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.youtube.com https://s.ytimg.com",
+  scriptSrc,
   "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com",
   "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
 ].join('; ')
