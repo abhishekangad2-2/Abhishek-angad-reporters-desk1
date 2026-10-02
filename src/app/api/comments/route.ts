@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
         // Never auto-publish anonymous input on a public news site.
         status: 'pending',
       },
+      overrideAccess: true, // trusted server path; public REST create is blocked
     })
     // Deliberately do NOT echo the comment back: it isn't public yet, so the
     // client shows a "held for review" acknowledgement rather than rendering it.

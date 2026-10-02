@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     await payload.create({
       collection: 'newsletter-subscribers',
       data: { email, source, status: 'active' },
+      overrideAccess: true, // trusted server path; public REST create is blocked
     })
   } catch (err: any) {
     // A unique-constraint error means they're already subscribed —

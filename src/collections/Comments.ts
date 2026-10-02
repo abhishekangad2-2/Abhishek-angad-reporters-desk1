@@ -14,11 +14,15 @@ export const Comments: CollectionConfig = {
     description: 'Reader comments left on stories.',
   },
   access: {
-    // Editors/admins see everything; the public reads only visible comments,
-    // which the API route enforces with an explicit where-clause anyway.
-    read: () => true,
-    // The public comment endpoint creates via the local API (elevated access).
-    create: () => true,
+    // Staff see everything; the PUBLIC may only read 'visible' comments. This
+    // must be enforced here, not just in the custom /api/comments route —
+    // Payload's REST API (/api/comments/<id>) is public and would otherwise
+    // expose unmoderated 'pending'/'hidden' comments by id.
+    read: ({ req: { user } }) => (user ? true : { status: { equals: 'visible' } }),
+    // Reader comments are created only through the /api/comments route (Local
+    // API, overrideAccess). Block anonymous REST creates so the honeypot +
+    // rate-limit + forced 'pending' status can't be bypassed.
+    create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user && (user.role === 'admin' || user.role === 'editor')),
   },

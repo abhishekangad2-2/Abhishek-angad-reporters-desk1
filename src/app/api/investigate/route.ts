@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
         status: 'new',
         source: typeof source === 'string' ? source.slice(0, 300) : undefined,
       },
+      overrideAccess: true, // trusted server path; public REST create is blocked
     })
   } catch (err: any) {
     payload.logger?.error?.(`[Investigate] create failed: ${err?.message}`)
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
       await payload.create({
         collection: 'newsletter-subscribers',
         data: { email: email.trim(), source: 'investigate-callout', status: 'active' },
+        overrideAccess: true, // trusted server path; public REST create is blocked
       })
     } catch (err: any) {
       // Unique-constraint = already subscribed; anything else we just log.

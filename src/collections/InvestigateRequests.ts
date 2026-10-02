@@ -10,10 +10,10 @@ export const InvestigateRequests: CollectionConfig = {
     description: 'Reader-submitted investigation tips and leads ("Investigate this" callout).',
   },
   access: {
-    // Anyone can submit a tip. Submissions come through the /api/investigate
-    // route (Local API, elevated access), but allowing public create also keeps
-    // the REST endpoint consistent with the Newsletter pattern.
-    create: () => true,
+    // Tips come only through /api/investigate (Local API, overrideAccess) which
+    // rate-limits + honeypots. Block anonymous REST creates so the tips inbox
+    // can't be flooded straight through Payload's public API.
+    create: ({ req: { user } }) => Boolean(user),
     // Tips can contain sensitive source info — reading/triage is staff-only.
     read: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),

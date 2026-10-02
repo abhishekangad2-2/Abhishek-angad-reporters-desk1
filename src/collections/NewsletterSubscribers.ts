@@ -12,8 +12,11 @@ export const NewsletterSubscribers: CollectionConfig = {
   access: {
     // Only authenticated users (editors/admins) can read the list
     read: ({ req: { user } }) => Boolean(user),
-    // Public endpoint (the subscribe route) creates via local API with elevated access
-    create: () => true,
+    // Sign-ups come only through /api/newsletter/subscribe (Local API,
+    // overrideAccess) which rate-limits + validates. Block anonymous REST
+    // creates so the subscriber list can't be flooded with arbitrary emails
+    // (which the newsletter would then broadcast to).
+    create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user && (user.role === 'admin' || user.role === 'editor')),
   },
