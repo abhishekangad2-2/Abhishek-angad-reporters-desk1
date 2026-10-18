@@ -329,6 +329,23 @@ export const Stories: CollectionConfig = {
           /* never block editorial actions on audit log failure */
         }
       },
+      // Single lead: when a story is pinned as the homepage lead, clear the pin
+      // on every other story so there is only ever one lead. Guarded by context
+      // so the cascade can't re-trigger itself.
+      async ({ doc, req, context }) => {
+        if ((doc as any)?.isLead !== true || (context as any)?.skipLeadSync) return
+        try {
+          await req.payload.update({
+            collection: 'stories',
+            where: { and: [{ isLead: { equals: true } }, { id: { not_equals: doc.id } }] },
+            data: { isLead: false },
+            overrideAccess: true,
+            context: { skipLeadSync: true },
+          })
+        } catch {
+          /* non-fatal: a stale extra pin just means newest pinned wins below */
+        }
+      },
     ],
   },
   fields: [
@@ -670,6 +687,22 @@ export const Stories: CollectionConfig = {
       type: 'date',
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'isLead',
+      type: 'checkbox',
+      label: 'Pin as lead story',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Show this story in the homepage hero slot, ahead of newer stories. Pinning one story clears the pin on any other.',
+      },
+      access: {
+        // Only editors/admins decide the homepage lead.
+        update: ({ req: { user } }) =>
+          Boolean(user && (user.role === 'admin' || user.role === 'editor')),
       },
     },
     {
