@@ -53,21 +53,35 @@ export async function getLandingDesign(): Promise<DesignConfig> {
 export async function getLandingData(): Promise<LandingData> {
   try {
     const payload = await getPayload({ config })
-    const [stories, sections, design] = await Promise.all([
+    const [latest, pinned, sections, design] = await Promise.all([
       payload.find({
         collection: 'stories',
         where: { status: { equals: 'published' } },
         sort: '-publishedAt',
         depth: 1,
         // Editorial rule: every landing layout presents exactly the three
-        // latest stories (desk promos backfill only when fewer exist).
-        limit: 3,
+        // latest stories (desk promos backfill only when fewer exist). One
+        // extra so that removing a pinned story still leaves three.
+        limit: 4,
+      }),
+      // An editor-pinned lead overrides recency for the hero slot.
+      payload.find({
+        collection: 'stories',
+        where: { and: [{ status: { equals: 'published' } }, { isLead: { equals: true } }] },
+        sort: '-publishedAt',
+        depth: 1,
+        limit: 1,
       }),
       payload.find({ collection: 'sections', sort: 'name', limit: 50 }),
       getLandingDesign(),
     ])
+    // Lead slot: a pinned story wins; otherwise the most recent (the old rule).
+    const lead = pinned.docs[0]
+    const ordered = lead
+      ? [lead, ...latest.docs.filter((d: any) => d.id !== lead.id)]
+      : latest.docs
     return {
-      stories: stories.docs.map(normalizeStory),
+      stories: ordered.slice(0, 3).map(normalizeStory),
       sections: sections.docs.map((s: any) => ({
         name: s.name,
         slug: s.slug,
