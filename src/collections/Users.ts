@@ -49,6 +49,15 @@ export const Users: CollectionConfig = {
         { label: 'Reporter', value: 'reporter' },
         { label: 'Contributor', value: 'contributor' },
       ],
+      // Only an admin may set or change a role. The collection `update` access
+      // lets a user edit their OWN record (name, etc.); without this field-level
+      // guard any authenticated user could PATCH /api/users/<self> with
+      // {role:'admin'} and escalate to admin. Server-side user creation via the
+      // Local API (overrideAccess) still bypasses this, so seeding admins works.
+      access: {
+        create: ({ req: { user } }) => Boolean(user && (user as { role?: string }).role === 'admin'),
+        update: ({ req: { user } }) => Boolean(user && (user as { role?: string }).role === 'admin'),
+      },
     },
     {
       name: 'firstName',
@@ -104,6 +113,14 @@ export const Users: CollectionConfig = {
       name: 'twoFactorEnabled',
       type: 'checkbox',
       defaultValue: false,
+      // Only ever flipped by the server-side 2FA flow (api/auth/*, Local API
+      // with overrideAccess, which bypasses this). Block it over the REST/
+      // GraphQL surface so a user can't self-toggle their own 2FA state — e.g.
+      // mark twoFactorEnabled:true without actually enrolling, or clear it.
+      access: {
+        create: () => false,
+        update: () => false,
+      },
       admin: {
         hidden: true,
       },
